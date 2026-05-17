@@ -193,22 +193,10 @@ let rowsHTML = rows.map { row in
     return "          <tr>\n            \(cells)\n          </tr>"
 }.joined(separator: "\n")
 
-let patternsHTML: String
-if patterns.isEmpty {
-    patternsHTML = ""
-} else {
-    let items = patterns.map { "          <li>\(renderInline($0.body))</li>" }.joined(separator: "\n")
-    patternsHTML = """
-        <h2>Patterns worth flagging</h2>
-        <p>
-          A few of the reports show patterns that the planned cable trust signals
-          feature should pick up:
-        </p>
-        <ol class="patterns">
-    \(items)
-        </ol>
-    """
-}
+// The cables page now hardcodes its prose/patterns sections (see the
+// template below), so the parsed `## Patterns` list is no longer
+// rendered into the page. It is still parsed and reported in the final
+// summary line for sanity.
 
 // The JavaScript in this page uses innerHTML to render the table from
 // cables.json. All dynamic values pass through esc() (which sets textContent
@@ -223,24 +211,25 @@ let html = """
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>WhatCable: Cable database</title>
+    <title>USB-C Cable Database: E-Marker Fingerprints | WhatCable</title>
     <meta
       name="description"
-      content="A growing public database of USB-C cable e-marker fingerprints reported via WhatCable, the macOS menu bar app for cable diagnostics."
+      content="A growing database of USB-C cables with real e-marker fingerprints reported by WhatCable users. Search by brand, vendor, speed, or VID to identify what your cable actually is."
     >
     <link rel="icon" href="icon.png" type="image/png">
     <link rel="apple-touch-icon" href="icon.png">
+    <link rel="canonical" href="https://www.whatcable.uk/cables">
 
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://whatcable.uk/cables">
+    <meta property="og:url" content="https://www.whatcable.uk/cables">
     <meta property="og:title" content="WhatCable: Cable database">
-    <meta property="og:description" content="A growing public database of USB-C cable e-marker fingerprints reported via WhatCable, the macOS menu bar app for cable diagnostics.">
-    <meta property="og:image" content="https://whatcable.uk/screenshot.webp">
+    <meta property="og:description" content="A growing database of USB-C cables with real e-marker fingerprints reported by WhatCable users. Search by brand, vendor, speed, or VID to identify what your cable actually is.">
+    <meta property="og:image" content="https://www.whatcable.uk/screenshot.png">
 
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="WhatCable: Cable database">
     <meta name="twitter:description" content="A growing public database of USB-C cable e-marker fingerprints reported via WhatCable.">
-    <meta name="twitter:image" content="https://whatcable.uk/screenshot.webp">
+    <meta name="twitter:image" content="https://www.whatcable.uk/screenshot.png">
 
     <script type="application/ld+json">
     {
@@ -248,11 +237,11 @@ let html = """
       "@type": "Dataset",
       "name": "WhatCable cable fingerprint database",
       "description": "Crowd-sourced USB-C cable e-marker fingerprints reported via WhatCable.",
-      "url": "https://whatcable.uk/cables",
+      "url": "https://www.whatcable.uk/cables",
       "isPartOf": {
         "@type": "WebSite",
         "name": "WhatCable",
-        "url": "https://whatcable.uk"
+        "url": "https://www.whatcable.uk"
       }
     }
     </script>
@@ -295,14 +284,20 @@ let html = """
       }
 
       .nav {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: rgba(250, 251, 252, 0.85);
+        backdrop-filter: saturate(180%) blur(12px);
         border-bottom: 1px solid var(--line);
-        background: var(--panel);
       }
       .nav-inner {
+        width: min(1120px, calc(100% - 40px));
         height: 64px;
         display: flex;
         align-items: center;
-        gap: 16px;
+        justify-content: space-between;
+        gap: 24px;
       }
       .brand {
         display: inline-flex;
@@ -322,15 +317,19 @@ let html = """
         box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12);
       }
       .nav-links {
-        margin-left: auto;
         display: flex;
         align-items: center;
-        gap: 20px;
+        gap: 28px;
         font-size: 14px;
         color: var(--ink-soft);
       }
       .nav-links a { color: inherit; text-decoration: none; }
       .nav-links a:hover { color: var(--ink); }
+      .nav .button { padding: 8px 14px; min-height: 36px; font-size: 14px; text-decoration: none; display: inline-flex; align-items: center; border-radius: 8px; font-weight: 600; line-height: 1; }
+      .nav .button.secondary { background: #fff; color: var(--ink); border: 1px solid var(--line); }
+      .nav .button.secondary:hover { border-color: #c8d0db; }
+      .nav .button.accent { background: var(--accent); color: #fff; border-color: var(--accent); }
+      .nav .button.accent:hover { background: #0a7188; }
 
       main { padding: 48px 0 80px; }
       h1 {
@@ -456,41 +455,90 @@ let html = """
       .cta strong { color: var(--ink); }
 
       footer {
-        border-top: 1px solid var(--line);
-        padding: 24px 0;
-        color: var(--muted);
-        font-size: 13px;
+        padding: 32px 0;
+        background: #0c1219;
+        color: rgba(255, 255, 255, 0.55);
+        font-size: 13.5px;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      footer .wrap {
+        width: min(1120px, calc(100% - 40px));
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+      footer a { color: rgba(255, 255, 255, 0.85); }
+      footer a:hover { color: #fff; }
+      @media (max-width: 600px) {
+        .nav-links a:not(.button) { display: none; }
+        .nav-links { gap: 12px; }
+        .nav .button { padding: 8px 12px; font-size: 13px; }
+        h1 { font-size: 28px; }
+        .search-input { font-size: 16px; }
+        table { font-size: 13px; }
+        table th, table td { padding: 10px 12px; }
+        footer .wrap { flex-direction: column; align-items: flex-start; }
       }
     </style>
   </head>
   <body>
-    <header class="nav">
+    <nav class="nav" aria-label="Primary">
       <div class="wrap nav-inner">
         <a class="brand" href="/">
           <img class="mark" src="icon.png" alt="" aria-hidden="true" width="28" height="28">
           <span>WhatCable</span>
         </a>
-        <nav class="nav-links">
+        <div class="nav-links">
           <a href="/instructions">Docs</a>
           <a href="/cli">CLI</a>
           <a href="/cables">Cables</a>
-          <a href="https://github.com/darrylmorley/whatcable">GitHub</a>
-        </nav>
+          <a class="button secondary" href="https://github.com/darrylmorley/whatcable">GitHub</a>
+          <a class="button accent" href="/pro">Get Pro</a>
+        </div>
       </div>
-    </header>
+    </nav>
 
     <main>
       <div class="wrap wide">
-        <h1>Cable database</h1>
-        <p class="subtitle">USB-C cable e-marker fingerprints reported via WhatCable. Last updated \(today).</p>
+        <h1>USB-C Cable Database</h1>
+        <p class="subtitle">Last updated \(today).</p>
 
         <p>
-          A growing list of real-world USB-C cables, indexed by the identity
-          their e-marker reports over USB-PD Discover Identity. Vendor names
-          come from the bundled USB-IF list. Anyone running WhatCable can add
-          a cable here through the in-app "Report this cable" button, which
-          opens a pre-filled GitHub issue.
+          Every USB-C cable with an e-marker chip reports an identity when you
+          plug it in: vendor ID, speed rating, power limit, cable type. This
+          database records what cables actually report, not what the marketing
+          claims.
         </p>
+
+        <h2>What this is for</h2>
+        <ul>
+          <li><strong>Verify a cable before you buy.</strong> Search by brand or vendor to see what cables from that manufacturer actually report.</li>
+          <li><strong>Identify a mystery cable.</strong> Got a cable with no markings? Search by VID or speed to find a match.</li>
+          <li><strong>Spot suspicious patterns.</strong> Zeroed VIDs, missing XIDs, and speed claims that don't match the e-marker are all red flags.</li>
+          <li><strong>Compare what you have.</strong> See how your cable stacks up against others in its class.</li>
+        </ul>
+
+        <h2>Patterns we're seeing</h2>
+        <p>
+          A few reports show patterns that are worth knowing about:
+        </p>
+        <ol class="patterns">
+          <li><strong>Marketing outpaces the e-marker.</strong> #49 (Dbilida) is sold as "Thunderbolt 4 / 40 Gbps / 240 W" but reports passive USB4 Gen 3 with no USB-IF cert. The cable may carry the advertised rate, but nothing in the e-marker backs that claim.</li>
+          <li><strong>Unregistered VID, no XID.</strong> #71 (UGOURD, AliExpress) reports 80 Gbps USB4 Gen 4 from an unregistered vendor with zero XID. Plausibly real silicon, but unverifiable from the identity alone.</li>
+          <li><strong>Zeroed identity fields.</strong> #61 (CUKTECH No.6) has a present e-marker that reports <code>0x0000</code> for VID, PID, and no speed. This pattern usually means the e-marker was programmed with blank defaults.</li>
+        </ol>
+
+        <h2>How to read this table</h2>
+        <ul>
+          <li><strong>VID / PID</strong> - Vendor ID and Product ID. Assigned by USB-IF. A zeroed VID (<code>0x0000</code>) means the cable didn't identify its manufacturer.</li>
+          <li><strong>Cable VDO</strong> - Cable Vendor Defined Object. A bitfield encoding the cable's speed, current rating, and construction type.</li>
+          <li><strong>Vendor (USB-IF)</strong> - The registered name for that VID. "Unregistered" means the VID isn't in the USB-IF database.</li>
+          <li><strong>XID</strong> - A secondary identifier some vendors use. "none" means the cable didn't report one.</li>
+          <li><strong>Speed</strong> - The maximum data rate the e-marker advertises.</li>
+          <li><strong>Power</strong> - Maximum current and voltage the cable claims to support.</li>
+          <li><strong>Source</strong> - Link to the GitHub issue where this cable was reported.</li>
+        </ul>
 
         <div class="search-bar" id="search-bar" hidden>
           <input type="text" id="search" placeholder="Search cables by brand, vendor, speed, VID..." autocomplete="off">
@@ -514,21 +562,44 @@ let html = """
           </div>
         </noscript>
 
-    \(patternsHTML)
-
-        <div class="cta">
-          <strong>Got a USB-C cable that should be on this list?</strong>
-          Run WhatCable, open the popover, and click "Report this cable".
+        <h2>Add your cable</h2>
+        <p>Every report makes the database more useful. Here's how:</p>
+        <ol class="patterns">
+          <li><strong>Install WhatCable</strong> (free, open source). Download from <a href="/">the homepage</a> or via Homebrew.</li>
+          <li><strong>Plug in a cable</strong> and open the menu bar popover.</li>
+          <li><strong>Click "Report this cable".</strong> WhatCable opens a pre-filled GitHub issue with the e-marker fields. Review it and submit.</li>
+        </ol>
+        <p>
           Reports land at
-          <a href="https://github.com/darrylmorley/whatcable/issues?q=label%3Acable-report">
-          the cable-report tracker</a>.
+          <a href="https://github.com/darrylmorley/whatcable/issues?q=label%3Acable-report">the cable-report tracker</a>.
+          Once triaged, they appear here within a day or two.
+        </p>
+
+        <div class="cta" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+          <a href="/" style="display: inline-flex; align-items: center; padding: 10px 18px; background: var(--accent); color: #fff; border-radius: 8px; font-weight: 600; font-size: 14px; text-decoration: none;">Download WhatCable</a>
+          <a href="https://github.com/darrylmorley/whatcable/issues?q=label%3Acable-report" style="display: inline-flex; align-items: center; padding: 10px 18px; background: #fff; color: var(--ink); border: 1px solid var(--line); border-radius: 8px; font-weight: 600; font-size: 14px; text-decoration: none;">Browse all reports on GitHub</a>
         </div>
       </div>
     </main>
 
     <footer>
       <div class="wrap">
-        <p>WhatCable. Built by <a href="https://github.com/darrylmorley">Darryl Morley</a>.</p>
+        <span>Built by <a href="https://github.com/darrylmorley">Darryl Morley</a>. MIT licensed.</span>
+        <span>
+          <a href="/instructions">Docs</a>
+          &nbsp;·&nbsp;
+          <a href="/cli">CLI</a>
+          &nbsp;·&nbsp;
+          <a href="/cables">Cables</a>
+          &nbsp;·&nbsp;
+          <a href="/pro">Pro</a>
+          &nbsp;·&nbsp;
+          <a href="/support">Support</a>
+          &nbsp;·&nbsp;
+          <a href="/privacy">Privacy</a>
+          &nbsp;·&nbsp;
+          <a href="https://github.com/darrylmorley/whatcable">View source on GitHub</a>
+        </span>
       </div>
     </footer>
 
