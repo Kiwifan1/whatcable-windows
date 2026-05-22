@@ -325,10 +325,10 @@
 "This cable has no e-marker and no controller data, so we can't tell whether it is the limit." = "這條線材沒有 e-marker，也沒有控制器資料，因此無法判斷它是否為限制因素。";
 "Running slower than expected (%@)" = "運作速度低於預期（%@）";
 "The parts we can see all support %@ or more, but the link came up slower. Reseating the cable or trying another port may help." = "目前可見的部分都支援 %@ 或更高速度，但連線建立時速度較低。重新插拔線材或嘗試其他連接埠可能會有幫助。";
-"Running at full data speed (%@)" = "正在以完整資料速度運作（%@）";
-"Nothing is being held back: the parts we can see all support this speed." = "沒有任何限制：目前可見的部分都支援此速度。";
+"Running at full data speed (%@)" = "正在以最高資料速度運作（%@）";
+"Nothing is being held back: the parts we can see all support this speed." = "沒有任何限制：目前偵測到的裝置都支援此速度。";
 "Cable is limiting data speed" = "線材限制了資料速度";
-"The Mac and device can do %@, but the cable only carries %@. A faster cable would unlock full speed." = "Mac 和裝置都能達到 %@，但線材只能承載 %@。使用更快的線材即可解鎖完整速度。";
+"The Mac and device can do %@, but the cable only carries %@. A faster cable would unlock full speed." = "Mac 和裝置都能達到 %@，但線材只能承載 %@。使用更快的線材即可解鎖最高速度。";
 "This Mac port limits data speed" = "這個 Mac 連接埠限制了資料速度";
 "The cable and device can do %@, but this port maxes out at %@." = "線材和裝置都能達到 %@，但此連接埠最高只有 %@。";
 "Device runs at %@" = "裝置以 %@ 運作";
@@ -355,12 +355,12 @@
 
 
 /* Pro overview screen + footer pill (Pro funnel). Parity placeholders in English; refine in the community translation flow. */
-"Cable Diagnostics" = "Cable Diagnostics";
-"Deep per-port pin maps, plug orientation, and protocol detail." = "Deep per-port pin maps, plug orientation, and protocol detail.";
-"Licence Key" = "Licence Key";
-"Live MagSafe pin layout for charging and diagnostics." = "Live MagSafe pin layout for charging and diagnostics.";
-"Live multi-port power graphs and event history." = "Live multi-port power graphs and event history.";
-"MagSafe pin diagrams" = "MagSafe pin diagrams";
-"Manage Licence…" = "Manage Licence…";
-"See exactly what each link can do, and where the bottleneck is." = "See exactly what each link can do, and where the bottleneck is.";
-"Unlock deep diagnostics, live power graphs, and per-port history. One-off licence, no subscription." = "Unlock deep diagnostics, live power graphs, and per-port history. One-off licence, no subscription.";
+"Cable Diagnostics" = "線材診斷";
+"Deep per-port pin maps, plug orientation, and protocol detail." = "深入查看各連接埠的針腳配置、插頭方向與協定詳細資訊。";
+"Licence Key" = "授權金鑰";
+"Live MagSafe pin layout for charging and diagnostics." = "即時顯示用於充電與診斷的 MagSafe 針腳配置。";
+"Live multi-port power graphs and event history." = "即時多連接埠功率圖表與事件記錄。";
+"MagSafe pin diagrams" = "MagSafe 針腳圖";
+"Manage Licence…" = "管理授權…";
+"See exactly what each link can do, and where the bottleneck is." = "精確查看每個連線能做什麼，以及瓶頸在哪裡。";
+"Unlock deep diagnostics, live power graphs, and per-port history. One-off licence, no subscription." = "解鎖進階診斷、即時功率圖表與各連接埠歷史記錄。一次授權，無需訂閱。";
