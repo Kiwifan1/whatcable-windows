@@ -108,41 +108,45 @@ public final class DisplayPortTransportWatcher: ObservableObject {
     }
 
     private func makeUpdate(from service: io_service_t) -> DisplayPortUpdate? {
-        var props: Unmanaged<CFMutableDictionary>?
-        guard IORegistryEntryCreateCFProperties(service, &props, kCFAllocatorDefault, 0) == KERN_SUCCESS,
-              let dict = props?.takeRetainedValue() as? [String: Any] else {
-            return nil
+        // Read keys individually rather than fetching the full property
+        // dictionary. The bulk fetch (IORegistryEntryCreateCFProperties)
+        // can abort the process from inside IOCFUnserializeBinary when
+        // the kernel returns a malformed serialised properties blob,
+        // typically when the service is being torn down mid-read. The
+        // per-key call has no such failure path. See issue #181.
+        func read(_ key: String) -> Any? {
+            IORegistryEntryCreateCFProperty(service, key as CFString, kCFAllocatorDefault, 0)?.takeRetainedValue()
         }
 
         let link = DisplayPortLink(
-            active: wcBool(dict["Active"]),
-            laneCount: wcInt(dict["LaneCount"]),
-            maxLaneCount: wcInt(dict["MaxLaneCount"]),
-            linkRate: wcInt(dict["LinkRate"]),
-            linkRateDescription: dict["LinkRateDescription"] as? String,
-            tunneled: wcBool(dict["Tunneled"]),
-            hpdState: wcInt(dict["HPD_State"]),
-            hpdStateDescription: dict["HPD_StateDescription"] as? String
+            active: wcBool(read("Active")),
+            laneCount: wcInt(read("LaneCount")),
+            maxLaneCount: wcInt(read("MaxLaneCount")),
+            linkRate: wcInt(read("LinkRate")),
+            linkRateDescription: read("LinkRateDescription") as? String,
+            tunneled: wcBool(read("Tunneled")),
+            hpdState: wcInt(read("HPD_State")),
+            hpdStateDescription: read("HPD_StateDescription") as? String
         )
 
-        let metadata = dict["Metadata"] as? [String: Any]
+        let metadata = read("Metadata") as? [String: Any]
         let monitor = MonitorInfo(
-            manufacturerName: (dict["ManufacturerName"] as? String)
+            manufacturerName: (read("ManufacturerName") as? String)
                 ?? (metadata?["ManufacturerName"] as? String),
-            productName: (dict["ProductName"] as? String)
+            productName: (read("ProductName") as? String)
                 ?? (metadata?["ProductName"] as? String),
-            productId: dict["ProductID"].map(wcInt)
+            productId: read("ProductID").map(wcInt)
                 ?? metadata?["ProductID"].map(wcInt),
-            serialNumber: dict["SerialNumber"].map(wcInt)
+            serialNumber: read("SerialNumber").map(wcInt)
                 ?? metadata?["SerialNumber"].map(wcInt),
-            yearOfManufacture: dict["YearOfManufacture"].map(wcInt)
+            yearOfManufacture: read("YearOfManufacture").map(wcInt)
                 ?? metadata?["Year of Manufacture"].map(wcInt),
             weekOfManufacture: metadata?["Week of Manufacture"].map(wcInt),
-            edid: wcData(dict["EDID"]) ?? wcData(metadata?["EDID"])
+            edid: wcData(read("EDID")) ?? wcData(metadata?["EDID"])
         )
 
         let freqs: [Int]
-        if let arr = dict["NominalSignalingFrequenciesHz"] as? [Any] {
+        if let arr = read("NominalSignalingFrequenciesHz") as? [Any] {
             freqs = arr.map { wcInt($0) }
         } else {
             freqs = []
@@ -151,44 +155,44 @@ public final class DisplayPortTransportWatcher: ObservableObject {
         let status = IOPortTransportStateDisplayPort(
             link: link,
             monitor: monitor,
-            dfpType: (dict["DFP Type Description"] as? String)
+            dfpType: (read("DFP Type Description") as? String)
                 ?? (metadata?["DFP Type Description"] as? String)
-                ?? dict["DFP Type"].map { String(wcInt($0)) },
-            branchDeviceId: (dict["BranchDeviceID"] as? String)
+                ?? read("DFP Type").map { String(wcInt($0)) },
+            branchDeviceId: (read("BranchDeviceID") as? String)
                 ?? (metadata?["BranchDeviceID"] as? String),
-            branchDeviceOUI: wcData(dict["BranchDeviceOUI"])
+            branchDeviceOUI: wcData(read("BranchDeviceOUI"))
                 ?? wcData(metadata?["BranchDeviceOUI"]),
-            sinkCount: wcInt(dict["SinkCount"]),
-            role: wcInt(dict["Role"]),
-            roleDescription: dict["RoleDescription"] as? String,
-            driverStatus: wcInt(dict["DriverStatus"]),
-            driverStatusDescription: dict["DriverStatusDescription"] as? String,
-            transportType: wcInt(dict["TransportType"]),
-            transportTypeDescription: dict["TransportTypeDescription"] as? String,
-            transportDescription: dict["TransportDescription"] as? String,
-            authorizationRequired: wcBool(dict["AuthorizationRequired"]),
-            authorizationStatus: wcInt(dict["AuthorizationStatus"]),
-            authorizationStatusDescription: dict["AuthorizationStatusDescription"] as? String,
-            authenticationRequired: wcBool(dict["AuthenticationRequired"]),
-            authenticationStatus: wcInt(dict["AuthenticationStatus"]),
-            authenticationStatusDescription: dict["AuthenticationStatusDescription"] as? String,
-            hashStatus: wcInt(dict["HashStatus"]),
-            hashStatusDescription: dict["HashStatusDescription"] as? String,
-            trmTransportSupervised: wcBool(dict["TRM_TransportSupervised"]),
-            parentPortType: wcInt(dict["ParentPortType"]),
-            parentPortTypeDescription: dict["ParentPortTypeDescription"] as? String,
-            parentPortNumber: wcInt(dict["ParentPortNumber"]),
-            parentPortBuiltIn: wcBool(dict["ParentPortBuiltIn"]),
-            parentBuiltInPortType: wcInt(dict["ParentBuiltInPortType"]),
-            parentBuiltInPortTypeDescription: dict["ParentBuiltInPortTypeDescription"] as? String,
-            parentBuiltInPortNumber: wcInt(dict["ParentBuiltInPortNumber"]),
-            edidChanged: wcBool(dict["EDIDChanged"]),
+            sinkCount: wcInt(read("SinkCount")),
+            role: wcInt(read("Role")),
+            roleDescription: read("RoleDescription") as? String,
+            driverStatus: wcInt(read("DriverStatus")),
+            driverStatusDescription: read("DriverStatusDescription") as? String,
+            transportType: wcInt(read("TransportType")),
+            transportTypeDescription: read("TransportTypeDescription") as? String,
+            transportDescription: read("TransportDescription") as? String,
+            authorizationRequired: wcBool(read("AuthorizationRequired")),
+            authorizationStatus: wcInt(read("AuthorizationStatus")),
+            authorizationStatusDescription: read("AuthorizationStatusDescription") as? String,
+            authenticationRequired: wcBool(read("AuthenticationRequired")),
+            authenticationStatus: wcInt(read("AuthenticationStatus")),
+            authenticationStatusDescription: read("AuthenticationStatusDescription") as? String,
+            hashStatus: wcInt(read("HashStatus")),
+            hashStatusDescription: read("HashStatusDescription") as? String,
+            trmTransportSupervised: wcBool(read("TRM_TransportSupervised")),
+            parentPortType: wcInt(read("ParentPortType")),
+            parentPortTypeDescription: read("ParentPortTypeDescription") as? String,
+            parentPortNumber: wcInt(read("ParentPortNumber")),
+            parentPortBuiltIn: wcBool(read("ParentPortBuiltIn")),
+            parentBuiltInPortType: wcInt(read("ParentBuiltInPortType")),
+            parentBuiltInPortTypeDescription: read("ParentBuiltInPortTypeDescription") as? String,
+            parentBuiltInPortNumber: wcInt(read("ParentBuiltInPortNumber")),
+            edidChanged: wcBool(read("EDIDChanged")),
             nominalSignalingFrequenciesHz: freqs,
-            index: wcInt(dict["Index"])
+            index: wcInt(read("Index"))
         )
         return DisplayPortUpdate(
-            portIndex: wcPortIndex(from: dict, service: service),
-            portType: wcPortType(from: dict, service: service),
+            portIndex: wcPortIndex(read: read, service: service),
+            portType: wcPortType(read: read, service: service),
             status: status
         )
     }
