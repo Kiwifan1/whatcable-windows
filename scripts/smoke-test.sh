@@ -286,6 +286,26 @@ cp "${HELPERS_DIR}/${CLI_BIN_NAME}" "${CLI_STAGING_DIR}/${CLI_BIN_NAME}"
 if [[ -d "${RESOURCES_DIR}/${SPM_BUNDLE_NAME}" ]]; then
     cp -R "${RESOURCES_DIR}/${SPM_BUNDLE_NAME}" "${CLI_STAGING_DIR}/${SPM_BUNDLE_NAME}"
 fi
+
+# AppInfo.version walks up from the binary looking for Info.plist. Inside
+# the .app it finds Contents/Info.plist. For the standalone CLI we drop a
+# minimal Info.plist alongside the binary so the walk-up finds it on the
+# first iteration, instead of falling back to "dev".
+cat > "${CLI_STAGING_DIR}/Info.plist" <<PLIST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleShortVersionString</key>
+    <string>${VERSION}</string>
+    <key>CFBundleVersion</key>
+    <string>${BUILD_NUMBER}</string>
+    <key>CFBundleIdentifier</key>
+    <string>${BUNDLE_ID}.cli</string>
+</dict>
+</plist>
+PLIST
+
 find "${CLI_STAGING_DIR}" -name "._*" -delete 2>/dev/null || true
 find "${CLI_STAGING_DIR}" -name ".DS_Store" -delete 2>/dev/null || true
 

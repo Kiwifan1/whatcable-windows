@@ -86,7 +86,12 @@ else
     SED_INPLACE=(sed -i '')
 fi
 
-"${SED_INPLACE[@]}" -E "s/^  version \".*\"/  version \"${VERSION}\"/" "${FORMULA_FILE}"
+# The formula has no explicit `version` field; Homebrew parses the version
+# from the URL automatically. We rewrite both occurrences of the version
+# in the URL (v<ver>/whatcable-cli-<ver>.zip) in a single substitution.
+"${SED_INPLACE[@]}" -E \
+    "s|/download/v[0-9]+\.[0-9]+\.[0-9]+/whatcable-cli-[0-9]+\.[0-9]+\.[0-9]+\.zip|/download/v${VERSION}/whatcable-cli-${VERSION}.zip|" \
+    "${FORMULA_FILE}"
 "${SED_INPLACE[@]}" -E "s/^  sha256 \".*\"/  sha256 \"${NEW_SHA}\"/" "${FORMULA_FILE}"
 
 cd "${TAP_DIR}"
