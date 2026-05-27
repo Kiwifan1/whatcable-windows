@@ -310,6 +310,7 @@
 "Enter Licence Key…" = "Lizenzschlüssel eingeben…";
 "Negotiated PD contract maximum. Live draw is shown in the System Power Input chart below." = "Maximum des ausgehandelten PD-Vertrags. Der Live-Verbrauch wird unten im Diagramm \"Systemleistungseingang\" angezeigt.";
 "No power data for this port right now." = "Derzeit keine Stromdaten für diesen Anschluss.";
+"Waiting for power telemetry from macOS..." = "Warte auf Stromtelemetrie von macOS...";
 "Upgrade to WhatCable Pro" = "Auf WhatCable Pro upgraden";
 "not reported in this state" = "wird in diesem Zustand nicht gemeldet";
 
