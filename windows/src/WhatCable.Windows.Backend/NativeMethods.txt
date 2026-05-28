@@ -1,3 +1,40 @@
-# CsWin32 native API surface for the Windows backend.
-# Populated as adapters are added in PR 4 onwards.
+// CsWin32 native API surface for the Windows backend.
+// PR 4: USB topology (SetupAPI + hub IOCTLs) and system power.
+
+// --- System power (PowerAdapter) ---
 GetSystemPowerStatus
+CallNtPowerInformation
+SYSTEM_BATTERY_STATE
+
+// --- Device interface enumeration (SetupAPI) ---
+SetupDiGetClassDevs
+SetupDiEnumDeviceInterfaces
+SetupDiGetDeviceInterfaceDetail
+SetupDiDestroyDeviceInfoList
+
+// --- Device / hub I/O (kernel32) ---
+CreateFile
+DeviceIoControl
+CloseHandle
+
+// --- USB host controller / hub interface GUIDs ---
+GUID_DEVINTERFACE_USB_HOST_CONTROLLER
+GUID_DEVINTERFACE_USB_HUB
+
+// --- USB hub / node IOCTLs ---
+IOCTL_USB_GET_ROOT_HUB_NAME
+IOCTL_USB_GET_NODE_INFORMATION
+IOCTL_USB_GET_NODE_CONNECTION_INFORMATION_EX
+IOCTL_USB_GET_NODE_CONNECTION_INFORMATION_EX_V2
+IOCTL_USB_GET_NODE_CONNECTION_NAME
+IOCTL_USB_GET_DESCRIPTOR_FROM_NODE_CONNECTION
+
+// --- USB structures ---
+USB_ROOT_HUB_NAME
+USB_NODE_INFORMATION
+USB_NODE_CONNECTION_INFORMATION_EX
+USB_NODE_CONNECTION_INFORMATION_EX_V2
+USB_NODE_CONNECTION_NAME
+USB_DESCRIPTOR_REQUEST
+USB_STRING_DESCRIPTOR
+USB_DEVICE_DESCRIPTOR
