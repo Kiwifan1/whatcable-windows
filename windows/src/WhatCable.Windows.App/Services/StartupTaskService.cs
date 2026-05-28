@@ -16,6 +16,9 @@ public sealed class StartupTaskService : IStartupTaskService
     private const string RunKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Run";
     private const string RunValueName = "WhatCable";
 
+    /// <summary>Win32 <c>APPMODEL_ERROR_NO_PACKAGE</c>: returned when the process has no package identity.</summary>
+    private const int AppModelErrorNoPackage = 15700;
+
     private readonly bool _packaged;
     private StartupTask? _task;
 
@@ -107,10 +110,10 @@ public sealed class StartupTaskService : IStartupTaskService
 
     private static bool HasPackageIdentity()
     {
-        // GetCurrentPackageFullName returns APPMODEL_ERROR_NO_PACKAGE (15700) when unpackaged.
+        // GetCurrentPackageFullName returns APPMODEL_ERROR_NO_PACKAGE when unpackaged.
         int length = 0;
         var result = GetCurrentPackageFullName(ref length, null);
-        return result != 15700;
+        return result != AppModelErrorNoPackage;
     }
 
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
