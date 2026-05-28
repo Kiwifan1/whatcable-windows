@@ -108,6 +108,7 @@ internal sealed class QueryDisplayConfigDisplayEnumerator : IDisplayEnumerator
             }
         }
 
+        // Fall back to source mode if target mode is unavailable or invalid.
         uint sourceIdx = path.sourceInfo.Anonymous.modeInfoIdx;
         if (sourceIdx >= modes.Length || modes[sourceIdx].infoType != DISPLAYCONFIG_MODE_INFO_TYPE.DISPLAYCONFIG_MODE_INFO_TYPE_SOURCE)
         {

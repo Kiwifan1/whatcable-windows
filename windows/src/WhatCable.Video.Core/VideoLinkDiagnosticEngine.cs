@@ -152,7 +152,7 @@ public static class VideoLinkDiagnostic
                 else
                 {
                     bottleneck = VideoBottleneck.Unknown;
-                    details.Add($"Sink advertises {FormatMode(sinkMaxMode)}; active mode is {FormatMode(activeMode)} — cable or source limited.");
+                    details.Add($"Sink advertises {FormatMode(sinkMaxMode)}; active mode is {FormatMode(activeMode)} -- cable or source limited.");
                     recommendedCableClass = RecommendCableForMode(sinkMaxMode, snapshot.ConnectorType);
                     return BuildDiagnostic(bottleneck, details, recommendedCableClass,
                         "⚠ Cable or source is limiting the video link. The display advertises a higher mode than is active.");
