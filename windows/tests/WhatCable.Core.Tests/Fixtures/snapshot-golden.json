@@ -1,63 +1,147 @@
 {
-  "version": "0.26.0",
-  "isDesktopMac": false,
   "adapter": {
-    "watts": 140,
-    "source": "AC",
-    "voltageMV": 20000,
     "currentMA": 5000,
     "description": "pd charger",
+    "isWireless": false,
     "powerTier": 2,
-    "isWireless": false
+    "source": "AC",
+    "voltageMV": 20000,
+    "watts": 140
   },
+  "isDesktopMac": false,
   "ports": [
     {
-      "name": "Port-USB-C@1",
-      "type": "USB-C",
-      "className": "AppleHPMInterfaceType10",
-      "connectionActive": true,
-      "pdCapable": true,
-      "status": "connected",
-      "headline": "USB4 cable connected",
-      "subtitle": "40 Gbps",
       "bullets": [
         "USB4 Gen 3",
         "5A"
       ],
-      "powerSources": [
-        {
-          "name": "USB-PD",
-          "maxPowerW": 100,
-          "options": [
-            {
-              "kind": "Fixed",
-              "raw": 102700,
-              "minVoltageMv": 5000,
-              "maxVoltageMv": 5000,
-              "maxCurrentMa": 3000
-            }
-          ],
-          "negotiated": {
-            "kind": "Fixed",
-            "raw": 102700,
-            "minVoltageMv": 5000,
-            "maxVoltageMv": 5000,
-            "maxCurrentMa": 3000
-          }
-        }
-      ],
       "cable": {
-        "endpoint": "SOP'",
-        "vendorID": 438,
-        "vendorName": "CalDigit, Inc.",
         "curatedBrand": "CalDigit TS5 Plus bundled cable",
-        "speed": "USB4 Gen 3 (40 Gbps)",
         "currentRating": "5 A",
+        "endpoint": "SOP'",
         "maxVolts": 20,
         "maxWatts": 100,
-        "type": "passive"
-      }
+        "speed": "USB4 Gen 3 (40 Gbps)",
+        "type": "passive",
+        "vendorID": 438,
+        "vendorName": "CalDigit, Inc."
+      },
+      "charging": {
+        "bottleneck": "fine",
+        "detail": "Negotiated 20V at 3A.",
+        "isWarning": false,
+        "summary": "Charging well"
+      },
+      "cio": {
+        "asymmetricModeSupported": false,
+        "cableGeneration": 3,
+        "cableSpeed": 3,
+        "generation": 4,
+        "legacyAdapter": false,
+        "linkTrainingMode": 1
+      },
+      "className": "AppleHPMInterfaceType10",
+      "connectionActive": true,
+      "dataLink": {
+        "bottleneck": "fine",
+        "cableSignalConflict": false,
+        "detail": "Cable and host both support 40 Gbps.",
+        "isWarning": false,
+        "summary": "USB4 link active"
+      },
+      "device": {
+        "children": [
+          {
+            "children": [],
+            "locationID": "0x00110000",
+            "name": "SSD",
+            "productID": 1,
+            "speed": "USB 3.2 Gen 2 (10 Gbps)",
+            "vendorID": 57005,
+            "vendorName": "Test Vendor"
+          }
+        ],
+        "locationID": "0x00100000",
+        "name": "Dock",
+        "productID": 4660,
+        "speed": "USB 3.2 Gen 2 (10 Gbps)",
+        "vendorID": 1452,
+        "vendorName": "Apple Inc."
+      },
+      "devices": [
+        {
+          "children": [],
+          "locationID": "0x00100000",
+          "name": "Dock",
+          "productID": 4660,
+          "speed": "USB 3.2 Gen 2 (10 Gbps)",
+          "vendorID": 1452,
+          "vendorName": "Apple Inc."
+        }
+      ],
+      "headline": "USB4 cable connected",
+      "name": "Port-USB-C@1",
+      "pdCapable": true,
+      "powerSources": [
+        {
+          "maxPowerW": 100,
+          "name": "USB-PD",
+          "negotiated": {
+            "dualRolePower": false,
+            "kind": "Fixed",
+            "maxCurrentMa": 3000,
+            "maxVoltageMv": 5000,
+            "minVoltageMv": 5000,
+            "peakCurrent": 100,
+            "raw": 102700,
+            "unconstrainedPower": false,
+            "usbSuspendSupported": false
+          },
+          "options": [
+            {
+              "dualRolePower": false,
+              "kind": "Fixed",
+              "maxCurrentMa": 3000,
+              "maxVoltageMv": 5000,
+              "minVoltageMv": 5000,
+              "peakCurrent": 100,
+              "raw": 102700,
+              "unconstrainedPower": false,
+              "usbSuspendSupported": false
+            }
+          ]
+        }
+      ],
+      "rawProperties": {
+        "PortType": "2"
+      },
+      "status": "connected",
+      "subtitle": "40 Gbps",
+      "thunderboltSwitchUID": 12345,
+      "transports": {
+        "active": [
+          "USB4"
+        ],
+        "provisioned": [
+          "USB4"
+        ],
+        "supported": [
+          "CC",
+          "USB2",
+          "USB3",
+          "USB4"
+        ]
+      },
+      "trm": [
+        {
+          "state": 2,
+          "stateDescription": "enabled",
+          "transportType": "USB4"
+        }
+      ],
+      "type": "USB-C"
     }
   ],
-  "thunderboltSwitches": []
+  "thunderboltSwitches": [],
+  "version": "0.26.0"
 }

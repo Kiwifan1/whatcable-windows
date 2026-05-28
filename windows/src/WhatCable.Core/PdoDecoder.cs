@@ -29,7 +29,18 @@ public static class PdoDecoder
     {
         var voltageMv = (int)((raw >> 10) & 0x3FF) * 50;
         var currentMa = (int)(raw & 0x3FF) * 10;
-        return new("Fixed", raw, voltageMv, voltageMv, currentMa, null, false, false, false, null, null);
+        return new(
+            "Fixed",
+            raw,
+            voltageMv,
+            voltageMv,
+            currentMa,
+            null,
+            ((raw >> 29) & 0b1) != 0,
+            ((raw >> 28) & 0b1) != 0,
+            ((raw >> 27) & 0b1) != 0,
+            DecodePeakCurrent(raw),
+            null);
     }
 
     private static PdoDecodeResult DecodeVariable(uint raw)
@@ -63,6 +74,15 @@ public static class PdoDecoder
         var maxW = (int)((raw >> 17) & 0x1FF);
         return new("EprAvs", raw, minMv, maxMv, null, maxW * 1000, false, false, false, null, null);
     }
+
+    private static int DecodePeakCurrent(uint raw)
+        => (int)((raw >> 20) & 0b11) switch
+        {
+            0b00 => 100,
+            0b01 => 130,
+            0b10 => 150,
+            _ => 200
+        };
 }
 
 public sealed record PdoDecodeResult

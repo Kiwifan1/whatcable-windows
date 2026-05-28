@@ -25,8 +25,10 @@ public static class DiscoverPayloadDecoder
         {
             var low = (int)(vdo & 0xFFFF);
             var high = (int)((vdo >> 16) & 0xFFFF);
-            if (low != 0) svids.Add(low);
-            if (high != 0) svids.Add(high);
+            if (low == 0) break;
+            svids.Add(low);
+            if (high == 0) break;
+            svids.Add(high);
         }
         return new DiscoverSvidsPayload(svids, vdos);
     }

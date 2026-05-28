@@ -22,4 +22,11 @@ public sealed class JsonFormatterTests
         Assert.NotNull(cable);
         Assert.Contains("CalDigit", cable!.Brand);
     }
+
+    [Fact]
+    public void TrustScorer_DoesNotTreatFixtureVendorListAsAuthoritative()
+    {
+        Assert.False(VendorDatabase.HasAuthoritativeUsbIfRegistry);
+        Assert.DoesNotContain(CableTrustScorer.Evaluate(0x1234, null), flag => flag.Code == "vidNotInUSBIFList");
+    }
 }

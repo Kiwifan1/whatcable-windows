@@ -13,6 +13,22 @@ public sealed class PdoDecoderTests
         Assert.Equal("Fixed", pdo.Kind);
         Assert.Equal(5000, pdo.MinVoltageMv);
         Assert.Equal(3000, pdo.MaxCurrentMa);
+        Assert.False(pdo.DualRolePower);
+        Assert.False(pdo.UsbSuspendSupported);
+        Assert.False(pdo.UnconstrainedPower);
+        Assert.Equal(100, pdo.PeakCurrent);
+    }
+
+    [Fact]
+    public void DecodeFixedPdo_SourceCapabilityBits()
+    {
+        var raw = ((uint)1 << 29) | ((uint)1 << 28) | ((uint)1 << 27) | ((uint)2 << 20) | ((uint)100 << 10) | 300;
+        var pdo = PdoDecoder.Decode(raw);
+
+        Assert.True(pdo.DualRolePower);
+        Assert.True(pdo.UsbSuspendSupported);
+        Assert.True(pdo.UnconstrainedPower);
+        Assert.Equal(150, pdo.PeakCurrent);
     }
 
     [Fact]

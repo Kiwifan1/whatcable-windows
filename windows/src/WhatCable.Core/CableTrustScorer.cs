@@ -10,7 +10,7 @@ public static class CableTrustScorer
         {
             flags.Add(new TrustFlag("zeroVendorID", "E-marker reports no vendor identity", "Legitimate USB-IF members ship cables with a non-zero vendor ID."));
         }
-        else if (vendorId != 0xFFFF && !VendorDatabase.IsRegistered(vendorId))
+        else if (vendorId != 0xFFFF && VendorDatabase.HasAuthoritativeUsbIfRegistry && !VendorDatabase.IsRegistered(vendorId))
         {
             flags.Add(new TrustFlag("vidNotInUSBIFList", "Vendor ID isn't in USB-IF's published list", "The reported vendor ID is not present in the bundled USB-IF registry data."));
         }

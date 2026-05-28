@@ -26,6 +26,7 @@ public static class CableDatabase
 public static class VendorDatabase
 {
     private static readonly Lazy<Dictionary<int, VendorEntry>> Vendors = new(LoadVendors);
+    public static bool HasAuthoritativeUsbIfRegistry => false;
 
     public static string? Name(int vendorId)
     {

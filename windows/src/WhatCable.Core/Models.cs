@@ -1,35 +1,44 @@
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace WhatCable.Core;
 
 public sealed record Port
 {
-    [JsonPropertyName("name"), JsonPropertyOrder(0)] public string Name { get; init; } = string.Empty;
-    [JsonPropertyName("type"), JsonPropertyOrder(1)] public string? Type { get; init; }
-    [JsonPropertyName("className"), JsonPropertyOrder(2)] public string ClassName { get; init; } = string.Empty;
-    [JsonPropertyName("connectionActive"), JsonPropertyOrder(3)] public bool ConnectionActive { get; init; }
-    [JsonPropertyName("pdCapable"), JsonPropertyOrder(4)] public bool PdCapable { get; init; }
-    [JsonPropertyName("status"), JsonPropertyOrder(5)] public string Status { get; init; } = string.Empty;
-    [JsonPropertyName("headline"), JsonPropertyOrder(6)] public string Headline { get; init; } = string.Empty;
-    [JsonPropertyName("subtitle"), JsonPropertyOrder(7)] public string Subtitle { get; init; } = string.Empty;
-    [JsonPropertyName("bullets"), JsonPropertyOrder(8)] public IReadOnlyList<string> Bullets { get; init; } = Array.Empty<string>();
-    [JsonPropertyName("powerSources"), JsonPropertyOrder(9)] public IReadOnlyList<ChargerProfile> PowerSources { get; init; } = Array.Empty<ChargerProfile>();
-    [JsonPropertyName("cable"), JsonPropertyOrder(10)] public Cable? Cable { get; init; }
-    [JsonPropertyName("device"), JsonPropertyOrder(11)] public DeviceNode? Device { get; init; }
+    [JsonPropertyName("name")] public string Name { get; init; } = string.Empty;
+    [JsonPropertyName("type")] public string? Type { get; init; }
+    [JsonPropertyName("className")] public string ClassName { get; init; } = string.Empty;
+    [JsonPropertyName("connectionActive")] public bool ConnectionActive { get; init; }
+    [JsonPropertyName("pdCapable")] public bool PdCapable { get; init; }
+    [JsonPropertyName("status")] public string Status { get; init; } = string.Empty;
+    [JsonPropertyName("headline")] public string Headline { get; init; } = string.Empty;
+    [JsonPropertyName("subtitle")] public string Subtitle { get; init; } = string.Empty;
+    [JsonPropertyName("bullets")] public IReadOnlyList<string> Bullets { get; init; } = Array.Empty<string>();
+    [JsonPropertyName("transports")] public JsonElement? Transports { get; init; }
+    [JsonPropertyName("powerSources")] public IReadOnlyList<ChargerProfile> PowerSources { get; init; } = Array.Empty<ChargerProfile>();
+    [JsonPropertyName("cable")] public Cable? Cable { get; init; }
+    [JsonPropertyName("device")] public DeviceNode? Device { get; init; }
+    [JsonPropertyName("charging")] public JsonElement? Charging { get; init; }
+    [JsonPropertyName("dataLink")] public JsonElement? DataLink { get; init; }
+    [JsonPropertyName("thunderboltSwitchUID")] public long? ThunderboltSwitchUid { get; init; }
+    [JsonPropertyName("trm")] public JsonElement? Trm { get; init; }
+    [JsonPropertyName("cio")] public JsonElement? Cio { get; init; }
+    [JsonPropertyName("devices")] public JsonElement? Devices { get; init; }
+    [JsonPropertyName("rawProperties")] public JsonElement? RawProperties { get; init; }
 }
 
 public sealed record Cable
 {
-    [JsonPropertyName("endpoint"), JsonPropertyOrder(0)] public string Endpoint { get; init; } = string.Empty;
-    [JsonPropertyName("vendorID"), JsonPropertyOrder(1)] public int VendorId { get; init; }
-    [JsonPropertyName("vendorName"), JsonPropertyOrder(2)] public string? VendorName { get; init; }
-    [JsonPropertyName("curatedBrand"), JsonPropertyOrder(3)] public string? CuratedBrand { get; init; }
-    [JsonPropertyName("speed"), JsonPropertyOrder(4)] public string? Speed { get; init; }
-    [JsonPropertyName("currentRating"), JsonPropertyOrder(5)] public string? CurrentRating { get; init; }
-    [JsonPropertyName("maxVolts"), JsonPropertyOrder(6)] public int? MaxVolts { get; init; }
-    [JsonPropertyName("maxWatts"), JsonPropertyOrder(7)] public int? MaxWatts { get; init; }
-    [JsonPropertyName("type"), JsonPropertyOrder(8)] public string? Type { get; init; }
-    [JsonPropertyName("trustFlags"), JsonPropertyOrder(9)] public IReadOnlyList<TrustFlag>? TrustFlags { get; init; }
+    [JsonPropertyName("endpoint")] public string Endpoint { get; init; } = string.Empty;
+    [JsonPropertyName("vendorID")] public int VendorId { get; init; }
+    [JsonPropertyName("vendorName")] public string? VendorName { get; init; }
+    [JsonPropertyName("curatedBrand")] public string? CuratedBrand { get; init; }
+    [JsonPropertyName("speed")] public string? Speed { get; init; }
+    [JsonPropertyName("currentRating")] public string? CurrentRating { get; init; }
+    [JsonPropertyName("maxVolts")] public int? MaxVolts { get; init; }
+    [JsonPropertyName("maxWatts")] public int? MaxWatts { get; init; }
+    [JsonPropertyName("type")] public string? Type { get; init; }
+    [JsonPropertyName("trustFlags")] public IReadOnlyList<TrustFlag>? TrustFlags { get; init; }
 }
 
 public sealed record TrustFlag
@@ -63,11 +72,11 @@ public sealed record ChargerProfile
 
 public sealed record Snapshot
 {
-    [JsonPropertyName("version"), JsonPropertyOrder(0)] public string Version { get; init; } = string.Empty;
-    [JsonPropertyName("isDesktopMac"), JsonPropertyOrder(1)] public bool IsDesktopMac { get; init; }
-    [JsonPropertyName("adapter"), JsonPropertyOrder(2)] public AdapterSnapshot? Adapter { get; init; }
-    [JsonPropertyName("ports"), JsonPropertyOrder(3)] public IReadOnlyList<Port> Ports { get; init; } = Array.Empty<Port>();
-    [JsonPropertyName("thunderboltSwitches"), JsonPropertyOrder(4)] public IReadOnlyList<object> ThunderboltSwitches { get; init; } = Array.Empty<object>();
+    [JsonPropertyName("version")] public string Version { get; init; } = string.Empty;
+    [JsonPropertyName("isDesktopMac")] public bool IsDesktopMac { get; init; }
+    [JsonPropertyName("adapter")] public AdapterSnapshot? Adapter { get; init; }
+    [JsonPropertyName("ports")] public IReadOnlyList<Port> Ports { get; init; } = Array.Empty<Port>();
+    [JsonPropertyName("thunderboltSwitches")] public IReadOnlyList<object> ThunderboltSwitches { get; init; } = Array.Empty<object>();
 }
 
 public sealed record AdapterSnapshot

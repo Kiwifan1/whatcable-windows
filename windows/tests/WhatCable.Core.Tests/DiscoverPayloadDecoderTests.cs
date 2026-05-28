@@ -25,9 +25,10 @@ public sealed class DiscoverPayloadDecoderTests
     [Fact]
     public void DecodeDiscoverSvidsPayload()
     {
-        var bytes = new byte[] { 0xD0, 0xFF, 0x01, 0x00, 0x34, 0x12, 0x00, 0x00 };
+        var bytes = new byte[] { 0xD0, 0xFF, 0x01, 0x00, 0x00, 0x00, 0x34, 0x12, 0x78, 0x56, 0x9A, 0xBC };
         var payload = DiscoverPayloadDecoder.DecodeDiscoverSvids(bytes);
-        Assert.Equal(new[] { 0xFFD0, 0x0001, 0x1234 }, payload.Svids);
+        Assert.Equal(new[] { 0xFFD0, 0x0001 }, payload.Svids);
+        Assert.Equal(3, payload.RawVdos.Count);
     }
 
     [Fact]
