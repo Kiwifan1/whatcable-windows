@@ -30,7 +30,7 @@ public sealed class KnownVideoCablesDatabaseTests
 
         var dp20Cables = cables.Where(c =>
             c.CableClass == VideoCableClass.DisplayPort20UHBR20 ||
-            c.CableClass == VideoCableClass.DisplayPort20UHBR13_5).ToList();
+            c.CableClass == VideoCableClass.DisplayPort20Uhbr135).ToList();
         Assert.NotEmpty(dp20Cables);
     }
 

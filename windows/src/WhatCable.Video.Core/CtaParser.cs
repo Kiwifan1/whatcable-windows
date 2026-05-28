@@ -273,32 +273,41 @@ public static class CtaParser
         bool supportsVrr = false;
         bool supportsQms = false;
         bool supportsQft = false;
-        int? maxCharRate = null;
+        int? maxTmdsCharacterRate = null;
 
         if (data.Length >= 2)
         {
-            byte flags = data[1];
-            maxFrlRate = (flags >> 4) & 0x0F;
-            supportsDsc = (flags & 0x08) != 0;
-        }
-
-        if (data.Length >= 3)
-        {
-            byte flags2 = data[2];
-            supportsAllm = (flags2 & 0x02) != 0;
-            supportsVrr = (flags2 & 0x08) != 0;
+            maxTmdsCharacterRate = data[1] == 0 ? null : data[1] * 5;
         }
 
         if (data.Length >= 4)
         {
-            byte flags3 = data[3];
-            supportsQms = (flags3 & 0x80) != 0;
-            supportsQft = (flags3 & 0x40) != 0;
+            maxFrlRate = data[3] & 0x0F;
+            if (maxFrlRate == 0)
+                maxFrlRate = null;
         }
 
         if (data.Length >= 5)
         {
-            maxCharRate = data[4] * 5; // in Mbps
+            byte pb5 = data[4];
+            supportsAllm = (pb5 & 0x40) != 0;
+            supportsQms = (pb5 & 0x02) != 0;
+            supportsQft = (pb5 & 0x09) != 0;
+            supportsVrr = (pb5 & 0x10) != 0;
+        }
+
+        if (data.Length >= 7)
+        {
+            byte pb6 = data[5];
+            byte pb7 = data[6];
+            int vrrMin = pb6 & 0x3F;
+            int vrrMax = ((pb6 >> 6) & 0x03) << 8 | pb7;
+            supportsVrr = supportsVrr || (vrrMin > 0 && vrrMax > 0);
+        }
+
+        if (data.Length >= 8)
+        {
+            supportsDsc = (data[7] & 0x01) != 0;
         }
 
         return new HdmiForumVsdb
@@ -310,7 +319,7 @@ public static class CtaParser
             SupportsVrr = supportsVrr,
             SupportsQms = supportsQms,
             SupportsQft = supportsQft,
-            MaxCharRateMbps = maxCharRate
+            MaxTmdsCharacterRateMhz = maxTmdsCharacterRate
         };
     }
 

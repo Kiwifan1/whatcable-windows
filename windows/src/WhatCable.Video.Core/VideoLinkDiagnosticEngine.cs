@@ -218,10 +218,10 @@ public static class VideoLinkDiagnostic
             VideoCableClass.HdmiUltraHighSpeed => 1200.0, // HDMI 2.1: 48 Gbps FRL
             VideoCableClass.DisplayPort14 => 810.0,       // DP 1.4 HBR3: 8.1 Gbps per lane × 4 = 32.4 Gbps
             VideoCableClass.DisplayPort20 => 1000.0,      // DP 2.0 UHBR10: 10 Gbps per lane × 4 = 40 Gbps
-            VideoCableClass.DisplayPort20UHBR13_5 => 1350.0, // DP 2.0 UHBR13.5: 54 Gbps
+            VideoCableClass.DisplayPort20Uhbr135 => 1350.0, // DP 2.0 UHBR13.5: 54 Gbps
             VideoCableClass.DisplayPort20UHBR20 => 2000.0,   // DP 2.0 UHBR20: 80 Gbps
-            VideoCableClass.UsbC3_1Gen1 => 540.0,         // USB-C with DP Alt Mode HBR2: 5.4 Gbps per lane
-            VideoCableClass.UsbC3_1Gen2 => 810.0,         // USB-C with DP Alt Mode HBR3: 8.1 Gbps per lane
+            VideoCableClass.UsbC31Gen1 => 540.0,          // USB-C with DP Alt Mode HBR2: 5.4 Gbps per lane
+            VideoCableClass.UsbC31Gen2 => 810.0,          // USB-C with DP Alt Mode HBR3: 8.1 Gbps per lane
             VideoCableClass.UsbC4Gen3 => 2000.0,          // USB4 with DP 2.0: up to 80 Gbps
             _ => null
         };

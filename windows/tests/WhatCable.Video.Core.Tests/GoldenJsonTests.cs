@@ -1,84 +1,33 @@
-using System.IO;
-using System.Text.Json;
 using Xunit;
 
 namespace WhatCable.Video.Core.Tests;
 
 public sealed class GoldenJsonTests
 {
-    private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
+    [Theory]
+    [InlineData("4k120-hdmi21-cable-bottleneck.json")]
+    [InlineData("1080p60-hdmi14-optimal.json")]
+    [InlineData("8k120-dp20-both-limiting.json")]
+    public void Diagnostic_GoldenFixtures_Match(string fixtureName)
     {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        WriteIndented = true
-    };
+        var expected = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Fixtures", fixtureName));
+        var fixture = VideoJsonFormatter.Parse<GoldenDiagnosticFixture>(expected);
 
-    [Fact]
-    public void Diagnostic_4K120_CableBottleneck_MatchesGolden()
-    {
+        Assert.NotNull(fixture);
+
         var snapshot = new VideoPortSnapshot
         {
-            ConnectorType = VideoConnectorType.HDMI,
-            ActiveMode = new VideoMode { WidthPx = 3840, HeightPx = 2160, RefreshRateHz = 60, PixelClockMhz = 594.0 },
-            SinkMaxMode = new VideoMode { WidthPx = 3840, HeightPx = 2160, RefreshRateHz = 120, PixelClockMhz = 1188.0 },
-            AdvertisedCableClass = VideoCableClass.HdmiHighSpeed,
-            SourceGpuCaps = new GpuCapabilities
-            {
-                Vendor = "NVIDIA",
-                Model = "GeForce RTX 4090",
-                MaxHdmiGen = "2.1",
-                MaxDisplayPortGen = "1.4",
-                MaxPixelClockMhz = 2000.0
-            }
+            ConnectorType = fixture!.ConnectorType,
+            ActiveMode = fixture.ActiveMode,
+            SinkMaxMode = fixture.SinkMaxMode,
+            AdvertisedCableClass = fixture.AdvertisedCableClass,
+            SourceGpuCaps = fixture.SourceGpuCaps
         };
 
-        var diagnostic = VideoLinkDiagnostic.Analyze(snapshot);
+        var actual = VideoJsonFormatter.Render(VideoLinkDiagnostic.Analyze(snapshot));
+        var expectedDiagnostic = VideoJsonFormatter.Render(fixture.Diagnostic);
 
-        Assert.Equal(VideoBottleneck.Cable, diagnostic.Bottleneck);
-        Assert.Contains("Cable", diagnostic.Verdict);
-        Assert.NotNull(diagnostic.RecommendedCableClass);
-        Assert.Equal(VideoCableClass.HdmiUltraHighSpeed, diagnostic.RecommendedCableClass);
-    }
-
-    [Fact]
-    public void Diagnostic_1080p60_Optimal_MatchesGolden()
-    {
-        var snapshot = new VideoPortSnapshot
-        {
-            ConnectorType = VideoConnectorType.HDMI,
-            ActiveMode = new VideoMode { WidthPx = 1920, HeightPx = 1080, RefreshRateHz = 60, PixelClockMhz = 148.5 },
-            SinkMaxMode = new VideoMode { WidthPx = 1920, HeightPx = 1080, RefreshRateHz = 60, PixelClockMhz = 148.5 },
-            AdvertisedCableClass = VideoCableClass.HdmiStandard
-        };
-
-        var diagnostic = VideoLinkDiagnostic.Analyze(snapshot);
-
-        Assert.Equal(VideoBottleneck.None, diagnostic.Bottleneck);
-        Assert.Contains("Optimal", diagnostic.Verdict);
-    }
-
-    [Fact]
-    public void Diagnostic_8K120_GpuBottleneck_MatchesGolden()
-    {
-        var snapshot = new VideoPortSnapshot
-        {
-            ConnectorType = VideoConnectorType.DisplayPort,
-            ActiveMode = new VideoMode { WidthPx = 7680, HeightPx = 4320, RefreshRateHz = 60, PixelClockMhz = 2376.0 },
-            SinkMaxMode = new VideoMode { WidthPx = 7680, HeightPx = 4320, RefreshRateHz = 120, PixelClockMhz = 4752.0 },
-            AdvertisedCableClass = VideoCableClass.DisplayPort20UHBR20,
-            SourceGpuCaps = new GpuCapabilities
-            {
-                Vendor = "AMD",
-                Model = "Radeon RX 7900 XTX",
-                MaxHdmiGen = "2.1",
-                MaxDisplayPortGen = "2.0",
-                MaxPixelClockMhz = 2000.0
-            }
-        };
-
-        var diagnostic = VideoLinkDiagnostic.Analyze(snapshot);
-
-        Assert.Equal(VideoBottleneck.Source, diagnostic.Bottleneck);
-        Assert.Contains("GPU", diagnostic.Verdict);
+        Assert.Equal(expectedDiagnostic.Replace("\r\n", "\n"), actual.Replace("\r\n", "\n"));
     }
 
     [Fact]
@@ -89,16 +38,16 @@ public sealed class GoldenJsonTests
             ConnectorType = VideoConnectorType.HDMI,
             ActiveMode = new VideoMode { WidthPx = 1920, HeightPx = 1080, RefreshRateHz = 60 },
             SinkMaxMode = new VideoMode { WidthPx = 3840, HeightPx = 2160, RefreshRateHz = 60 },
-            AdvertisedCableClass = VideoCableClass.HdmiHighSpeed
+            AdvertisedCableClass = VideoCableClass.HdmiHighSpeed,
+            EdidRaw = new byte[] { 0x01, 0x02, 0x03 }
         };
 
-        var json = JsonSerializer.Serialize(snapshot, JsonOptions);
+        var json = VideoJsonFormatter.Render(snapshot);
 
         Assert.NotNull(json);
-        Assert.Contains("\"connectorType\"", json);
+        Assert.Contains("\"connectorType\": \"HDMI\"", json);
         Assert.Contains("\"activeMode\"", json);
-        Assert.Contains("1920", json);
-        Assert.Contains("1080", json);
+        Assert.DoesNotContain("edidRaw", json);
     }
 
     [Fact]
@@ -112,11 +61,20 @@ public sealed class GoldenJsonTests
             RecommendedCableClass = VideoCableClass.HdmiUltraHighSpeed
         };
 
-        var json = JsonSerializer.Serialize(diagnostic, JsonOptions);
+        var json = VideoJsonFormatter.Render(diagnostic);
 
         Assert.NotNull(json);
-        Assert.Contains("\"bottleneck\"", json);
-        Assert.Contains("\"verdict\"", json);
-        Assert.Contains("Cable", json);
+        Assert.Contains("\"bottleneck\": \"Cable\"", json);
+        Assert.Contains("\"recommendedCableClass\": \"HdmiUltraHighSpeed\"", json);
+    }
+
+    private sealed record GoldenDiagnosticFixture
+    {
+        public VideoConnectorType ConnectorType { get; init; }
+        public VideoMode? ActiveMode { get; init; }
+        public VideoMode? SinkMaxMode { get; init; }
+        public VideoCableClass? AdvertisedCableClass { get; init; }
+        public GpuCapabilities? SourceGpuCaps { get; init; }
+        public VideoLinkDiagnosticResult Diagnostic { get; init; } = new();
     }
 }

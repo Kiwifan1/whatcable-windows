@@ -7,6 +7,7 @@ namespace WhatCable.Video.Core;
 /// <summary>
 /// Connector type for a video port.
 /// </summary>
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum VideoConnectorType
 {
     Unknown,
@@ -33,6 +34,7 @@ public sealed record VideoMode
 /// <summary>
 /// Cable class for video cables (HDMI/DP/USB-C).
 /// </summary>
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum VideoCableClass
 {
     Unknown,
@@ -41,10 +43,10 @@ public enum VideoCableClass
     HdmiUltraHighSpeed, // HDMI 2.1 (up to 8K60 or 4K120+)
     DisplayPort14,    // DP 1.4 (HBR3, up to 8.1 Gbps per lane)
     DisplayPort20,    // DP 2.0 UHBR10 (10 Gbps per lane)
-    DisplayPort20UHBR13_5, // DP 2.0 UHBR13.5 (13.5 Gbps per lane)
+    DisplayPort20Uhbr135, // DP 2.0 UHBR13.5 (13.5 Gbps per lane)
     DisplayPort20UHBR20,   // DP 2.0 UHBR20 (20 Gbps per lane)
-    UsbC3_1Gen1,      // USB-C 3.1 Gen1 (DP Alt Mode up to HBR2)
-    UsbC3_1Gen2,      // USB-C 3.1 Gen2 (DP Alt Mode up to HBR3)
+    UsbC31Gen1,       // USB-C 3.1 Gen1 (DP Alt Mode up to HBR2)
+    UsbC31Gen2,       // USB-C 3.1 Gen2 (DP Alt Mode up to HBR3)
     UsbC4Gen3         // USB-C 4 Gen3 (DP Alt Mode up to UHBR20)
 }
 
@@ -70,13 +72,14 @@ public sealed record VideoPortSnapshot
     [JsonPropertyName("sinkMaxMode")] public VideoMode? SinkMaxMode { get; init; }
     [JsonPropertyName("advertisedCableClass")] public VideoCableClass? AdvertisedCableClass { get; init; }
     [JsonPropertyName("sourceGpuCaps")] public GpuCapabilities? SourceGpuCaps { get; init; }
-    [JsonPropertyName("edidRaw")] public byte[]? EdidRaw { get; init; }
+    [JsonIgnore] public byte[]? EdidRaw { get; init; }
     [JsonPropertyName("edidParsed")] public EdidInfo? EdidParsed { get; init; }
 }
 
 /// <summary>
 /// Bottleneck classification for video link diagnostic.
 /// </summary>
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum VideoBottleneck
 {
     None,           // No bottleneck, optimal configuration
@@ -186,7 +189,7 @@ public sealed record HdmiForumVsdb
     [JsonPropertyName("supportsVrr")] public bool SupportsVrr { get; init; }
     [JsonPropertyName("supportsQms")] public bool SupportsQms { get; init; }
     [JsonPropertyName("supportsQft")] public bool SupportsQft { get; init; }
-    [JsonPropertyName("maxCharRateMbps")] public int? MaxCharRateMbps { get; init; }
+    [JsonPropertyName("maxTmdsCharacterRateMhz")] public int? MaxTmdsCharacterRateMhz { get; init; }
 }
 
 /// <summary>

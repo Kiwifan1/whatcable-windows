@@ -158,13 +158,26 @@ public static class EdidParser
         return sum == 0;
     }
 
-    private static string ParseManufacturerId(byte[] edid)
+    private static string? ParseManufacturerId(byte[] edid)
     {
         ushort id = (ushort)((edid[8] << 8) | edid[9]);
-        char c1 = (char)('A' + ((id >> 10) & 0x1F) - 1);
-        char c2 = (char)('A' + ((id >> 5) & 0x1F) - 1);
-        char c3 = (char)('A' + (id & 0x1F) - 1);
+
+        char? c1 = DecodeManufacturerCharacter((id >> 10) & 0x1F);
+        char? c2 = DecodeManufacturerCharacter((id >> 5) & 0x1F);
+        char? c3 = DecodeManufacturerCharacter(id & 0x1F);
+
+        if (!c1.HasValue || !c2.HasValue || !c3.HasValue)
+            return null;
+
         return $"{c1}{c2}{c3}";
+    }
+
+    private static char? DecodeManufacturerCharacter(int value)
+    {
+        if (value is < 1 or > 26)
+            return null;
+
+        return (char)('A' + value - 1);
     }
 
     private static string ParseDisplayName(byte[] edid, int offset)

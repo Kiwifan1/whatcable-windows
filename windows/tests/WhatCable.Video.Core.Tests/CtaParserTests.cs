@@ -1,3 +1,4 @@
+using System.IO;
 using System.Linq;
 using Xunit;
 
@@ -7,6 +8,9 @@ public sealed class CtaParserTests
 {
     // Sample CTA-861 extension block with HDMI 2.1 capabilities
     private static readonly byte[] SampleCtaBlock = new byte[128];
+
+    private static byte[] LoadFixture(params string[] relativePath)
+        => File.ReadAllBytes(Path.Combine(new[] { AppContext.BaseDirectory, "Fixtures" }.Concat(relativePath).ToArray()));
 
     static CtaParserTests()
     {
@@ -49,15 +53,29 @@ public sealed class CtaParserTests
         SampleCtaBlock[offset++] = 0x00;
 
         // Extended tag blocks
-        // Colorimetry Data Block (extended tag=5, length=2)
-        SampleCtaBlock[offset++] = 0x87; // Tag=7, Length=7
+        // Colorimetry Data Block (extended tag=5, length=3 including extended tag)
+        SampleCtaBlock[offset++] = 0xE3; // Tag=7, Length=3
         SampleCtaBlock[offset++] = 0x05; // Extended tag: Colorimetry
         SampleCtaBlock[offset++] = 0xE3; // xvYCC601, xvYCC709, sYCC601, AdobeYCC601, AdobeRGB, BT2020YCC, BT2020RGB
-        SampleCtaBlock[offset++] = 0x05; // Extended tag: Colorimetry
+        SampleCtaBlock[offset++] = 0x00;
+
+        // HDMI Forum VSDB (tag=3, length=13)
+        SampleCtaBlock[offset++] = 0x6D; // Tag=3, Length=13
+        SampleCtaBlock[offset++] = 0xD8; // IEEE OUI: 0xC45DD8 (HDMI Forum)
+        SampleCtaBlock[offset++] = 0x5D;
+        SampleCtaBlock[offset++] = 0xC4;
+        SampleCtaBlock[offset++] = 0x01; // Version
+        SampleCtaBlock[offset++] = 0x78; // Max TMDS character rate: 600 MHz
+        SampleCtaBlock[offset++] = 0x80; // SCDC present
+        SampleCtaBlock[offset++] = 0xE4; // Max FRL rate = 4, plus 4:2:0 deep color flags
+        SampleCtaBlock[offset++] = 0x53; // QMS, QFT range, VRR, ALLM
+        SampleCtaBlock[offset++] = 0x30; // VRR min = 48
+        SampleCtaBlock[offset++] = 0x78; // VRR max = 120
+        SampleCtaBlock[offset++] = 0x01; // DSC 1.2 support
         SampleCtaBlock[offset++] = 0x00;
         SampleCtaBlock[offset++] = 0x00;
-        SampleCtaBlock[offset++] = 0x00;
-        SampleCtaBlock[offset++] = 0x00;
+
+        SampleCtaBlock[2] = (byte)offset;
 
         // Fill rest with zeros
         // Checksum at byte 127
@@ -153,6 +171,35 @@ public sealed class CtaParserTests
     }
 
     [Fact]
+    public void Parse_ValidCtaBlock_ParsesColorimetry()
+    {
+        var cta = CtaParser.Parse(SampleCtaBlock);
+
+        Assert.NotNull(cta);
+        Assert.NotNull(cta.Colorimetry);
+        Assert.True(cta.Colorimetry.Xvycc601);
+        Assert.True(cta.Colorimetry.Xvycc709);
+        Assert.True(cta.Colorimetry.Bt2020Rgb);
+    }
+
+    [Fact]
+    public void Parse_ValidCtaBlock_ParsesHdmiForumVsdb()
+    {
+        var cta = CtaParser.Parse(SampleCtaBlock);
+
+        Assert.NotNull(cta);
+        Assert.NotNull(cta.HdmiForumVsdb);
+        Assert.Equal(1, cta.HdmiForumVsdb.Version);
+        Assert.Equal(600, cta.HdmiForumVsdb.MaxTmdsCharacterRateMhz);
+        Assert.Equal(4, cta.HdmiForumVsdb.MaxFrlRate);
+        Assert.True(cta.HdmiForumVsdb.SupportsAllm);
+        Assert.True(cta.HdmiForumVsdb.SupportsVrr);
+        Assert.True(cta.HdmiForumVsdb.SupportsQms);
+        Assert.True(cta.HdmiForumVsdb.SupportsQft);
+        Assert.True(cta.HdmiForumVsdb.SupportsDsc);
+    }
+
+    [Fact]
     public void Parse_NullBlock_ReturnsNull()
     {
         var cta = CtaParser.Parse(null);
@@ -162,7 +209,7 @@ public sealed class CtaParserTests
     [Fact]
     public void Parse_TooShortBlock_ReturnsNull()
     {
-        var cta = CtaParser.Parse(new byte[64]);
+        var cta = CtaParser.Parse(LoadFixture("cta", "truncated-extension.bin"));
         Assert.Null(cta);
     }
 
