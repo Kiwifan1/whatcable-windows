@@ -25,11 +25,11 @@ public static class SnapshotChangeDetector
         var hasAdapter = HasAdapter(current.Adapter);
         if (!hadAdapter && hasAdapter)
         {
-            changes.Add(new PortChange(PortChangeKind.ChargerConnected, current.Adapter?.Source ?? string.Empty));
+            changes.Add(new PortChange(PortChangeKind.ChargerConnected, AdapterName(current.Adapter), AdapterDetail(current.Adapter)));
         }
         else if (hadAdapter && !hasAdapter)
         {
-            changes.Add(new PortChange(PortChangeKind.ChargerDisconnected, previous.Adapter?.Source ?? string.Empty));
+            changes.Add(new PortChange(PortChangeKind.ChargerDisconnected, AdapterName(previous.Adapter), AdapterDetail(previous.Adapter)));
         }
 
         // Per-port device count transitions, matched by port name.
@@ -53,6 +53,15 @@ public static class SnapshotChangeDetector
 
     private static bool HasAdapter(AdapterSnapshot? adapter)
         => adapter is not null && (adapter.Watts is > 0 || !string.IsNullOrEmpty(adapter.Source));
+
+    /// <summary>A non-empty label for the charger, falling back to a generic name when the
+    /// adapter reports no source so notifications never show blank text.</summary>
+    private static string AdapterName(AdapterSnapshot? adapter)
+        => !string.IsNullOrEmpty(adapter?.Source) ? adapter!.Source! : "Power adapter";
+
+    /// <summary>Optional watts detail so charger notifications carry meaningful context.</summary>
+    private static string? AdapterDetail(AdapterSnapshot? adapter)
+        => adapter?.Watts is > 0 ? $"{adapter.Watts} W" : null;
 
     private static int CountDevices(Port port)
         => port.Device is { } root ? CountNodes(root) : 0;

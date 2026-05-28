@@ -8,7 +8,7 @@ namespace WhatCable.Windows.App.Core.Settings;
 /// feedback and reject obviously malformed keys.
 /// </summary>
 /// <remarks>
-/// A key looks like <c>WCPRO-ABCDE-FGHIJ-KLMNP</c>: a fixed <c>WCPRO</c> prefix followed by three
+/// A key looks like <c>WCPRO-ABCDE-FGHJK-MNPQR</c>: a fixed <c>WCPRO</c> prefix followed by three
 /// 5-character groups drawn from Crockford base-32 (no I, L, O, U). The final character of the
 /// last group is a checksum over every preceding alphanumeric character.
 /// </remarks>

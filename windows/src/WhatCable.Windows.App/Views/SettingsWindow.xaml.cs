@@ -51,6 +51,14 @@ public sealed partial class SettingsWindow : Window
 
     private async void OnLaunchAtLoginToggled(object sender, RoutedEventArgs e)
     {
+        // Toggled also fires when IsOn is set programmatically (initial binding and the
+        // reconciliation assignment below). Ignore those: only act when the user actually changed
+        // the switch to a state that differs from the ViewModel.
+        if (LaunchAtLoginToggle.IsOn == _viewModel.LaunchAtLogin)
+        {
+            return;
+        }
+
         // Route through the ViewModel so the OS startup task is actually toggled and the effective
         // state (which the OS may override) is reflected back into the switch.
         await _viewModel.ApplyLaunchAtLoginCommand.ExecuteAsync(LaunchAtLoginToggle.IsOn);

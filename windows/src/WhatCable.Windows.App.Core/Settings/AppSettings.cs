@@ -2,7 +2,7 @@ namespace WhatCable.Windows.App.Core.Settings;
 
 /// <summary>
 /// User-facing preferences surfaced in the Settings window. Persisted via
-/// <see cref="ISettingsStore"/> (ApplicationData LocalSettings in the packaged app).
+/// <see cref="ISettingsStore"/> (a JSON file under <c>%LOCALAPPDATA%\WhatCable</c> in the WinUI app).
 /// </summary>
 public sealed record AppSettings
 {

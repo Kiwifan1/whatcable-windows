@@ -44,7 +44,12 @@ public sealed class JsonFileSettingsStore : ISettingsStore
     public void Save(AppSettings settings)
     {
         ArgumentNullException.ThrowIfNull(settings);
-        Directory.CreateDirectory(Path.GetDirectoryName(_path)!);
+        var directory = Path.GetDirectoryName(_path);
+        if (!string.IsNullOrEmpty(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
         File.WriteAllText(_path, JsonSerializer.Serialize(settings, Options));
     }
 }

@@ -11,9 +11,10 @@
 ;
 ;   iscc installer\WhatCable.iss /DSourceDir=publish\win-x64
 ;
-; Launch-at-login for this build is handled by StartupTaskService's per-user
-; "Run" registry fallback (the packaged StartupTask only exists for the MSIX build),
-; so the installer intentionally does not write any Run key itself.
+; Launch-at-login for this build is handled entirely by the app's own setting, via
+; StartupTaskService's per-user "Run" registry fallback (the packaged StartupTask only
+; exists for the MSIX build). The installer intentionally does not write any Run key or
+; Startup-folder shortcut, so the in-app toggle stays the single source of truth.
 
 #ifndef SourceDir
   #define SourceDir "..\publish\win-x64"
@@ -50,15 +51,11 @@ UninstallDisplayIcon={app}\{#AppExeName}
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
-[Tasks]
-Name: "startupicon"; Description: "Start {#AppName} when I sign in"; GroupDescription: "Startup:"; Flags: unchecked
-
 [Files]
 Source: "{#SourceDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExeName}"
-Name: "{userstartup}\{#AppName}"; Filename: "{app}\{#AppExeName}"; Tasks: startupicon
 
 [Run]
 Filename: "{app}\{#AppExeName}"; Description: "Launch {#AppName}"; Flags: nowait postinstall skipifsilent

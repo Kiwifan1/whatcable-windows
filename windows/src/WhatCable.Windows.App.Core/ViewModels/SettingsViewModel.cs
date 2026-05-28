@@ -84,7 +84,7 @@ public sealed partial class SettingsViewModel : ObservableObject
             return;
         }
 
-        LaunchAtLogin = await _startupTask.SetEnabledAsync(enabled).ConfigureAwait(false);
+        LaunchAtLogin = await _startupTask.SetEnabledAsync(enabled);
     }
 
     /// <summary>Persists the current values to the backing store.</summary>

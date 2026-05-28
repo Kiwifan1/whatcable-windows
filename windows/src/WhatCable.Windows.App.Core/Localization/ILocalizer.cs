@@ -1,9 +1,9 @@
 namespace WhatCable.Windows.App.Core.Localization;
 
 /// <summary>
-/// Resolves localised UI strings. The WinUI app backs this with a
-/// <c>Microsoft.Windows.ApplicationModel.Resources.ResourceLoader</c> over the
-/// per-locale <c>.resw</c> files; tests use <see cref="DictionaryLocalizer"/>.
+/// Resolves localised UI strings. The WinUI app backs this with <c>ResourceLocalizer</c>, which uses
+/// <c>Microsoft.Windows.ApplicationModel.Resources.ResourceManager</c> over the per-locale
+/// <c>.resw</c> files; tests use <see cref="DictionaryLocalizer"/>.
 /// </summary>
 public interface ILocalizer
 {

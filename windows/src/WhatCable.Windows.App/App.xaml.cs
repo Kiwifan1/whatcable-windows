@@ -27,6 +27,10 @@ public partial class App : Application
 
     private TrayViewModel? _trayViewModel;
     private TaskbarIcon? _trayIcon;
+    private TrayPopover? _popover;
+    private MenuFlyoutItem? _refreshMenuItem;
+    private MenuFlyoutItem? _settingsMenuItem;
+    private MenuFlyoutItem? _quitMenuItem;
     private DispatcherQueueTimer? _pollTimer;
     private SettingsWindow? _settingsWindow;
 
@@ -52,12 +56,12 @@ public partial class App : Application
 
     private void CreateTrayIcon()
     {
-        var popover = new TrayPopover { ViewModel = _trayViewModel! };
-        popover.ApplyLocalization(_localizer);
-        popover.PortInvoked += (_, port) => ShowPortDetail(port);
-        popover.SettingsRequested += (_, _) => ShowSettings();
-        popover.RefreshRequested += (_, _) => _trayViewModel!.Refresh();
-        popover.QuitRequested += (_, _) => Quit();
+        _popover = new TrayPopover { ViewModel = _trayViewModel! };
+        _popover.ApplyLocalization(_localizer);
+        _popover.PortInvoked += (_, port) => ShowPortDetail(port);
+        _popover.SettingsRequested += (_, _) => ShowSettings();
+        _popover.RefreshRequested += (_, _) => _trayViewModel!.Refresh();
+        _popover.QuitRequested += (_, _) => Quit();
 
         _trayIcon = new TaskbarIcon
         {
@@ -65,7 +69,7 @@ public partial class App : Application
             IconSource = TrayIconImage.Load(),
             NoLeftClickDelay = true,
             ContextFlyout = BuildContextMenu(),
-            TrayPopup = popover,
+            TrayPopup = _popover,
         };
         _trayIcon.ForceCreate();
     }
@@ -74,20 +78,46 @@ public partial class App : Application
     {
         var menu = new MenuFlyout();
 
-        var refresh = new MenuFlyoutItem { Text = _localizer.Get(StringKeys.TrayRefresh) };
-        refresh.Click += (_, _) => _trayViewModel!.Refresh();
+        _refreshMenuItem = new MenuFlyoutItem { Text = _localizer.Get(StringKeys.TrayRefresh) };
+        _refreshMenuItem.Click += (_, _) => _trayViewModel!.Refresh();
 
-        var settings = new MenuFlyoutItem { Text = _localizer.Get(StringKeys.TraySettings) };
-        settings.Click += (_, _) => ShowSettings();
+        _settingsMenuItem = new MenuFlyoutItem { Text = _localizer.Get(StringKeys.TraySettings) };
+        _settingsMenuItem.Click += (_, _) => ShowSettings();
 
-        var quit = new MenuFlyoutItem { Text = _localizer.Get(StringKeys.TrayQuit) };
-        quit.Click += (_, _) => Quit();
+        _quitMenuItem = new MenuFlyoutItem { Text = _localizer.Get(StringKeys.TrayQuit) };
+        _quitMenuItem.Click += (_, _) => Quit();
 
-        menu.Items.Add(refresh);
-        menu.Items.Add(settings);
+        menu.Items.Add(_refreshMenuItem);
+        menu.Items.Add(_settingsMenuItem);
         menu.Items.Add(new MenuFlyoutSeparator());
-        menu.Items.Add(quit);
+        menu.Items.Add(_quitMenuItem);
         return menu;
+    }
+
+    /// <summary>Re-applies the current language to the tray UI built once at startup.</summary>
+    private void ApplyTrayLocalization()
+    {
+        _popover?.ApplyLocalization(_localizer);
+
+        if (_trayIcon is not null)
+        {
+            _trayIcon.ToolTipText = _localizer.Get(StringKeys.TrayTooltip);
+        }
+
+        if (_refreshMenuItem is not null)
+        {
+            _refreshMenuItem.Text = _localizer.Get(StringKeys.TrayRefresh);
+        }
+
+        if (_settingsMenuItem is not null)
+        {
+            _settingsMenuItem.Text = _localizer.Get(StringKeys.TraySettings);
+        }
+
+        if (_quitMenuItem is not null)
+        {
+            _quitMenuItem.Text = _localizer.Get(StringKeys.TrayQuit);
+        }
     }
 
     private void StartPolling()
@@ -110,6 +140,7 @@ public partial class App : Application
                 _settingsWindow = null;
                 // Re-apply language and refresh so changes take effect immediately.
                 ApplyLanguageOverride(_settingsStore.Load());
+                ApplyTrayLocalization();
                 _trayViewModel!.Refresh();
             };
         }
