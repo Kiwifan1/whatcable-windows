@@ -12,4 +12,9 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\WhatCable.Video.Core\WhatCable.Video.Core.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="Fixtures\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

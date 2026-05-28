@@ -1,0 +1,37 @@
+{
+  "connectorType": "HDMI",
+  "activeMode": {
+    "widthPx": 3840,
+    "heightPx": 2160,
+    "refreshRateHz": 60,
+    "interlaced": false,
+    "pixelClockMhz": 594.0
+  },
+  "sinkMaxMode": {
+    "widthPx": 3840,
+    "heightPx": 2160,
+    "refreshRateHz": 120,
+    "interlaced": false,
+    "pixelClockMhz": 1188.0
+  },
+  "advertisedCableClass": "HdmiHighSpeed",
+  "sourceGpuCaps": {
+    "vendor": "NVIDIA",
+    "model": "GeForce RTX 4090",
+    "maxHdmiGen": "2.1",
+    "maxDisplayPortGen": "1.4",
+    "maxPixelClockMhz": 2000.0
+  },
+  "diagnostic": {
+    "bottleneck": "Cable",
+    "verdict": "⚠ Cable is limiting the video link. Consider upgrading the cable.",
+    "details": [
+      "Active mode: 3840×2160@60Hz",
+      "Display maximum: 3840×2160@120Hz",
+      "Cable class: HdmiHighSpeed",
+      "GPU: NVIDIA GeForce RTX 4090",
+      "Cable limits to 3840×2160@60Hz. Display supports 3840×2160@120Hz."
+    ],
+    "recommendedCableClass": "HdmiUltraHighSpeed"
+  }
+}
