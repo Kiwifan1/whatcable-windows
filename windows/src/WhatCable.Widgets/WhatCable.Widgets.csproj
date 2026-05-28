@@ -2,15 +2,21 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
     <RootNamespace>WhatCable.Widgets</RootNamespace>
     <AssemblyName>WhatCable.Widgets</AssemblyName>
     <Platforms>x64;ARM64</Platforms>
+    <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
+    <UseWinUI>false</UseWinUI>
+    <EnableMsixTooling>true</EnableMsixTooling>
     <Description>Windows 11 Widget Provider COM server for WhatCable. Renders cable status as Adaptive Cards on the Widgets Board and lock screen.</Description>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.3233" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.241114003" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WhatCable.Core\WhatCable.Core.csproj" />
+    <ProjectReference Include="..\WhatCable.Widgets.Core\WhatCable.Widgets.Core.csproj" />
   </ItemGroup>
 </Project>

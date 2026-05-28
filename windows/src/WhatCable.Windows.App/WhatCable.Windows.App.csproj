@@ -22,7 +22,16 @@
   <ItemGroup>
     <ProjectReference Include="..\WhatCable.Core\WhatCable.Core.csproj" />
     <ProjectReference Include="..\WhatCable.Video.Core\WhatCable.Video.Core.csproj" />
+    <ProjectReference Include="..\WhatCable.Widgets.Core\WhatCable.Widgets.Core.csproj" />
     <ProjectReference Include="..\WhatCable.Windows.App.Core\WhatCable.Windows.App.Core.csproj" />
     <ProjectReference Include="..\WhatCable.Windows.Backend\WhatCable.Windows.Backend.csproj" />
+    <!--
+      Include WhatCable.Widgets.exe in the MSIX package alongside WhatCable.exe. The manifest
+      registers it as the out-of-process widget provider COM server; both must live at the app root.
+    -->
+    <ProjectReference Include="..\WhatCable.Widgets\WhatCable.Widgets.csproj"
+                      ReferenceOutputAssembly="false"
+                      OutputItemType="Content"
+                      CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

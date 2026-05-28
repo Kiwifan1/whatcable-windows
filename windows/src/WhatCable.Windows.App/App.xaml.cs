@@ -9,6 +9,7 @@ using WhatCable.Windows.App.Core.Settings;
 using WhatCable.Windows.App.Core.ViewModels;
 using WhatCable.Windows.App.Services;
 using WhatCable.Windows.App.Views;
+using WhatCable.Windows.Backend;
 
 namespace WhatCable.Windows.App;
 
@@ -24,6 +25,10 @@ public partial class App : Application
     private readonly ISettingsStore _settingsStore = new JsonFileSettingsStore();
     private readonly ILocalizer _localizer = new ResourceLocalizer();
     private readonly IStartupTaskService _startupTask = new StartupTaskService();
+    private readonly WidgetPublisher _widgetPublisher = new();
+
+    // Caches the latest snapshot so the tray VM and widget publisher share one backend query.
+    private readonly CachingSnapshotProvider _snapshotProvider = new();
 
     private TrayViewModel? _trayViewModel;
     private TaskbarIcon? _trayIcon;
@@ -31,8 +36,12 @@ public partial class App : Application
     private MenuFlyoutItem? _refreshMenuItem;
     private MenuFlyoutItem? _settingsMenuItem;
     private MenuFlyoutItem? _quitMenuItem;
+    private DispatcherQueue? _dispatcherQueue;
     private DispatcherQueueTimer? _pollTimer;
     private SettingsWindow? _settingsWindow;
+
+    // Cancels any in-flight background poll work when a newer poll fires.
+    private CancellationTokenSource _publishCts = new();
 
     public App()
     {
@@ -45,7 +54,7 @@ public partial class App : Application
         AppNotificationManager.Default.Register();
 
         _trayViewModel = new TrayViewModel(
-            new BackendSnapshotProvider(),
+            _snapshotProvider,
             _settingsStore,
             _localizer,
             new ToastNotificationService());
@@ -122,12 +131,51 @@ public partial class App : Application
 
     private void StartPolling()
     {
-        var queue = DispatcherQueue.GetForCurrentThread();
-        _pollTimer = queue.CreateTimer();
+        _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
+        _pollTimer = _dispatcherQueue.CreateTimer();
         _pollTimer.Interval = PollInterval;
-        _pollTimer.Tick += (_, _) => _trayViewModel!.Refresh();
+        _pollTimer.Tick += (_, _) => Poll();
         _pollTimer.Start();
-        _trayViewModel!.Refresh();
+        Poll();
+    }
+
+    /// <summary>
+    /// Builds a backend report on the thread pool (once per tick), updates the snapshot cache so
+    /// <see cref="TrayViewModel"/> sees fresh data, then dispatches the UI refresh back to the
+    /// dispatcher thread and publishes the same report to the widget provider. Any in-flight work
+    /// from a previous tick is cancelled before the new one starts.
+    /// </summary>
+    private void Poll()
+    {
+        // Cancel any in-flight widget publish from a previous poll and start fresh.
+        _publishCts.Cancel();
+        _publishCts.Dispose();
+        _publishCts = new CancellationTokenSource();
+        var cts = _publishCts;
+        var dq = _dispatcherQueue!;
+
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                // Build the report once; both the tray VM and the widget publisher use it.
+                var report = SnapshotBuilder.CreateDefault().BuildReport();
+                if (cts.IsCancellationRequested) return;
+
+                // Update the cache so the tray ViewModel picks up the new snapshot.
+                _snapshotProvider.Update(report.Snapshot);
+
+                // Refresh the tray UI on the dispatcher thread.
+                dq.TryEnqueue(() => _trayViewModel!.Refresh());
+
+                // Publish to the widget provider; interruptible if the next poll fires first.
+                await _widgetPublisher.PublishAsync(report, cts.Token).ConfigureAwait(false);
+            }
+            catch
+            {
+                // Best-effort; widget publishing must never disrupt the tray app.
+            }
+        });
     }
 
     private void ShowSettings()
@@ -157,6 +205,7 @@ public partial class App : Application
     private void Quit()
     {
         _pollTimer?.Stop();
+        _publishCts.Cancel();
         _trayIcon?.Dispose();
         AppNotificationManager.Default.Unregister();
         Exit();
