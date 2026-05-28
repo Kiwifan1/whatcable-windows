@@ -6,6 +6,19 @@ dist/
 dist-mas/
 *.xcodeproj
 .DS_Store
+
+# Windows port (windows/) — .NET / WinUI 3 build artefacts
+windows/**/bin/
+windows/**/obj/
+windows/**/AppPackages/
+windows/**/BundleArtifacts/
+windows/**/GeneratedArtifacts/
+windows/**/.vs/
+windows/**/*.user
+windows/**/*.suo
+windows/**/*.binlog
+windows/**/TestResults/
+windows/**/Generated Files/
 .env
 .claude/
 

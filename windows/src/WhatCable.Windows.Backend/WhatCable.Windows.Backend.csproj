@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
+    <RootNamespace>WhatCable.Windows.Backend</RootNamespace>
+    <AssemblyName>WhatCable.Windows.Backend</AssemblyName>
+    <Description>Windows-only P/Invoke adapters: UCSI, USB topology, power, Thunderbolt chain, display config, EDID, optional vendor GPU SDKs.</Description>
+    <Platforms>x64;ARM64</Platforms>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WhatCable.Core\WhatCable.Core.csproj" />
+    <ProjectReference Include="..\WhatCable.Video.Core\WhatCable.Video.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.106" PrivateAssets="all" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,3 @@
+# CsWin32 native API surface for the Windows backend.
+# Populated as adapters are added in PR 4 onwards.
+GetSystemPowerStatus

@@ -236,6 +236,10 @@ cp .env.example .env
 
 [@abrauchli](https://github.com/abrauchli) built a Rust port for Linux called [usbeehive](https://github.com/abrauchli/usbeehive). Install it with `cargo install usbeehive`. It reads from the kernel's typec sysfs interface rather than IOKit, so it's an independent implementation rather than a fork. It started life as a `whatcable` crate on crates.io before being renamed to avoid confusion with this repo. He's also working on [usbee](https://github.com/abrauchli/usbee), a GNOME UI for it (early stage, but the basics work).
 
+## Windows port
+
+A Windows port is in progress under [`windows/`](windows/). It's a clean-sheet WinUI 3 / C# rewrite (Apple's IOKit services have no Windows equivalents) that reuses the same data models, decoders, and JSON shape so `cables.json` and CLI tooling keep working across platforms. It also adds a new **video-cable diagnostic** for HDMI / DisplayPort / USB-C-as-DP outputs. See [`windows/README.md`](windows/README.md) for the capability matrix and per-PR plan.
+
 ## Privacy
 
 WhatCable reads USB-C port state directly from IOKit on your Mac. All of that happens locally. Nothing is sent anywhere automatically.

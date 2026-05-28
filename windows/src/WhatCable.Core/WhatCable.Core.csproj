@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>WhatCable.Core</RootNamespace>
+    <AssemblyName>WhatCable.Core</AssemblyName>
+    <Description>Platform-neutral data models and decoders for WhatCable (USB-PD VDOs, e-marker, cable DB, vendor DB, diagnostics).</Description>
+  </PropertyGroup>
+</Project>
