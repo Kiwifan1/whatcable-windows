@@ -53,6 +53,7 @@ public partial class App : Application
     private void CreateTrayIcon()
     {
         var popover = new TrayPopover { ViewModel = _trayViewModel! };
+        popover.ApplyLocalization(_localizer);
         popover.PortInvoked += (_, port) => ShowPortDetail(port);
         popover.SettingsRequested += (_, _) => ShowSettings();
         popover.RefreshRequested += (_, _) => _trayViewModel!.Refresh();

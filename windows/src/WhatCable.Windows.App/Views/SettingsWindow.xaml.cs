@@ -1,0 +1,80 @@
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using WhatCable.Windows.App.Core.Localization;
+using WhatCable.Windows.App.Core.ViewModels;
+
+namespace WhatCable.Windows.App.Views;
+
+/// <summary>
+/// Settings window over <see cref="SettingsViewModel"/>: launch-at-login, notifications, port
+/// visibility, vendor-SDK probing, UI language, and Pro license entry. Labels are pulled from the
+/// localiser at construction; values round-trip through the ViewModel and are persisted on close.
+/// </summary>
+public sealed partial class SettingsWindow : Window
+{
+    private readonly SettingsViewModel _viewModel;
+    private readonly ILocalizer _localizer;
+
+    public SettingsWindow(SettingsViewModel viewModel, ILocalizer localizer)
+    {
+        _viewModel = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
+        _localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
+
+        InitializeComponent();
+
+        Title = _localizer.Get(StringKeys.SettingsTitle);
+        Root.DataContext = _viewModel;
+        ApplyLocalization();
+        UpdateLicenseStatus();
+
+        // Persist whatever the user changed when the window closes.
+        Closed += (_, _) => _viewModel.Save();
+    }
+
+    private void ApplyLocalization()
+    {
+        TitleText.Text = _localizer.Get(StringKeys.SettingsTitle);
+
+        BehaviorHeader.Text = _localizer.Get(StringKeys.SettingsBehavior);
+        LaunchAtLoginToggle.Header = _localizer.Get(StringKeys.SettingsLaunchAtLogin);
+        NotificationsToggle.Header = _localizer.Get(StringKeys.SettingsNotifications);
+        NotifyChangesToggle.Header = _localizer.Get(StringKeys.SettingsNotifyOnCableChanges);
+        HideEmptyToggle.Header = _localizer.Get(StringKeys.SettingsHideEmptyPorts);
+        VendorSdkToggle.Header = _localizer.Get(StringKeys.SettingsVendorSdk);
+        VendorSdkDetail.Text = _localizer.Get(StringKeys.SettingsVendorSdkDetail);
+
+        LanguageHeader.Text = _localizer.Get(StringKeys.SettingsLanguage);
+        ProHeader.Text = _localizer.Get(StringKeys.SettingsPro);
+        LicenseBox.Header = _localizer.Get(StringKeys.SettingsProLicenseKey);
+        DoneButton.Content = _localizer.Get(StringKeys.SettingsDone);
+    }
+
+    private async void OnLaunchAtLoginToggled(object sender, RoutedEventArgs e)
+    {
+        // Route through the ViewModel so the OS startup task is actually toggled and the effective
+        // state (which the OS may override) is reflected back into the switch.
+        await _viewModel.ApplyLaunchAtLoginCommand.ExecuteAsync(LaunchAtLoginToggle.IsOn);
+        LaunchAtLoginToggle.IsOn = _viewModel.LaunchAtLogin;
+    }
+
+    private void OnLicenseChanged(object sender, TextChangedEventArgs e) => UpdateLicenseStatus();
+
+    private void UpdateLicenseStatus()
+    {
+        if (string.IsNullOrWhiteSpace(_viewModel.LicenseKey))
+        {
+            LicenseStatus.Text = string.Empty;
+            return;
+        }
+
+        LicenseStatus.Text = _viewModel.IsProLicensed
+            ? _localizer.Get(StringKeys.SettingsProLicenseValid)
+            : _localizer.Get(StringKeys.SettingsProLicenseInvalid);
+    }
+
+    private void OnDoneClicked(object sender, RoutedEventArgs e)
+    {
+        _viewModel.Save();
+        Close();
+    }
+}

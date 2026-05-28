@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Window
+    x:Class="WhatCable.Windows.App.Views.SettingsWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid x:Name="Root" Padding="24" RowSpacing="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock
+            x:Name="TitleText"
+            Grid.Row="0"
+            Style="{ThemeResource TitleTextBlockStyle}" />
+
+        <ScrollViewer Grid.Row="1">
+            <StackPanel Spacing="16">
+                <!-- Behaviour -->
+                <TextBlock x:Name="BehaviorHeader" Style="{ThemeResource BodyStrongTextBlockStyle}" />
+                <ToggleSwitch
+                    x:Name="LaunchAtLoginToggle"
+                    IsOn="{Binding LaunchAtLogin, Mode=OneWay}"
+                    IsEnabled="{Binding CanToggleLaunchAtLogin}"
+                    Toggled="OnLaunchAtLoginToggled" />
+                <ToggleSwitch
+                    x:Name="NotificationsToggle"
+                    IsOn="{Binding NotificationsEnabled, Mode=TwoWay}" />
+                <ToggleSwitch
+                    x:Name="NotifyChangesToggle"
+                    IsOn="{Binding NotifyOnCableChanges, Mode=TwoWay}"
+                    IsEnabled="{Binding NotificationsEnabled}" />
+                <ToggleSwitch
+                    x:Name="HideEmptyToggle"
+                    IsOn="{Binding HideEmptyPorts, Mode=TwoWay}" />
+
+                <StackPanel Spacing="4">
+                    <ToggleSwitch
+                        x:Name="VendorSdkToggle"
+                        IsOn="{Binding VendorSdkEnabled, Mode=TwoWay}" />
+                    <TextBlock
+                        x:Name="VendorSdkDetail"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        Style="{ThemeResource CaptionTextBlockStyle}"
+                        TextWrapping="Wrap" />
+                </StackPanel>
+
+                <!-- Language -->
+                <TextBlock x:Name="LanguageHeader" Style="{ThemeResource BodyStrongTextBlockStyle}" />
+                <ComboBox
+                    x:Name="LocaleCombo"
+                    MinWidth="220"
+                    DisplayMemberPath="DisplayName"
+                    ItemsSource="{Binding Locales}"
+                    SelectedItem="{Binding SelectedLocale, Mode=TwoWay}" />
+
+                <!-- Pro -->
+                <TextBlock x:Name="ProHeader" Style="{ThemeResource BodyStrongTextBlockStyle}" />
+                <TextBox
+                    x:Name="LicenseBox"
+                    PlaceholderText="WCPRO-XXXXX-XXXXX-XXXXX"
+                    Text="{Binding LicenseKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    TextChanged="OnLicenseChanged" />
+                <TextBlock x:Name="LicenseStatus" Style="{ThemeResource CaptionTextBlockStyle}" />
+            </StackPanel>
+        </ScrollViewer>
+
+        <Button
+            x:Name="DoneButton"
+            Grid.Row="2"
+            HorizontalAlignment="Right"
+            Style="{ThemeResource AccentButtonStyle}"
+            Click="OnDoneClicked" />
+    </Grid>
+</Window>
