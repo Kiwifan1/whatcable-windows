@@ -138,12 +138,12 @@ public static class VideoLinkDiagnostic
             else
             {
                 // Display supports more than the active mode. If we have cable and/or GPU
-                // capability data showing headroom, the lower mode is a user/OS selection
-                // (the sink itself is not the limit). On a stock PC with no vendor SDK we
-                // usually have neither the cable e-marker nor GPU caps, so we cannot tell
-                // whether the cable or the source is the limit — report that explicitly.
-                bool haveComponentInfo = cableBandwidthGbps.HasValue || gpuBandwidthGbps.HasValue;
-                if (haveComponentInfo)
+                // and GPU capability data showing headroom, the lower mode is a user/OS
+                // selection (the sink itself is not the limit). If either component limit
+                // is unknown, we cannot distinguish sink/user choice from cable/source
+                // limitations, so report that explicitly.
+                bool haveBothComponentCaps = cableBandwidthGbps.HasValue && gpuBandwidthGbps.HasValue;
+                if (haveBothComponentCaps)
                 {
                     bottleneck = VideoBottleneck.Sink;
                     details.Add($"Display reports {FormatMode(sinkMaxMode)} capability but not active.");

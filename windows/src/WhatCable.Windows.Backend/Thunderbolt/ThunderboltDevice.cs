@@ -16,7 +16,7 @@ public sealed record ThunderboltDevice
 {
     [JsonPropertyName("name")] public string? Name { get; init; }
     [JsonPropertyName("instanceId")] public string InstanceId { get; init; } = string.Empty;
-    [JsonPropertyName("chainDepth")] public int ChainDepth { get; init; }
+    [JsonPropertyName("chainDepth")] public int EnumerationIndex { get; init; }
     [JsonPropertyName("perLaneSpeedsAvailable")] public bool PerLaneSpeedsAvailable { get; init; }
     [JsonPropertyName("unavailable_reason")] public string? UnavailableReason { get; init; }
 }

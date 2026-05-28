@@ -3,6 +3,7 @@ namespace WhatCable.Windows.Backend.Thunderbolt;
 /// <summary>
 /// Maps an enumerated Thunderbolt/USB4 device list onto the <see cref="ThunderboltDevice"/>
 /// chain emitted in the CLI. The list is ordered as enumerated (controllers first), with
+/// per-device enumeration indexes (not topological depth), and with
 /// per-lane speeds explicitly marked unavailable — see <see cref="ThunderboltDevice"/>.
 /// </summary>
 public sealed class ThunderboltChainAdapter
@@ -19,7 +20,7 @@ public sealed class ThunderboltChainAdapter
     {
         var devices = _enumerator.EnumerateChain();
         var chain = new List<ThunderboltDevice>(devices.Count);
-        var depth = 0;
+        var enumerationIndex = 0;
 
         foreach (var device in devices)
         {
@@ -27,11 +28,11 @@ public sealed class ThunderboltChainAdapter
             {
                 Name = device.Name,
                 InstanceId = device.InstanceId,
-                ChainDepth = depth,
+                EnumerationIndex = enumerationIndex,
                 PerLaneSpeedsAvailable = false,
                 UnavailableReason = PerLaneUnavailableReason,
             });
-            depth++;
+            enumerationIndex++;
         }
 
         return chain;

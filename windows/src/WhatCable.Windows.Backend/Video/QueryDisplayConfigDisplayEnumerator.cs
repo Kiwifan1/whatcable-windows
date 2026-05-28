@@ -91,8 +91,25 @@ internal sealed class QueryDisplayConfigDisplayEnumerator : IDisplayEnumerator
 
     private static VideoMode? ReadActiveMode(DISPLAYCONFIG_PATH_INFO path, DISPLAYCONFIG_MODE_INFO[] modes)
     {
+        uint targetIdx = path.targetInfo.Anonymous.modeInfoIdx;
+        if (targetIdx < modes.Length && modes[targetIdx].infoType == DISPLAYCONFIG_MODE_INFO_TYPE.DISPLAYCONFIG_MODE_INFO_TYPE_TARGET)
+        {
+            var targetSignal = modes[targetIdx].Anonymous.targetMode.targetVideoSignalInfo;
+            int targetWidth = (int)targetSignal.activeSize.cx;
+            int targetHeight = (int)targetSignal.activeSize.cy;
+            if (targetWidth > 0 && targetHeight > 0)
+            {
+                return new VideoMode
+                {
+                    WidthPx = targetWidth,
+                    HeightPx = targetHeight,
+                    RefreshRateHz = Math.Round(ReadRefresh(targetSignal.vSyncFreq, path.targetInfo.refreshRate), 3),
+                };
+            }
+        }
+
         uint sourceIdx = path.sourceInfo.Anonymous.modeInfoIdx;
-        if (sourceIdx >= modes.Length)
+        if (sourceIdx >= modes.Length || modes[sourceIdx].infoType != DISPLAYCONFIG_MODE_INFO_TYPE.DISPLAYCONFIG_MODE_INFO_TYPE_SOURCE)
         {
             return null;
         }
@@ -105,20 +122,22 @@ internal sealed class QueryDisplayConfigDisplayEnumerator : IDisplayEnumerator
             return null;
         }
 
-        double refresh = 0;
-        var rate = path.targetInfo.refreshRate;
-        if (rate.Denominator != 0)
-        {
-            refresh = (double)rate.Numerator / rate.Denominator;
-        }
-
         return new VideoMode
         {
             WidthPx = width,
             HeightPx = height,
-            RefreshRateHz = Math.Round(refresh, 3),
+            RefreshRateHz = Math.Round(ReadRefresh(path.targetInfo.refreshRate), 3),
         };
     }
+
+    private static double ReadRefresh(DISPLAYCONFIG_RATIONAL preferred, DISPLAYCONFIG_RATIONAL fallback)
+    {
+        var refresh = ReadRefresh(preferred);
+        return refresh > 0 ? refresh : ReadRefresh(fallback);
+    }
+
+    private static double ReadRefresh(DISPLAYCONFIG_RATIONAL rate)
+        => rate.Denominator != 0 ? (double)rate.Numerator / rate.Denominator : 0;
 
     private static unsafe (string? Name, string? DevicePath) ReadTargetDeviceName(DISPLAYCONFIG_PATH_INFO path)
     {
