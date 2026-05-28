@@ -45,9 +45,11 @@ public sealed class GoldenJsonTests
         var json = VideoJsonFormatter.Render(snapshot);
 
         Assert.NotNull(json);
+        Assert.EndsWith("\n", json);
         Assert.Contains("\"connectorType\": \"HDMI\"", json);
         Assert.Contains("\"activeMode\"", json);
         Assert.DoesNotContain("edidRaw", json);
+        Assert.DoesNotContain("sourceGpuCaps", json);
     }
 
     [Fact]

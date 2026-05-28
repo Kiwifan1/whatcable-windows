@@ -197,7 +197,7 @@ public static class CtaParser
                 MaxChannels = maxChannels,
                 SampleRatesKhz = sampleRates,
                 BitDepths = bitDepths,
-                MaxBitrateMbps = maxBitrate
+                MaxBitrateKbps = maxBitrate
             });
         }
     }

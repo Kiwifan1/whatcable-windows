@@ -1,11 +1,11 @@
 {
   "connectorType": "DisplayPort",
   "activeMode": {
-    "widthPx": 7680,
-    "heightPx": 4320,
+    "widthPx": 3840,
+    "heightPx": 2160,
     "refreshRateHz": 60,
     "interlaced": false,
-    "pixelClockMhz": 2376.0
+    "pixelClockMhz": 594.0
   },
   "sinkMaxMode": {
     "widthPx": 7680,
@@ -14,7 +14,7 @@
     "interlaced": false,
     "pixelClockMhz": 4752.0
   },
-  "advertisedCableClass": "DisplayPort20UHBR20",
+  "advertisedCableClass": "DisplayPort20Uhbr20",
   "sourceGpuCaps": {
     "vendor": "AMD",
     "model": "Radeon RX 7900 XTX",
@@ -26,12 +26,12 @@
     "bottleneck": "Source",
     "verdict": "⚠ GPU/source is limiting the video link. Hardware upgrade needed for higher modes.",
     "details": [
-      "Active mode: 7680×4320@60Hz",
+      "Active mode: 3840×2160@60Hz",
       "Display maximum: 7680×4320@120Hz",
-      "Cable class: DisplayPort20UHBR20",
+      "Cable class: DisplayPort20Uhbr20",
       "GPU: AMD Radeon RX 7900 XTX",
       "GPU is primary bottleneck. Cable also limiting."
     ],
-    "recommendedCableClass": null
+    "recommendedCableClass": "DisplayPort20Uhbr20"
   }
 }

@@ -29,7 +29,7 @@ public sealed class KnownVideoCablesDatabaseTests
         var cables = KnownVideoCablesDatabase.GetAll();
 
         var dp20Cables = cables.Where(c =>
-            c.CableClass == VideoCableClass.DisplayPort20UHBR20 ||
+            c.CableClass == VideoCableClass.DisplayPort20Uhbr20 ||
             c.CableClass == VideoCableClass.DisplayPort20Uhbr135).ToList();
         Assert.NotEmpty(dp20Cables);
     }
@@ -37,10 +37,10 @@ public sealed class KnownVideoCablesDatabaseTests
     [Fact]
     public void FindByCertificationId_ValidId_ReturnsCable()
     {
-        var cable = KnownVideoCablesDatabase.FindByCertificationId("HDMI-UHS-48G-001");
+        var cable = KnownVideoCablesDatabase.FindByCertificationId("PLACEHOLDER-HDMI-UHS-48G-001");
 
         Assert.NotNull(cable);
-        Assert.Equal("HDMI-UHS-48G-001", cable.CertificationId);
+        Assert.Equal("PLACEHOLDER-HDMI-UHS-48G-001", cable.CertificationId);
         Assert.Equal(VideoCableClass.HdmiUltraHighSpeed, cable.CableClass);
     }
 
@@ -63,10 +63,10 @@ public sealed class KnownVideoCablesDatabaseTests
     [Fact]
     public void FindByCertificationId_CaseInsensitive()
     {
-        var cable = KnownVideoCablesDatabase.FindByCertificationId("hdmi-uhs-48g-001");
+        var cable = KnownVideoCablesDatabase.FindByCertificationId("placeholder-hdmi-uhs-48g-001");
 
         Assert.NotNull(cable);
-        Assert.Equal("HDMI-UHS-48G-001", cable.CertificationId);
+        Assert.Equal("PLACEHOLDER-HDMI-UHS-48G-001", cable.CertificationId);
     }
 
     [Fact]

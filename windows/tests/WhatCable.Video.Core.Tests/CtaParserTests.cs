@@ -12,6 +12,18 @@ public sealed class CtaParserTests
     private static byte[] LoadFixture(params string[] relativePath)
         => File.ReadAllBytes(Path.Combine(new[] { AppContext.BaseDirectory, "Fixtures" }.Concat(relativePath).ToArray()));
 
+    private static void UpdateChecksum(byte[] block)
+    {
+        block[127] = 0;
+        byte sum = 0;
+        for (int i = 0; i < 127; i++)
+        {
+            sum += block[i];
+        }
+
+        block[127] = (byte)(256 - sum);
+    }
+
     static CtaParserTests()
     {
         // Initialize CTA block
@@ -145,6 +157,23 @@ public sealed class CtaParserTests
         Assert.Contains(48, lpcm.SampleRatesKhz);
         Assert.NotNull(lpcm.BitDepths);
         Assert.Contains(24, lpcm.BitDepths);
+    }
+
+    [Fact]
+    public void Parse_CompressedAudioDescriptor_ReportsMaxBitrateInKbps()
+    {
+        var ctaBlock = (byte[])SampleCtaBlock.Clone();
+        ctaBlock[11] = 0x15; // Format=AC-3, 6 channels
+        ctaBlock[12] = 0x04; // 48 kHz
+        ctaBlock[13] = 0x50; // 640 kbps encoded as 80 * 8 kbps
+        UpdateChecksum(ctaBlock);
+
+        var cta = CtaParser.Parse(ctaBlock);
+
+        Assert.NotNull(cta);
+        var ac3 = cta.AudioDescriptors.FirstOrDefault(a => a.Format == "AC-3");
+        Assert.NotNull(ac3);
+        Assert.Equal(640, ac3.MaxBitrateKbps);
     }
 
     [Fact]

@@ -23,8 +23,8 @@ public static class DisplayIdParser
 
         // DisplayID structure starts at offset 1
         byte structVersion = displayIdBlock[1];
-        byte revision = (byte)((structVersion >> 4) & 0x0F);
-        byte version = (byte)(structVersion & 0x0F);
+        byte version = (byte)((structVersion >> 4) & 0x0F);
+        byte revision = (byte)(structVersion & 0x0F);
 
         if (version < 2) // We're looking for DisplayID 2.0+
             return null;

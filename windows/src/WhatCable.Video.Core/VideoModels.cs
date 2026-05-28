@@ -44,7 +44,7 @@ public enum VideoCableClass
     DisplayPort14,    // DP 1.4 (HBR3, up to 8.1 Gbps per lane)
     DisplayPort20,    // DP 2.0 UHBR10 (10 Gbps per lane)
     DisplayPort20Uhbr135, // DP 2.0 UHBR13.5 (13.5 Gbps per lane)
-    DisplayPort20UHBR20,   // DP 2.0 UHBR20 (20 Gbps per lane)
+    DisplayPort20Uhbr20,  // DP 2.0 UHBR20 (20 Gbps per lane)
     UsbC31Gen1,       // USB-C 3.1 Gen1 (DP Alt Mode up to HBR2)
     UsbC31Gen2,       // USB-C 3.1 Gen2 (DP Alt Mode up to HBR3)
     UsbC4Gen3         // USB-C 4 Gen3 (DP Alt Mode up to UHBR20)
@@ -161,7 +161,7 @@ public sealed record AudioDescriptor
     [JsonPropertyName("maxChannels")] public int MaxChannels { get; init; }
     [JsonPropertyName("sampleRatesKhz")] public IReadOnlyList<int> SampleRatesKhz { get; init; } = Array.Empty<int>();
     [JsonPropertyName("bitDepths")] public IReadOnlyList<int>? BitDepths { get; init; }
-    [JsonPropertyName("maxBitrateMbps")] public int? MaxBitrateMbps { get; init; }
+    [JsonPropertyName("maxBitrateKbps")] public int? MaxBitrateKbps { get; init; }
 }
 
 /// <summary>

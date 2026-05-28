@@ -42,7 +42,7 @@ public static class VideoLinkDiagnostic
                 bottleneck = VideoBottleneck.Cable;
                 details.Add("No active video signal detected.");
                 details.Add($"Display supports up to {FormatMode(sinkMaxMode)}.");
-                recommendedCableClass = RecommendCableForMode(sinkMaxMode);
+                recommendedCableClass = RecommendCableForMode(sinkMaxMode, snapshot.ConnectorType);
                 return BuildDiagnostic(bottleneck, details, recommendedCableClass);
             }
             else
@@ -104,7 +104,7 @@ public static class VideoLinkDiagnostic
             {
                 bottleneck = VideoBottleneck.Cable;
                 details.Add($"Cable limits to {FormatMode(activeMode)}. Display supports {FormatMode(sinkMaxMode)}.");
-                recommendedCableClass = RecommendCableForMode(sinkMaxMode);
+                recommendedCableClass = RecommendCableForMode(sinkMaxMode, snapshot.ConnectorType);
             }
             else if (gpuLimiting && !cableLimiting)
             {
@@ -120,12 +120,13 @@ public static class VideoLinkDiagnostic
                     {
                         bottleneck = VideoBottleneck.Cable;
                         details.Add($"Cable is primary bottleneck. GPU also limiting.");
-                        recommendedCableClass = RecommendCableForMode(sinkMaxMode);
+                        recommendedCableClass = RecommendCableForMode(sinkMaxMode, snapshot.ConnectorType);
                     }
                     else
                     {
                         bottleneck = VideoBottleneck.Source;
                         details.Add($"GPU is primary bottleneck. Cable also limiting.");
+                        recommendedCableClass = RecommendCableForMode(sinkMaxMode, snapshot.ConnectorType);
                     }
                 }
                 else
@@ -219,7 +220,7 @@ public static class VideoLinkDiagnostic
             VideoCableClass.DisplayPort14 => 810.0,       // DP 1.4 HBR3: 8.1 Gbps per lane × 4 = 32.4 Gbps
             VideoCableClass.DisplayPort20 => 1000.0,      // DP 2.0 UHBR10: 10 Gbps per lane × 4 = 40 Gbps
             VideoCableClass.DisplayPort20Uhbr135 => 1350.0, // DP 2.0 UHBR13.5: 54 Gbps
-            VideoCableClass.DisplayPort20UHBR20 => 2000.0,   // DP 2.0 UHBR20: 80 Gbps
+            VideoCableClass.DisplayPort20Uhbr20 => 2000.0,  // DP 2.0 UHBR20: 80 Gbps
             VideoCableClass.UsbC31Gen1 => 540.0,          // USB-C with DP Alt Mode HBR2: 5.4 Gbps per lane
             VideoCableClass.UsbC31Gen2 => 810.0,          // USB-C with DP Alt Mode HBR3: 8.1 Gbps per lane
             VideoCableClass.UsbC4Gen3 => 2000.0,          // USB4 with DP 2.0: up to 80 Gbps
@@ -263,11 +264,19 @@ public static class VideoLinkDiagnostic
         return null;
     }
 
-    private static VideoCableClass? RecommendCableForMode(VideoMode mode)
+    private static VideoCableClass? RecommendCableForMode(VideoMode mode, VideoConnectorType connectorType)
     {
-        double bandwidth = CalculateRequiredBandwidth(mode);
+        return connectorType switch
+        {
+            VideoConnectorType.DisplayPort => RecommendDisplayPortCableForMode(mode),
+            VideoConnectorType.UsbCDisplayPort => RecommendUsbCCableForMode(mode),
+            VideoConnectorType.Thunderbolt => RecommendUsbCCableForMode(mode),
+            _ => RecommendHdmiCableForMode(mode)
+        };
+    }
 
-        // Recommend based on mode requirements
+    private static VideoCableClass RecommendHdmiCableForMode(VideoMode mode)
+    {
         bool is4K = mode.HeightPx >= 2160;
         bool is8K = mode.HeightPx >= 4320;
         bool highRefresh = mode.RefreshRateHz >= 120;
@@ -292,5 +301,38 @@ public static class VideoLinkDiagnostic
             // 1080p or lower
             return VideoCableClass.HdmiStandard;
         }
+    }
+
+    private static VideoCableClass RecommendDisplayPortCableForMode(VideoMode mode)
+    {
+        bool is4K = mode.HeightPx >= 2160;
+        bool is8K = mode.HeightPx >= 4320;
+        bool highRefresh = mode.RefreshRateHz >= 120;
+
+        if (is8K || (is4K && highRefresh))
+        {
+            return VideoCableClass.DisplayPort20Uhbr20;
+        }
+
+        return VideoCableClass.DisplayPort14;
+    }
+
+    private static VideoCableClass RecommendUsbCCableForMode(VideoMode mode)
+    {
+        bool is4K = mode.HeightPx >= 2160;
+        bool is8K = mode.HeightPx >= 4320;
+        bool highRefresh = mode.RefreshRateHz >= 120;
+
+        if (is8K || (is4K && highRefresh))
+        {
+            return VideoCableClass.UsbC4Gen3;
+        }
+
+        if (is4K && mode.RefreshRateHz >= 60)
+        {
+            return VideoCableClass.UsbC31Gen2;
+        }
+
+        return VideoCableClass.UsbC31Gen1;
     }
 }

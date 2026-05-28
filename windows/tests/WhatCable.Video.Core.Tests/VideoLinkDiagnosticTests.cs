@@ -132,7 +132,7 @@ public sealed class VideoLinkDiagnosticTests
             ConnectorType = VideoConnectorType.DisplayPort,
             ActiveMode = new VideoMode { WidthPx = 7680, HeightPx = 4320, RefreshRateHz = 60 },
             SinkMaxMode = new VideoMode { WidthPx = 7680, HeightPx = 4320, RefreshRateHz = 60 },
-            AdvertisedCableClass = VideoCableClass.DisplayPort20UHBR20
+            AdvertisedCableClass = VideoCableClass.DisplayPort20Uhbr20
         };
 
         var diagnostic = VideoLinkDiagnostic.Analyze(snapshot);
@@ -140,6 +140,25 @@ public sealed class VideoLinkDiagnosticTests
         Assert.NotNull(diagnostic);
         // Should be optimal with DP 2.0 UHBR20 for 8K60
         Assert.Equal(VideoBottleneck.None, diagnostic.Bottleneck);
+    }
+
+    [Fact]
+    public void Analyze_DisplayPortBothLimiting_RecommendsDisplayPortCableClass()
+    {
+        var snapshot = new VideoPortSnapshot
+        {
+            ConnectorType = VideoConnectorType.DisplayPort,
+            ActiveMode = new VideoMode { WidthPx = 3840, HeightPx = 2160, RefreshRateHz = 60, PixelClockMhz = 594.0 },
+            SinkMaxMode = new VideoMode { WidthPx = 7680, HeightPx = 4320, RefreshRateHz = 120, PixelClockMhz = 4752.0 },
+            AdvertisedCableClass = VideoCableClass.DisplayPort20Uhbr20,
+            SourceGpuCaps = new GpuCapabilities { Vendor = "AMD", Model = "Radeon RX 7900 XTX", MaxPixelClockMhz = 1500.0 }
+        };
+
+        var diagnostic = VideoLinkDiagnostic.Analyze(snapshot);
+
+        Assert.NotNull(diagnostic);
+        Assert.Equal(VideoBottleneck.Source, diagnostic.Bottleneck);
+        Assert.Equal(VideoCableClass.DisplayPort20Uhbr20, diagnostic.RecommendedCableClass);
     }
 
     [Fact]
