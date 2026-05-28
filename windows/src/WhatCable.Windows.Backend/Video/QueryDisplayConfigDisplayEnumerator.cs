@@ -180,7 +180,10 @@ internal sealed class QueryDisplayConfigDisplayEnumerator : IDisplayEnumerator
             return null;
         }
 
-        var trimmed = monitorDevicePath!.TrimStart('\\', '?', '.');
+        const string prefix = @"\\?\";
+        var trimmed = monitorDevicePath!.StartsWith(prefix, StringComparison.Ordinal)
+            ? monitorDevicePath.Substring(prefix.Length)
+            : monitorDevicePath;
         var parts = trimmed.Split('#');
         if (parts.Length < 3 || !string.Equals(parts[0], "DISPLAY", StringComparison.OrdinalIgnoreCase))
         {
