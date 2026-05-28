@@ -94,4 +94,4 @@ The widget provider is gated to Windows 11 because the Widgets Board / lock-scre
 
 ## CLI compatibility
 
-`whatcable-cli.exe` is intended to emit the same JSON schema as `whatcable-cli` on macOS, with a new `video` section appended. A `--legacy` flag will be added in PR 6 to suppress the new section for tooling that hasn't been updated yet.
+`whatcable-cli.exe` emits the same JSON schema as `whatcable-cli` on macOS, with new `video` and `thunderbolt` sections appended. Pass `--legacy` to suppress those sections for tooling that still consumes the macOS schema. Per-lane Thunderbolt speeds are intentionally absent (no public Windows API); each chain entry documents this with `unavailable_reason`.

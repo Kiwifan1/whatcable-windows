@@ -178,4 +178,23 @@ public sealed class VideoLinkDiagnosticTests
         Assert.Contains(diagnostic.Details, d => d.Contains("1920×1080"));
         Assert.Contains(diagnostic.Details, d => d.Contains("3840×2160"));
     }
+
+    [Fact]
+    public void Analyze_OnlyOneComponentCapabilityKnown_ReturnsUnknownNotSink()
+    {
+        var snapshot = new VideoPortSnapshot
+        {
+            ConnectorType = VideoConnectorType.HDMI,
+            ActiveMode = new VideoMode { WidthPx = 3840, HeightPx = 2160, RefreshRateHz = 60 },
+            SinkMaxMode = new VideoMode { WidthPx = 3840, HeightPx = 2160, RefreshRateHz = 120 },
+            AdvertisedCableClass = VideoCableClass.HdmiUltraHighSpeed,
+            SourceGpuCaps = null
+        };
+
+        var diagnostic = VideoLinkDiagnostic.Analyze(snapshot);
+
+        Assert.NotNull(diagnostic);
+        Assert.Equal(VideoBottleneck.Unknown, diagnostic.Bottleneck);
+        Assert.Contains("Cable or source is limiting", diagnostic.Verdict);
+    }
 }
