@@ -20,6 +20,9 @@ internal sealed class SetupApiUsbEnumerator : IUsbEnumerator
 {
     private const uint GenericWrite = 0x40000000;
     private const int MaxHubDepth = 16;
+    // SP_DEVICE_INTERFACE_DETAIL_DATA_W.cbSize: size of the fixed header only.
+    private const uint DetailCbSize64 = 8;
+    private const uint DetailCbSize32 = 6;
     private const byte UsbLowSpeed = 0;
     private const byte UsbFullSpeed = 1;
     private const byte UsbHighSpeed = 2;
@@ -102,7 +105,7 @@ internal sealed class SetupApiUsbEnumerator : IUsbEnumerator
         {
             var detail = (SP_DEVICE_INTERFACE_DETAIL_DATA_W*)p;
             // cbSize is the size of the fixed header only (8 on 64-bit, 6 on 32-bit).
-            detail->cbSize = (uint)(IntPtr.Size == 8 ? 8 : 6);
+            detail->cbSize = IntPtr.Size == 8 ? DetailCbSize64 : DetailCbSize32;
             if (!PInvoke.SetupDiGetDeviceInterfaceDetail(deviceInfo, in interfaceData, detail, required, null, null))
             {
                 return null;

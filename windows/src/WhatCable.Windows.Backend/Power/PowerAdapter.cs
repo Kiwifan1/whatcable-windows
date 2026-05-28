@@ -47,7 +47,7 @@ public sealed class PowerAdapter
                 return $"{level} — charging (AC connected).";
             }
 
-            return info.BatteryPercent >= 100
+            return info.BatteryPercent is >= 100
                 ? $"{level} — fully charged (AC connected)."
                 : $"{level} — on AC, not charging.";
         }
