@@ -80,6 +80,21 @@ public static class VideoLinkDiagnostic
             details.Add($"Cable class: {cableClass.Value}");
         }
 
+        // A vendor GPU SDK (NVAPI / AMD ADL / Intel IGCL) can report the *measured* negotiated
+        // link rate, which is authoritative over the advertised cable class. When present it
+        // both supplies a link capacity and lets us state confidently whether a lower-than-max
+        // active mode is link-limited or an intentional selection.
+        double? vendorLinkGbps = GetVendorLinkBandwidthGbps(snapshot);
+        bool haveMeasuredLink = vendorLinkGbps.HasValue;
+        if (snapshot.VendorGpuLink is { } vendorLink)
+        {
+            AddVendorLinkDetails(details, vendorLink);
+            if (haveMeasuredLink)
+            {
+                cableBandwidthGbps = vendorLinkGbps;
+            }
+        }
+
         // Determine GPU capability
         double? gpuBandwidthGbps = GetGpuBandwidthGbps(gpuCaps, snapshot.ConnectorType);
         if (gpuCaps != null && !string.IsNullOrEmpty(gpuCaps.Model))
@@ -143,11 +158,18 @@ public static class VideoLinkDiagnostic
                 // is unknown, we cannot distinguish sink/user choice from cable/source
                 // limitations, so report that explicitly.
                 bool haveBothComponentCaps = cableBandwidthGbps.HasValue && gpuBandwidthGbps.HasValue;
-                if (haveBothComponentCaps)
+                if (haveBothComponentCaps || haveMeasuredLink)
                 {
                     bottleneck = VideoBottleneck.Sink;
                     details.Add($"Display reports {FormatMode(sinkMaxMode)} capability but not active.");
-                    details.Add("This may be a user setting or OS limitation.");
+                    if (haveMeasuredLink)
+                    {
+                        details.Add("Vendor GPU SDK reports the link can carry the display's maximum mode; the lower active mode is an intentional user or OS selection.");
+                    }
+                    else
+                    {
+                        details.Add("This may be a user setting or OS limitation.");
+                    }
                 }
                 else
                 {
@@ -221,6 +243,66 @@ public static class VideoLinkDiagnostic
         double pixelClockMhz = (pixelsPerSecond * 1.25) / 1_000_000;
 
         return (pixelClockMhz * BitsPerPixelRgb8Bit) / 1000.0;
+    }
+
+    /// <summary>
+    /// Approximate effective payload bandwidth (Gbps) of the negotiated link reported by a
+    /// vendor GPU SDK, applying the line-coding efficiency for the link type so it is
+    /// comparable to <see cref="CalculateRequiredBandwidthGbps"/> and the cable-class table.
+    /// </summary>
+    private static double? GetVendorLinkBandwidthGbps(VideoPortSnapshot snapshot)
+    {
+        var link = snapshot.VendorGpuLink;
+        if (link?.TotalLinkBandwidthGbps is not { } rawGbps || rawGbps <= 0)
+        {
+            return null;
+        }
+
+        double efficiency;
+        if (link.HdmiFrlRateGbps is > 0)
+        {
+            // HDMI 2.1 FRL uses 16b/18b channel coding (~88.9% efficiency).
+            efficiency = 16.0 / 18.0;
+        }
+        else if (link.DpLinkRateGbps is { } dpRate && dpRate >= 10.0)
+        {
+            // DisplayPort 2.0 UHBR uses 128b/132b coding (~96.97% efficiency).
+            efficiency = 128.0 / 132.0;
+        }
+        else
+        {
+            // DisplayPort HBR/HBR2/HBR3 use 8b/10b coding (80% efficiency).
+            efficiency = 0.8;
+        }
+
+        return rawGbps * efficiency;
+    }
+
+    private static void AddVendorLinkDetails(List<string> details, VendorGpuLinkInfo link)
+    {
+        string vendor = string.IsNullOrEmpty(link.Vendor) ? "Vendor GPU SDK" : link.Vendor!;
+
+        if (link.DpLinkRateGbps is { } dpRate and > 0)
+        {
+            string lanes = link.DpLaneCount is { } dpLanes and > 0 ? $" × {dpLanes} lanes" : string.Empty;
+            details.Add($"{vendor}: DP link {dpRate:0.##} Gbps/lane{lanes}.");
+        }
+
+        if (link.HdmiFrlRateGbps is { } frlRate and > 0)
+        {
+            string lanes = link.HdmiFrlLaneCount is { } frlLanes and > 0 ? $" × {frlLanes} lanes" : string.Empty;
+            details.Add($"{vendor}: HDMI FRL {frlRate:0.##} Gbps/lane{lanes}.");
+        }
+
+        if (link.ScramblingEnabled == true)
+        {
+            details.Add($"{vendor}: link scrambling enabled.");
+        }
+
+        if (link.DscEnabled.HasValue)
+        {
+            details.Add($"{vendor}: DSC {(link.DscEnabled.Value ? "enabled" : "disabled")}.");
+        }
     }
 
     private static double? GetCableBandwidthGbps(VideoCableClass? cableClass, VideoConnectorType connectorType)

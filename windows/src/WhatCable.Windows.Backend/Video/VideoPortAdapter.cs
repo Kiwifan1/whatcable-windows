@@ -17,9 +17,25 @@ namespace WhatCable.Windows.Backend.Video;
 public sealed class VideoPortAdapter
 {
     private readonly IDisplayEnumerator _enumerator;
+    private readonly IReadOnlyList<IVendorGpuAdapter> _vendorAdapters;
 
     public VideoPortAdapter(IDisplayEnumerator enumerator)
-        => _enumerator = enumerator ?? throw new ArgumentNullException(nameof(enumerator));
+        : this(enumerator, vendorAdapters: null)
+    {
+    }
+
+    /// <param name="vendorAdapters">
+    /// Optional vendor GPU SDK adapters (NVAPI / AMD ADL / Intel IGCL). Only adapters that
+    /// report <see cref="IVendorGpuAdapter.IsAvailable"/> are queried; their link data is
+    /// merged into each <see cref="VideoPortSnapshot"/> as additive fields.
+    /// </param>
+    public VideoPortAdapter(IDisplayEnumerator enumerator, IReadOnlyList<IVendorGpuAdapter>? vendorAdapters)
+    {
+        _enumerator = enumerator ?? throw new ArgumentNullException(nameof(enumerator));
+        _vendorAdapters = vendorAdapters is null
+            ? Array.Empty<IVendorGpuAdapter>()
+            : vendorAdapters.Where(static a => a is not null && a.IsAvailable).ToArray();
+    }
 
     public IReadOnlyList<VideoPortReport> GetReports()
     {
@@ -38,6 +54,7 @@ public sealed class VideoPortAdapter
                 SinkMaxMode = sinkMaxMode,
                 EdidRaw = display.EdidRaw,
                 EdidParsed = edid,
+                VendorGpuLink = QueryVendorLink(display),
             };
 
             reports.Add(new VideoPortReport
@@ -49,6 +66,31 @@ public sealed class VideoPortAdapter
         }
 
         return reports;
+    }
+
+    /// <summary>
+    /// Queries each available vendor adapter for the display and returns the first link
+    /// report. Any adapter failure is swallowed so a misbehaving SDK never breaks enumeration.
+    /// </summary>
+    private VendorGpuLinkInfo? QueryVendorLink(DisplayInfo display)
+    {
+        foreach (var adapter in _vendorAdapters)
+        {
+            try
+            {
+                var link = adapter.QueryLink(display);
+                if (link is not null)
+                {
+                    return link;
+                }
+            }
+            catch
+            {
+                // A vendor SDK probe must never break the snapshot; try the next adapter.
+            }
+        }
+
+        return null;
     }
 
     /// <summary>

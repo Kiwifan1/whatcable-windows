@@ -74,6 +74,82 @@ public sealed record VideoPortSnapshot
     [JsonPropertyName("sourceGpuCaps")] public GpuCapabilities? SourceGpuCaps { get; init; }
     [JsonIgnore] public byte[]? EdidRaw { get; init; }
     [JsonPropertyName("edidParsed")] public EdidInfo? EdidParsed { get; init; }
+
+    /// <summary>
+    /// Live source-side link state reported by an optional vendor GPU SDK
+    /// (NVAPI / AMD ADL/ADLX / Intel IGCL). Additive and <c>null</c> on a stock build with
+    /// no vendor SDK present; when populated it lets the diagnostic distinguish a
+    /// cable-limited link from an intentional mode selection with higher confidence.
+    /// </summary>
+    [JsonPropertyName("vendorGpuLink")] public VendorGpuLinkInfo? VendorGpuLink { get; init; }
+}
+
+/// <summary>
+/// Source-side video link state read from a vendor GPU SDK. All fields are optional because
+/// each vendor exposes a different subset (NVAPI reports DP link rate/lane count, HDMI FRL
+/// rate, scrambling and DSC state; AMD ADL/ADLX reports the DisplayPort link config and HDMI
+/// signal info; Intel IGCL reports DP/HDMI link settings via <c>ctl_get_display_*</c>).
+/// </summary>
+public sealed record VendorGpuLinkInfo
+{
+    /// <summary>Vendor SDK that produced this data (e.g. <c>NVIDIA</c>, <c>AMD</c>, <c>Intel</c>).</summary>
+    [JsonPropertyName("vendor")] public string? Vendor { get; init; }
+
+    /// <summary>Negotiated DisplayPort link rate per lane, in Gbps (e.g. 8.1 for HBR3, 20 for UHBR20).</summary>
+    [JsonPropertyName("dpLinkRateGbps")] public double? DpLinkRateGbps { get; init; }
+
+    /// <summary>Negotiated DisplayPort lane count (typically 1, 2 or 4).</summary>
+    [JsonPropertyName("dpLaneCount")] public int? DpLaneCount { get; init; }
+
+    /// <summary>Negotiated HDMI Fixed Rate Link rate per lane, in Gbps (e.g. 3, 6, 8, 10, 12).</summary>
+    [JsonPropertyName("hdmiFrlRateGbps")] public double? HdmiFrlRateGbps { get; init; }
+
+    /// <summary>Number of HDMI FRL lanes in use (3 or 4); <c>null</c> when running in legacy TMDS mode.</summary>
+    [JsonPropertyName("hdmiFrlLaneCount")] public int? HdmiFrlLaneCount { get; init; }
+
+    /// <summary>True when link scrambling is enabled (HDMI 2.1 FRL / high TMDS rates).</summary>
+    [JsonPropertyName("scramblingEnabled")] public bool? ScramblingEnabled { get; init; }
+
+    /// <summary>True when Display Stream Compression is active on the link.</summary>
+    [JsonPropertyName("dscEnabled")] public bool? DscEnabled { get; init; }
+
+    /// <summary>
+    /// Total raw negotiated link bandwidth across all lanes, in Gbps, when reported directly
+    /// by the vendor SDK. When <c>null</c> it is derived from the DP / HDMI FRL fields via
+    /// <see cref="TotalLinkBandwidthGbps"/>.
+    /// </summary>
+    [JsonPropertyName("negotiatedLinkRateGbps")] public double? NegotiatedLinkRateGbps { get; init; }
+
+    /// <summary>
+    /// Total raw negotiated link bandwidth in Gbps: the explicit
+    /// <see cref="NegotiatedLinkRateGbps"/> when present, otherwise <c>rate × lanes</c>
+    /// derived from the DisplayPort or HDMI FRL fields. Returns <c>null</c> when nothing is known.
+    /// </summary>
+    [JsonIgnore]
+    public double? TotalLinkBandwidthGbps
+    {
+        get
+        {
+            if (NegotiatedLinkRateGbps is { } negotiated and > 0)
+            {
+                return negotiated;
+            }
+
+            if (DpLinkRateGbps is { } dpRate and > 0)
+            {
+                int lanes = DpLaneCount is { } dpLanes and > 0 ? dpLanes : 4;
+                return dpRate * lanes;
+            }
+
+            if (HdmiFrlRateGbps is { } frlRate and > 0)
+            {
+                int lanes = HdmiFrlLaneCount is { } frlLanes and > 0 ? frlLanes : 4;
+                return frlRate * lanes;
+            }
+
+            return null;
+        }
+    }
 }
 
 /// <summary>
