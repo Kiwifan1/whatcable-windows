@@ -15,7 +15,7 @@ public static class CableDatabase
 
     private static Dictionary<CableFingerprint, CuratedCable> LoadCables()
     {
-        using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("WhatCable.Core.Resources.cables.json")!;
+        using var stream = OpenResource("WhatCable.Core.Resources.cables.json");
         using var doc = JsonDocument.Parse(stream);
         return doc.RootElement.EnumerateArray().ToDictionary(
             x => new CableFingerprint(x.GetProperty("vid").GetInt32(), x.GetProperty("pid").GetInt32(), x.GetProperty("cableVDO").GetUInt32()),
@@ -42,12 +42,16 @@ public static class VendorDatabase
 
     private static Dictionary<int, VendorEntry> LoadVendors()
     {
-        using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("WhatCable.Core.Resources.vendors.json")!;
+        using var stream = OpenResource("WhatCable.Core.Resources.vendors.json");
         using var doc = JsonDocument.Parse(stream);
         return doc.RootElement.EnumerateArray().ToDictionary(
             x => x.GetProperty("vid").GetInt32(),
             x => new VendorEntry(x.GetProperty("name").GetString()!, x.GetProperty("source").GetString()!));
     }
+
+    private static Stream OpenResource(string resourceName)
+        => Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName)
+           ?? throw new InvalidOperationException($"Missing embedded resource '{resourceName}'.");
 }
 
 public sealed record CuratedCable(string Brand, string Speed, string Power, string Type, string IssueUrl);
