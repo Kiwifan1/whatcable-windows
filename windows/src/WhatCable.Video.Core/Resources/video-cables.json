@@ -1,0 +1,93 @@
+[
+  {
+    "certificationId": "PLACEHOLDER-HDMI-UHS-48G-001",
+    "cableClass": "HdmiUltraHighSpeed",
+    "vendor": "Belkin",
+    "model": "Ultra High Speed HDMI Cable",
+    "type": "HDMI"
+  },
+  {
+    "certificationId": "PLACEHOLDER-HDMI-UHS-48G-002",
+    "cableClass": "HdmiUltraHighSpeed",
+    "vendor": "Cable Matters",
+    "model": "48Gbps 8K HDMI Cable",
+    "type": "HDMI"
+  },
+  {
+    "certificationId": "PLACEHOLDER-HDMI-UHS-48G-003",
+    "cableClass": "HdmiUltraHighSpeed",
+    "vendor": "Zeskit",
+    "model": "Maya 8K 48Gbps",
+    "type": "HDMI"
+  },
+  {
+    "certificationId": "PLACEHOLDER-HDMI-HS-18G-001",
+    "cableClass": "HdmiHighSpeed",
+    "vendor": "AmazonBasics",
+    "model": "High-Speed HDMI Cable",
+    "type": "HDMI"
+  },
+  {
+    "certificationId": "PLACEHOLDER-HDMI-HS-18G-002",
+    "cableClass": "HdmiHighSpeed",
+    "vendor": "Monoprice",
+    "model": "Certified Premium High Speed HDMI",
+    "type": "HDMI"
+  },
+  {
+    "certificationId": "PLACEHOLDER-DP14-HBR3-001",
+    "cableClass": "DisplayPort14",
+    "vendor": "Cable Matters",
+    "model": "8K DisplayPort 1.4 Cable",
+    "type": "DisplayPort"
+  },
+  {
+    "certificationId": "PLACEHOLDER-DP14-HBR3-002",
+    "cableClass": "DisplayPort14",
+    "vendor": "Club 3D",
+    "model": "DisplayPort 1.4 HBR3",
+    "type": "DisplayPort"
+  },
+  {
+    "certificationId": "PLACEHOLDER-DP20-UHBR20-001",
+    "cableClass": "DisplayPort20Uhbr20",
+    "vendor": "Cable Matters",
+    "model": "DisplayPort 2.0 UHBR20 Cable",
+    "type": "DisplayPort"
+  },
+  {
+    "certificationId": "PLACEHOLDER-DP20-UHBR13-001",
+    "cableClass": "DisplayPort20Uhbr135",
+    "vendor": "Club 3D",
+    "model": "DisplayPort 2.0 UHBR13.5",
+    "type": "DisplayPort"
+  },
+  {
+    "certificationId": "PLACEHOLDER-USBC-DP14-001",
+    "cableClass": "UsbC31Gen2",
+    "vendor": "Cable Matters",
+    "model": "USB-C to DisplayPort Cable",
+    "type": "USB-C"
+  },
+  {
+    "certificationId": "PLACEHOLDER-USBC-DP20-001",
+    "cableClass": "UsbC4Gen3",
+    "vendor": "CalDigit",
+    "model": "Thunderbolt 4 USB-C Cable",
+    "type": "USB-C"
+  },
+  {
+    "certificationId": "PLACEHOLDER-TB4-DP20-001",
+    "cableClass": "UsbC4Gen3",
+    "vendor": "Apple",
+    "model": "Thunderbolt 4 Pro Cable",
+    "type": "Thunderbolt"
+  },
+  {
+    "certificationId": "PLACEHOLDER-TB4-DP20-002",
+    "cableClass": "UsbC4Gen3",
+    "vendor": "CalDigit",
+    "model": "Thunderbolt 4 Cable",
+    "type": "Thunderbolt"
+  }
+]

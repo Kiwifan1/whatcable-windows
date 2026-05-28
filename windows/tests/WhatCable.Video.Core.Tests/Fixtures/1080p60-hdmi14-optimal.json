@@ -1,0 +1,29 @@
+{
+  "connectorType": "HDMI",
+  "activeMode": {
+    "widthPx": 1920,
+    "heightPx": 1080,
+    "refreshRateHz": 60,
+    "interlaced": false,
+    "pixelClockMhz": 148.5
+  },
+  "sinkMaxMode": {
+    "widthPx": 1920,
+    "heightPx": 1080,
+    "refreshRateHz": 60,
+    "interlaced": false,
+    "pixelClockMhz": 148.5
+  },
+  "advertisedCableClass": "HdmiStandard",
+  "diagnostic": {
+    "bottleneck": "None",
+    "verdict": "✓ Optimal configuration - running at display's maximum capability.",
+    "details": [
+      "Active mode: 1920×1080@60Hz",
+      "Display maximum: 1920×1080@60Hz",
+      "Cable class: HdmiStandard",
+      "Running at display's maximum capability. Optimal configuration."
+    ],
+    "recommendedCableClass": null
+  }
+}
