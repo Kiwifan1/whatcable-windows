@@ -12,6 +12,9 @@ on:
       - '.github/workflows/windows-ci.yml'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Build & Test
