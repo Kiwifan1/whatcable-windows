@@ -21,6 +21,10 @@ public static class CableDatabase
             x => new CableFingerprint(x.GetProperty("vid").GetInt32(), x.GetProperty("pid").GetInt32(), x.GetProperty("cableVDO").GetUInt32()),
             x => new CuratedCable(x.GetProperty("brand").GetString()!, x.GetProperty("speed").GetString()!, x.GetProperty("power").GetString()!, x.GetProperty("type").GetString()!, x.GetProperty("issueURL").GetString()!));
     }
+
+    private static Stream OpenResource(string resourceName)
+        => Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName)
+           ?? throw new InvalidOperationException($"Missing embedded resource '{resourceName}'.");
 }
 
 public static class VendorDatabase
