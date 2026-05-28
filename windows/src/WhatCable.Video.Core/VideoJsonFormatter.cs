@@ -11,8 +11,6 @@ public static class VideoJsonFormatter
         WriteIndented = true
     };
 
-    public static JsonSerializerOptions Options => FormatterOptions;
-
     public static string Render<T>(T value)
         => JsonSerializer.Serialize(value, FormatterOptions);
 

@@ -29,8 +29,8 @@ public static class EdidParser
             return null;
 
         var manufacturer = ParseManufacturerId(edid);
-        var productCode = BitConverter.ToUInt16(edid, 10);
-        var serialNumber = BitConverter.ToUInt32(edid, 12);
+        var productCode = ReadUInt16LittleEndian(edid, 10);
+        var serialNumber = ReadUInt32LittleEndian(edid, 12);
         var manufactureWeek = edid[16];
         var manufactureYear = edid[17] > 0 ? 1990 + edid[17] : (int?)null;
         var version = $"{edid[18]}.{edid[19]}";
@@ -56,7 +56,7 @@ public static class EdidParser
                 break;
 
             // Check if this is a detailed timing descriptor (pixel clock != 0)
-            ushort pixelClock = BitConverter.ToUInt16(edid, offset);
+            ushort pixelClock = ReadUInt16LittleEndian(edid, offset);
             if (pixelClock != 0)
             {
                 var mode = ParseDetailedTiming(edid, offset);
@@ -83,7 +83,7 @@ public static class EdidParser
             }
         }
 
-        var extensionBlocks = edid.Length > 126 ? edid[126] : 0;
+        var extensionBlocks = edid.Length >= 127 ? edid[126] : 0;
 
         // Parse CTA extension if present
         CtaInfo? ctaInfo = null;
@@ -180,6 +180,15 @@ public static class EdidParser
         return (char)('A' + value - 1);
     }
 
+    private static ushort ReadUInt16LittleEndian(byte[] data, int offset)
+        => (ushort)(data[offset] | (data[offset + 1] << 8));
+
+    private static uint ReadUInt32LittleEndian(byte[] data, int offset)
+        => (uint)(data[offset]
+                  | (data[offset + 1] << 8)
+                  | (data[offset + 2] << 16)
+                  | (data[offset + 3] << 24));
+
     private static string ParseDisplayName(byte[] edid, int offset)
     {
         var sb = new StringBuilder();
@@ -251,7 +260,7 @@ public static class EdidParser
     {
         try
         {
-            ushort pixelClock10kHz = BitConverter.ToUInt16(edid, offset);
+            ushort pixelClock10kHz = ReadUInt16LittleEndian(edid, offset);
             if (pixelClock10kHz == 0)
                 return null;
 
