@@ -118,7 +118,10 @@ internal sealed class AmdAdlVendorGpuAdapter : IVendorGpuAdapter, IDisposable
                 finally
                 {
                     // Free the ADL-allocated buffer regardless of whether reading succeeded.
-                    Marshal.FreeHGlobal(displayPtr);
+                    if (displayPtr != 0)
+                    {
+                        Marshal.FreeHGlobal(displayPtr);
+                    }
                 }
             }
 

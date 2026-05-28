@@ -86,13 +86,12 @@ public sealed class VendorGpuAdapterTests
         => Assert.Empty(VendorGpuAdapters.Discover(enabled: false));
 
     [Fact]
-    public void Discover_Enabled_WithoutSdks_ReturnsEmpty()
+    public void Discover_Enabled_ValidatesOrSkipsOnSdkPresence()
     {
         // On a developer workstation that has NVIDIA, AMD, or Intel graphics drivers installed,
         // the corresponding vendor DLL will be on the loader path and Discover() will return
-        // non-empty. In that case we skip the "empty" assertion to avoid a misleading
-        // "without SDKs" failure — we just verify each available adapter has a non-empty name
-        // and dispose it cleanly.
+        // non-empty. In that case we skip the "empty" assertion to avoid a misleading failure
+        // — we just verify each available adapter has a non-empty name and is marked available.
         var adapters = VendorGpuAdapters.Discover(enabled: true);
         try
         {
