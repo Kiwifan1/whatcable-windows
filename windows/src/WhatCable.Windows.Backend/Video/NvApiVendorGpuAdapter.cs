@@ -27,6 +27,9 @@ internal sealed class NvApiVendorGpuAdapter : IVendorGpuAdapter, IDisposable
     private const int MaxPhysicalGpus = 64;
     private const int StatusOk = 0;
 
+    // NV_DP_LINK_RATE is expressed in multiples of 0.27 Gbps (e.g. 6 → 1.62 Gbps/lane).
+    private const double DpLinkRateUnitGbps = 0.27;
+
     // NV_MONITOR_CONN_TYPE values used to match our connector classification.
     private const uint MonitorConnVga = 1;
     private const uint MonitorConnHdmi = 4;
@@ -150,7 +153,7 @@ internal sealed class NvApiVendorGpuAdapter : IVendorGpuAdapter, IDisposable
 
         // NV_DP_LINK_RATE is expressed in multiples of 0.27 Gbps; NV_DP_LANE_COUNT is the
         // lane count directly (1/2/4).
-        double? rate = info.curLinkRate > 0 ? Math.Round(info.curLinkRate * 0.27, 2) : null;
+        double? rate = info.curLinkRate > 0 ? Math.Round(info.curLinkRate * DpLinkRateUnitGbps, 2) : null;
         int? lanes = info.curLaneCount > 0 ? (int)info.curLaneCount : null;
         if (rate is null && lanes is null)
         {

@@ -229,6 +229,15 @@ public static class VideoLinkDiagnostic
 
     private const double BitsPerPixelRgb8Bit = 24.0;
 
+    // Line-coding efficiencies used to convert a raw negotiated link rate into effective
+    // payload bandwidth, comparable to CalculateRequiredBandwidthGbps and the cable-class table.
+    private const double HdmiFrlEfficiency = 16.0 / 18.0;   // HDMI 2.1 FRL 16b/18b coding (~88.9%).
+    private const double DpUhbrEfficiency = 128.0 / 132.0;  // DisplayPort 2.0 UHBR 128b/132b coding (~96.97%).
+    private const double DpHbrEfficiency = 0.8;             // DisplayPort HBR/HBR2/HBR3 8b/10b coding (80%).
+
+    // Per-lane DisplayPort rate (Gbps) at or above which the link uses UHBR (128b/132b) coding.
+    private const double DpUhbrThresholdGbps = 10.0;
+
     private static double CalculateRequiredBandwidthGbps(VideoMode mode)
     {
         if (mode.PixelClockMhz.HasValue)
@@ -261,18 +270,15 @@ public static class VideoLinkDiagnostic
         double efficiency;
         if (link.HdmiFrlRateGbps is > 0)
         {
-            // HDMI 2.1 FRL uses 16b/18b channel coding (~88.9% efficiency).
-            efficiency = 16.0 / 18.0;
+            efficiency = HdmiFrlEfficiency;
         }
-        else if (link.DpLinkRateGbps is { } dpRate && dpRate >= 10.0)
+        else if (link.DpLinkRateGbps is { } dpRate && dpRate >= DpUhbrThresholdGbps)
         {
-            // DisplayPort 2.0 UHBR uses 128b/132b coding (~96.97% efficiency).
-            efficiency = 128.0 / 132.0;
+            efficiency = DpUhbrEfficiency;
         }
         else
         {
-            // DisplayPort HBR/HBR2/HBR3 use 8b/10b coding (80% efficiency).
-            efficiency = 0.8;
+            efficiency = DpHbrEfficiency;
         }
 
         return rawGbps * efficiency;

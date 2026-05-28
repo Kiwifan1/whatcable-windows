@@ -92,6 +92,10 @@ public sealed record VideoPortSnapshot
 /// </summary>
 public sealed record VendorGpuLinkInfo
 {
+    // Most DisplayPort and HDMI FRL links use the full four-lane configuration; assumed when
+    // the vendor SDK reports a per-lane rate but no explicit lane count.
+    private const int DefaultLaneCount = 4;
+
     /// <summary>Vendor SDK that produced this data (e.g. <c>NVIDIA</c>, <c>AMD</c>, <c>Intel</c>).</summary>
     [JsonPropertyName("vendor")] public string? Vendor { get; init; }
 
@@ -137,13 +141,13 @@ public sealed record VendorGpuLinkInfo
 
             if (DpLinkRateGbps is { } dpRate and > 0)
             {
-                int lanes = DpLaneCount is { } dpLanes and > 0 ? dpLanes : 4;
+                int lanes = DpLaneCount is { } dpLanes and > 0 ? dpLanes : DefaultLaneCount;
                 return dpRate * lanes;
             }
 
             if (HdmiFrlRateGbps is { } frlRate and > 0)
             {
-                int lanes = HdmiFrlLaneCount is { } frlLanes and > 0 ? frlLanes : 4;
+                int lanes = HdmiFrlLaneCount is { } frlLanes and > 0 ? frlLanes : DefaultLaneCount;
                 return frlRate * lanes;
             }
 
