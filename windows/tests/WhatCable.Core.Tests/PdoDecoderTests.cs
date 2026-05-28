@@ -34,7 +34,7 @@ public sealed class PdoDecoderTests
     [Fact]
     public void DecodeVariablePdo()
     {
-        var raw = ((uint)2 << 30) | ((uint)400 << 10) | (uint)(100) | ((uint)300 << 20);
+        var raw = ((uint)2 << 30) | ((uint)400 << 20) | ((uint)100 << 10) | 300;
         var pdo = PdoDecoder.Decode(raw);
 
         Assert.Equal("Variable", pdo.Kind);
@@ -46,7 +46,7 @@ public sealed class PdoDecoderTests
     [Fact]
     public void DecodeBatteryPdo()
     {
-        var raw = ((uint)1 << 30) | ((uint)400 << 10) | (uint)100 | ((uint)240 << 20);
+        var raw = ((uint)1 << 30) | ((uint)400 << 20) | ((uint)100 << 10) | 240;
         var pdo = PdoDecoder.Decode(raw);
 
         Assert.Equal("Battery", pdo.Kind);
@@ -58,7 +58,7 @@ public sealed class PdoDecoderTests
     [Fact]
     public void DecodePpsApdo()
     {
-        var raw = ((uint)3 << 30) | ((uint)50 << 17) | ((uint)110 << 8) | 33;
+        var raw = ((uint)3 << 30) | ((uint)110 << 17) | ((uint)33 << 8) | 50;
         var pdo = PdoDecoder.Decode(raw);
 
         Assert.Equal("PpsApdo", pdo.Kind);

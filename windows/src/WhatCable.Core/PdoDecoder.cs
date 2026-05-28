@@ -45,25 +45,25 @@ public static class PdoDecoder
 
     private static PdoDecodeResult DecodeVariable(uint raw)
     {
-        var minMv = (int)(raw & 0x3FF) * 50;
-        var maxMv = (int)((raw >> 10) & 0x3FF) * 50;
-        var currentMa = (int)((raw >> 20) & 0x3FF) * 10;
+        var maxMv = (int)((raw >> 20) & 0x3FF) * 50;  // bits 29..20
+        var minMv = (int)((raw >> 10) & 0x3FF) * 50;  // bits 19..10
+        var currentMa = (int)(raw & 0x3FF) * 10;       // bits 9..0
         return new("Variable", raw, minMv, maxMv, currentMa, null, false, false, false, null, null);
     }
 
     private static PdoDecodeResult DecodeBattery(uint raw)
     {
-        var minMv = (int)(raw & 0x3FF) * 50;
-        var maxMv = (int)((raw >> 10) & 0x3FF) * 50;
-        var maxMw = (int)((raw >> 20) & 0x3FF) * 250;
+        var maxMv = (int)((raw >> 20) & 0x3FF) * 50;  // bits 29..20
+        var minMv = (int)((raw >> 10) & 0x3FF) * 50;  // bits 19..10
+        var maxMw = (int)(raw & 0x3FF) * 250;           // bits 9..0
         return new("Battery", raw, minMv, maxMv, null, maxMw, false, false, false, null, null);
     }
 
     private static PdoDecodeResult DecodePps(uint raw)
     {
-        var minMv = (int)(raw & 0xFF) * 100;
-        var maxMv = (int)((raw >> 8) & 0xFF) * 100;
-        var maxMa = (int)((raw >> 17) & 0x7F) * 50;
+        var maxMv = (int)((raw >> 17) & 0xFF) * 100;  // bits 24..17
+        var minMv = (int)((raw >> 8) & 0xFF) * 100;   // bits 15..8
+        var maxMa = (int)(raw & 0x7F) * 50;            // bits 6..0
         return new("PpsApdo", raw, minMv, maxMv, maxMa, null, false, false, false, null, null);
     }
 

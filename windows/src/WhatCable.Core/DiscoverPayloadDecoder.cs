@@ -23,12 +23,12 @@ public static class DiscoverPayloadDecoder
         var svids = new List<int>();
         foreach (var vdo in vdos)
         {
-            var low = (int)(vdo & 0xFFFF);
-            var high = (int)((vdo >> 16) & 0xFFFF);
-            if (low == 0) break;
-            svids.Add(low);
+            var high = (int)((vdo >> 16) & 0xFFFF);  // SVID0 in bits 31..16
+            var low = (int)(vdo & 0xFFFF);             // SVID1 in bits 15..0
             if (high == 0) break;
             svids.Add(high);
+            if (low == 0) break;
+            svids.Add(low);
         }
         return new DiscoverSvidsPayload(svids, vdos);
     }
