@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <RootNamespace>WhatCable.Cli</RootNamespace>
+    <AssemblyName>whatcable-cli</AssemblyName>
+    <Platforms>x64;ARM64</Platforms>
+    <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
+    <PublishSingleFile>true</PublishSingleFile>
+    <PublishTrimmed>false</PublishTrimmed>
+    <Description>WhatCable command-line tool. Emits the same JSON shape as whatcable-cli on macOS.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WhatCable.Core\WhatCable.Core.csproj" />
+    <ProjectReference Include="..\WhatCable.Video.Core\WhatCable.Video.Core.csproj" />
+    <ProjectReference Include="..\WhatCable.Windows.Backend\WhatCable.Windows.Backend.csproj" />
+  </ItemGroup>
+</Project>

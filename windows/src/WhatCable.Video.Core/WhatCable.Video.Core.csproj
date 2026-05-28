@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>WhatCable.Video.Core</RootNamespace>
+    <AssemblyName>WhatCable.Video.Core</AssemblyName>
+    <Description>Platform-neutral EDID / CTA-861 / DisplayID parsers and video-link diagnostics.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WhatCable.Core\WhatCable.Core.csproj" />
+  </ItemGroup>
+</Project>

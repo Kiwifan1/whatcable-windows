@@ -1,0 +1,5 @@
+<Project>
+  <PropertyGroup>
+    <!-- Reserved for solution-wide MSBuild after-targets. -->
+  </PropertyGroup>
+</Project>
