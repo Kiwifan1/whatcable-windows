@@ -44,6 +44,8 @@ internal sealed class WindowsUcsiTransport : IUcsiTransport
 
     public byte[]? GetCamSupported(int connector) => null;
 
+    public byte[]? GetCurrentCam(int connector) => null;
+
     public byte[]? GetPdMessage(int connector, UcsiRecipient recipient, UcsiPdResponse response) => null;
 
     public bool? GetLiquidDetected(int connector) => null;

@@ -33,6 +33,7 @@ internal sealed class FakeUcsiTransport : IUcsiTransport
     public byte[]? GetCableProperty(int connector) => Get($"cable:{connector}");
     public byte[]? GetAlternateModes(int connector, UcsiRecipient recipient) => Get($"altmodes:{connector}:{recipient}");
     public byte[]? GetCamSupported(int connector) => Get($"cam:{connector}");
+    public byte[]? GetCurrentCam(int connector) => Get($"currentcam:{connector}");
     public byte[]? GetPdMessage(int connector, UcsiRecipient recipient, UcsiPdResponse response)
         => Get($"pd:{connector}:{recipient}:{response}");
     public bool? GetLiquidDetected(int connector) => LiquidDetected;

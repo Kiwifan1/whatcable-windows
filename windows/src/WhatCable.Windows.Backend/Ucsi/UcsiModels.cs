@@ -102,7 +102,7 @@ public sealed record UcsiAlternateMode
     /// <summary>Friendly name for well-known SVIDs (DisplayPort, Thunderbolt, …).</summary>
     [JsonPropertyName("name")] public string? Name { get; init; }
 
-    /// <summary>True when this mode is currently entered (per GET_CAM_SUPPORTED).</summary>
+    /// <summary>True when this mode is currently entered (per GET_CURRENT_CAM).</summary>
     [JsonPropertyName("active")] public bool Active { get; init; }
 }
 

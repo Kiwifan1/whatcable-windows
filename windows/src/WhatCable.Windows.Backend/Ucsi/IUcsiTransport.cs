@@ -21,7 +21,7 @@ public interface IUcsiTransport
 
     /// <summary>
     /// UCSI specification version as a BCD value (for example <c>0x0200</c> for UCSI 2.0,
-    /// <c>0x0102</c> for UCSI 1.2). Zero when unknown.
+    /// <c>0x0120</c> for UCSI 1.2). Zero when unknown.
     /// </summary>
     ushort Version { get; }
 
@@ -53,6 +53,9 @@ public interface IUcsiTransport
 
     /// <summary>GET_CAM_SUPPORTED data for the connector: a bitmap of supported alternate-mode indices.</summary>
     byte[]? GetCamSupported(int connector);
+
+    /// <summary>GET_CURRENT_CAM data for the connector: the currently entered alternate-mode index.</summary>
+    byte[]? GetCurrentCam(int connector);
 
     /// <summary>
     /// GET_PD_MESSAGE (UCSI 2.0) data for a Structured VDM exchange (Discover Identity / Discover

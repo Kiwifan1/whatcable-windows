@@ -36,6 +36,7 @@ public sealed class UcsiAdapterTests
             .Set("cable:1", cable)
             .Set("altmodes:1:Connector", UcsiTestBytes.AlternateModes((0xFF01, 0x1C05), (0x8087, 0x0001)))
             .Set("cam:1", new byte[] { 0x01 })
+            .Set("currentcam:1", new byte[] { 0x01 })
             .Set("pd:1:SopPrime:DiscoverIdentity", UcsiTestBytes.Words(CableIdHeader, 1, 0x12345678, CableVdoRaw))
             .Set("pd:1:Connector:DiscoverIdentity", UcsiTestBytes.Words((2u << 27) | 0x1234, 1, 0x55667788))
             .Set("pd:1:Connector:DiscoverModes", UcsiTestBytes.Words(0x04030201, 0x08070605));
@@ -59,7 +60,7 @@ public sealed class UcsiAdapterTests
         Assert.Equal(CableSpeed.Usb4Gen3, connector.CableVdo!.Speed);
         Assert.Equal(CableCurrent.FiveAmp, connector.CableVdo.Current);
         Assert.Equal(2, connector.AlternateModes.Count);
-        Assert.True(connector.AlternateModes[0].Active);   // DisplayPort active per CAM bitmap
+        Assert.True(connector.AlternateModes[0].Active);   // DisplayPort active per current CAM index
         Assert.False(connector.AlternateModes[1].Active);
         Assert.Equal(0x1234, connector.PartnerIdentity!.Header!.VendorId);
         Assert.Equal(2, connector.PartnerModes!.Modes.Count);

@@ -120,7 +120,7 @@ public static class UcsiDecoder
         return modes;
     }
 
-    /// <summary>Decodes GET_CAM_SUPPORTED data into a bitmap of active alternate-mode indices.</summary>
+    /// <summary>Decodes GET_CAM_SUPPORTED data into a bitmap of supported alternate-mode indices.</summary>
     public static uint DecodeCamSupported(ReadOnlySpan<byte> data)
     {
         uint bitmap = 0;
@@ -131,6 +131,10 @@ public static class UcsiDecoder
 
         return bitmap;
     }
+
+    /// <summary>Decodes GET_CURRENT_CAM data into a 1-based alternate-mode index (0 when no mode is entered).</summary>
+    public static int DecodeCurrentCam(ReadOnlySpan<byte> data)
+        => data.Length == 0 ? 0 : data[0];
 
     /// <summary>Decodes GET_PDOS data into the platform-neutral PDO list, skipping zero padding.</summary>
     public static IReadOnlyList<PdoDecodeResult> DecodePdos(ReadOnlySpan<byte> data)

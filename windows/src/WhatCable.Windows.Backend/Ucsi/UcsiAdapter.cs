@@ -83,7 +83,7 @@ public sealed class UcsiAdapter
         var alternateModes = DecodeList(
             () => _transport.GetAlternateModes(index, UcsiRecipient.Connector),
             d => UcsiDecoder.DecodeAlternateModes(d));
-        alternateModes = ApplyCamSupported(index, alternateModes);
+        alternateModes = ApplyCurrentCam(index, alternateModes);
 
         // PD message round-trips (UCSI 2.0): Discover Identity to SOP' (cable) and SOP (partner),
         // plus Discover Modes to the partner.
@@ -153,22 +153,51 @@ public sealed class UcsiAdapter
         };
     }
 
-    private IReadOnlyList<UcsiAlternateMode> ApplyCamSupported(int index, IReadOnlyList<UcsiAlternateMode> modes)
+    private IReadOnlyList<UcsiAlternateMode> ApplyCurrentCam(int index, IReadOnlyList<UcsiAlternateMode> modes)
     {
         if (modes.Count == 0)
         {
             return modes;
         }
 
-        var raw = _transport.GetCamSupported(index);
-        if (raw is null)
+        uint? supported = null;
+        try
+        {
+            var rawSupported = _transport.GetCamSupported(index);
+            if (rawSupported is { Length: > 0 })
+            {
+                supported = UcsiDecoder.DecodeCamSupported(rawSupported);
+            }
+        }
+        catch
         {
             return modes;
         }
 
-        var bitmap = UcsiDecoder.DecodeCamSupported(raw);
+        int currentCam;
+        try
+        {
+            var rawCurrent = _transport.GetCurrentCam(index);
+            currentCam = rawCurrent is { Length: > 0 } ? UcsiDecoder.DecodeCurrentCam(rawCurrent) : 0;
+        }
+        catch
+        {
+            return modes;
+        }
+
+        if (currentCam < 1 || currentCam > modes.Count)
+        {
+            return modes;
+        }
+
+        var modeIndex = currentCam - 1;
+        if (supported is uint bitmap && modeIndex < 32 && ((bitmap >> modeIndex) & 1) == 0)
+        {
+            return modes;
+        }
+
         return modes
-            .Select((mode, i) => i < 32 && ((bitmap >> i) & 1) != 0 ? mode with { Active = true } : mode)
+            .Select((mode, i) => i == modeIndex ? mode with { Active = true } : mode)
             .ToList();
     }
 
