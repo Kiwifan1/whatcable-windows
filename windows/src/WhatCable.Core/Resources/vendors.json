@@ -1,0 +1,5 @@
+[
+  { "vid": 1452, "name": "Apple Inc.", "source": "usbif" },
+  { "vid": 438, "name": "CalDigit, Inc.", "source": "usbif" },
+  { "vid": 57005, "name": "Test Vendor", "source": "manual" }
+]

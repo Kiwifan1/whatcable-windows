@@ -1,0 +1,63 @@
+{
+  "version": "0.26.0",
+  "isDesktopMac": false,
+  "adapter": {
+    "watts": 140,
+    "source": "AC",
+    "voltageMV": 20000,
+    "currentMA": 5000,
+    "description": "pd charger",
+    "powerTier": 2,
+    "isWireless": false
+  },
+  "ports": [
+    {
+      "name": "Port-USB-C@1",
+      "type": "USB-C",
+      "className": "AppleHPMInterfaceType10",
+      "connectionActive": true,
+      "pdCapable": true,
+      "status": "connected",
+      "headline": "USB4 cable connected",
+      "subtitle": "40 Gbps",
+      "bullets": [
+        "USB4 Gen 3",
+        "5A"
+      ],
+      "powerSources": [
+        {
+          "name": "USB-PD",
+          "maxPowerW": 100,
+          "options": [
+            {
+              "kind": "Fixed",
+              "raw": 102700,
+              "minVoltageMv": 5000,
+              "maxVoltageMv": 5000,
+              "maxCurrentMa": 3000
+            }
+          ],
+          "negotiated": {
+            "kind": "Fixed",
+            "raw": 102700,
+            "minVoltageMv": 5000,
+            "maxVoltageMv": 5000,
+            "maxCurrentMa": 3000
+          }
+        }
+      ],
+      "cable": {
+        "endpoint": "SOP'",
+        "vendorID": 438,
+        "vendorName": "CalDigit, Inc.",
+        "curatedBrand": "CalDigit TS5 Plus bundled cable",
+        "speed": "USB4 Gen 3 (40 Gbps)",
+        "currentRating": "5 A",
+        "maxVolts": 20,
+        "maxWatts": 100,
+        "type": "passive"
+      }
+    }
+  ],
+  "thunderboltSwitches": []
+}

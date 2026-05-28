@@ -1,0 +1,12 @@
+[
+  {
+    "vid": 438,
+    "pid": 16387,
+    "cableVDO": 285877828,
+    "brand": "CalDigit TS5 Plus bundled cable",
+    "speed": "USB4 40Gbps",
+    "power": "240W",
+    "type": "passive",
+    "issueURL": "https://github.com/darrylmorley/whatcable/issues/0"
+  }
+]

@@ -5,4 +5,10 @@
     <AssemblyName>WhatCable.Core</AssemblyName>
     <Description>Platform-neutral data models and decoders for WhatCable (USB-PD VDOs, e-marker, cable DB, vendor DB, diagnostics).</Description>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\*.json" />
+  </ItemGroup>
 </Project>
