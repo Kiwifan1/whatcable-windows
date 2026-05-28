@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!--
+      Plain net8.0 (no WinUI) so the tray / popover / settings logic is unit-testable
+      off the UI thread and on non-Windows CI hosts. The WinUI 3 shell in
+      WhatCable.Windows.App references this library and supplies the platform services
+      (ApplicationData settings, ResourceLoader localisation, StartupTask, toasts).
+    -->
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>WhatCable.Windows.App.Core</RootNamespace>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WhatCable.Core\WhatCable.Core.csproj" />
+  </ItemGroup>
+</Project>

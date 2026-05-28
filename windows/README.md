@@ -18,6 +18,7 @@ windows/
 │   ├── WhatCable.Core/              # platform-neutral models, VDO/e-marker decoders, cable & vendor DB
 │   ├── WhatCable.Video.Core/        # EDID / CTA-861 / DisplayID parsers + video-link diagnostic
 │   ├── WhatCable.Windows.Backend/   # P/Invoke adapters: UCSI, USB, power, TB chain, display, EDID, vendor GPU
+│   ├── WhatCable.Windows.App.Core/  # platform-neutral tray/settings ViewModels, settings store, localisation
 │   ├── WhatCable.Windows.App/       # WinUI 3 tray app + popover + Settings
 │   ├── WhatCable.Widgets/           # Windows 11 Widget Provider COM server
 │   └── WhatCable.Cli/               # whatcable-cli.exe — JSON-compatible with the macOS CLI
@@ -25,6 +26,8 @@ windows/
     ├── WhatCable.Core.Tests/
     └── WhatCable.Video.Core.Tests/
 ```
+
+The unpackaged (non-Store) build is produced with the Inno Setup script in `windows/installer/WhatCable.iss` from a self-contained `dotnet publish` of `WhatCable.Windows.App`.
 
 ## Build
 

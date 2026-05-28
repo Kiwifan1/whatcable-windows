@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!--
+    WinUI 3 resource file. Keys mirror WhatCable.Windows.App.Core.Localization.StringKeys.
+    Strings ported from the macOS app (Sources/WhatCable/Resources/*.lproj/Localizable.strings);
+    Windows-only entries (vendor SDK toggle, Pro license, port summary) are new for this port.
+    Generated/maintained set — keep all five locales in key parity (see LocalizationParityTests).
+  -->
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Tray_Tooltip" xml:space="preserve">
+    <value>WhatCable</value>
+  </data>
+  <data name="Tray_Refresh" xml:space="preserve">
+    <value>Aggiorna</value>
+  </data>
+  <data name="Tray_Settings" xml:space="preserve">
+    <value>Impostazioni…</value>
+  </data>
+  <data name="Tray_Quit" xml:space="preserve">
+    <value>Esci</value>
+  </data>
+  <data name="Tray_NothingConnected" xml:space="preserve">
+    <value>Nessun dispositivo collegato</value>
+  </data>
+  <data name="Tray_NoPortsDetected" xml:space="preserve">
+    <value>Nessuna porta USB-C rilevata</value>
+  </data>
+  <data name="Tray_PortsSummary" xml:space="preserve">
+    <value>{0} di {1} porte attive</value>
+  </data>
+  <data name="Port_Active" xml:space="preserve">
+    <value>Attivo</value>
+  </data>
+  <data name="Port_Connection" xml:space="preserve">
+    <value>Connessione</value>
+  </data>
+  <data name="Port_ConnectedDevices" xml:space="preserve">
+    <value>Dispositivi connessi</value>
+  </data>
+  <data name="Port_Transports" xml:space="preserve">
+    <value>Trasporti</value>
+  </data>
+  <data name="Port_PdSource" xml:space="preserve">
+    <value>Sorgente PD</value>
+  </data>
+  <data name="Port_CableTrustSignals" xml:space="preserve">
+    <value>Segnali affidabili via cavo</value>
+  </data>
+  <data name="Port_Display" xml:space="preserve">
+    <value>Visualizzazione</value>
+  </data>
+  <data name="Port_ThunderboltFabric" xml:space="preserve">
+    <value>Thunderbolt di fabbrica</value>
+  </data>
+  <data name="Port_ShowTechnicalDetails" xml:space="preserve">
+    <value>Visualizza dettagli tecnici</value>
+  </data>
+  <data name="Port_UsbDevice" xml:space="preserve">
+    <value>Dispositivo USB</value>
+  </data>
+  <data name="Port_ActiveCableElectronics" xml:space="preserve">
+    <value>Elettronica attiva via cavo</value>
+  </data>
+  <data name="Port_ReportThisCable" xml:space="preserve">
+    <value>Segnala questo cavo</value>
+  </data>
+  <data name="Port_VideoDiagnostic" xml:space="preserve">
+    <value>Diagnostica video</value>
+  </data>
+  <data name="Settings_Title" xml:space="preserve">
+    <value>Impostazioni</value>
+  </data>
+  <data name="Settings_Behavior" xml:space="preserve">
+    <value>Comportamento</value>
+  </data>
+  <data name="Settings_LaunchAtLogin" xml:space="preserve">
+    <value>Esegui all'accesso</value>
+  </data>
+  <data name="Settings_Notifications" xml:space="preserve">
+    <value>Notifiche</value>
+  </data>
+  <data name="Settings_NotifyOnCableChanges" xml:space="preserve">
+    <value>Notifica cambio cavo</value>
+  </data>
+  <data name="Settings_HideEmptyPorts" xml:space="preserve">
+    <value>Nascondi porte con cavi non collegati</value>
+  </data>
+  <data name="Settings_VendorSdk" xml:space="preserve">
+    <value>Usa SDK GPU del fornitore</value>
+  </data>
+  <data name="Settings_VendorSdkDetail" xml:space="preserve">
+    <value>Abilita gli SDK opzionali di NVIDIA, AMD e Intel per una diagnostica video più completa.</value>
+  </data>
+  <data name="Settings_Language" xml:space="preserve">
+    <value>Lingua</value>
+  </data>
+  <data name="Settings_SystemDefault" xml:space="preserve">
+    <value>Predefinito sistema</value>
+  </data>
+  <data name="Settings_Pro" xml:space="preserve">
+    <value>Pro</value>
+  </data>
+  <data name="Settings_ProLicenseKey" xml:space="preserve">
+    <value>Chiave di licenza Pro</value>
+  </data>
+  <data name="Settings_ProLicenseValid" xml:space="preserve">
+    <value>Licenza attiva</value>
+  </data>
+  <data name="Settings_ProLicenseInvalid" xml:space="preserve">
+    <value>Inserisci una chiave di licenza valida</value>
+  </data>
+  <data name="Settings_Privacy" xml:space="preserve">
+    <value>Privacy</value>
+  </data>
+  <data name="Settings_Done" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Notification_ChargerConnected" xml:space="preserve">
+    <value>Caricatore collegato</value>
+  </data>
+  <data name="Notification_ChargerDisconnected" xml:space="preserve">
+    <value>Caricatore scollegato</value>
+  </data>
+  <data name="Notification_DeviceConnected" xml:space="preserve">
+    <value>Dispositivo connesso</value>
+  </data>
+  <data name="Notification_DeviceDisconnected" xml:space="preserve">
+    <value>Dispositivo USB disconnesso</value>
+  </data>
+  <data name="Common_Yes" xml:space="preserve">
+    <value>Sì</value>
+  </data>
+  <data name="Common_No" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="Common_Unknown" xml:space="preserve">
+    <value>Sconosciuto</value>
+  </data>
+  <data name="Common_Cancel" xml:space="preserve">
+    <value>Annulla</value>
+  </data>
+</root>
