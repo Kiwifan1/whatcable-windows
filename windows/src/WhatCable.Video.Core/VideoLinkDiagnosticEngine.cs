@@ -62,9 +62,9 @@ public static class VideoLinkDiagnostic
             details.Add($"Display maximum: {FormatMode(sinkMaxMode)}");
         }
 
-        // Calculate required bandwidth for active and max modes
-        double activeBandwidth = CalculateRequiredBandwidth(activeMode);
-        double? maxSinkBandwidth = sinkMaxMode != null ? CalculateRequiredBandwidth(sinkMaxMode) : null;
+        // Calculate required throughput for active and max modes in Gbps.
+        double activeBandwidthGbps = CalculateRequiredBandwidthGbps(activeMode);
+        double? maxSinkBandwidthGbps = sinkMaxMode != null ? CalculateRequiredBandwidthGbps(sinkMaxMode) : null;
 
         // Check if active mode matches sink capability
         bool runningAtMaxSinkCapability = false;
@@ -74,14 +74,14 @@ public static class VideoLinkDiagnostic
         }
 
         // Determine cable capability
-        double? cableBandwidth = GetCableBandwidth(cableClass, snapshot.ConnectorType);
+        double? cableBandwidthGbps = GetCableBandwidthGbps(cableClass, snapshot.ConnectorType);
         if (cableClass.HasValue)
         {
             details.Add($"Cable class: {cableClass.Value}");
         }
 
         // Determine GPU capability
-        double? gpuBandwidth = GetGpuBandwidth(gpuCaps, snapshot.ConnectorType);
+        double? gpuBandwidthGbps = GetGpuBandwidthGbps(gpuCaps, snapshot.ConnectorType);
         if (gpuCaps != null && !string.IsNullOrEmpty(gpuCaps.Model))
         {
             details.Add($"GPU: {gpuCaps.Vendor} {gpuCaps.Model}");
@@ -94,11 +94,11 @@ public static class VideoLinkDiagnostic
             bottleneck = VideoBottleneck.None;
             details.Add("Running at display's maximum capability. Optimal configuration.");
         }
-        else if (sinkMaxMode != null && maxSinkBandwidth.HasValue)
+        else if (sinkMaxMode != null && maxSinkBandwidthGbps.HasValue)
         {
             // Not running at max sink capability - determine why
-            bool cableLimiting = cableBandwidth.HasValue && maxSinkBandwidth.Value > cableBandwidth.Value * 0.9;
-            bool gpuLimiting = gpuBandwidth.HasValue && maxSinkBandwidth.Value > gpuBandwidth.Value * 0.9;
+            bool cableLimiting = cableBandwidthGbps.HasValue && maxSinkBandwidthGbps.Value > cableBandwidthGbps.Value * 0.9;
+            bool gpuLimiting = gpuBandwidthGbps.HasValue && maxSinkBandwidthGbps.Value > gpuBandwidthGbps.Value * 0.9;
 
             if (cableLimiting && !gpuLimiting)
             {
@@ -114,9 +114,9 @@ public static class VideoLinkDiagnostic
             else if (cableLimiting && gpuLimiting)
             {
                 // Both limiting - choose the more restrictive
-                if (cableBandwidth.HasValue && gpuBandwidth.HasValue)
+                if (cableBandwidthGbps.HasValue && gpuBandwidthGbps.HasValue)
                 {
-                    if (cableBandwidth.Value < gpuBandwidth.Value)
+                    if (cableBandwidthGbps.Value < gpuBandwidthGbps.Value)
                     {
                         bottleneck = VideoBottleneck.Cable;
                         details.Add($"Cable is primary bottleneck. GPU also limiting.");
@@ -189,62 +189,62 @@ public static class VideoLinkDiagnostic
                a.Interlaced == b.Interlaced;
     }
 
-    private static double CalculateRequiredBandwidth(VideoMode mode)
+    private const double BitsPerPixelRgb8Bit = 24.0;
+
+    private static double CalculateRequiredBandwidthGbps(VideoMode mode)
     {
         if (mode.PixelClockMhz.HasValue)
         {
-            // Use actual pixel clock if available
-            return mode.PixelClockMhz.Value;
+            // Pixel clock (MHz) × bits per pixel gives approximate link throughput in Gbps.
+            return (mode.PixelClockMhz.Value * BitsPerPixelRgb8Bit) / 1000.0;
         }
 
-        // Estimate bandwidth based on resolution and refresh rate
+        // Estimate throughput based on resolution and refresh rate.
         // Assume ~25% overhead for blanking intervals
         double pixelsPerSecond = mode.WidthPx * mode.HeightPx * mode.RefreshRateHz;
         double pixelClockMhz = (pixelsPerSecond * 1.25) / 1_000_000;
 
-        // For HDMI, multiply by bits per pixel (24-bit color = 3 bytes)
-        // This gives us approximate TMDS clock rate
-        return pixelClockMhz;
+        return (pixelClockMhz * BitsPerPixelRgb8Bit) / 1000.0;
     }
 
-    private static double? GetCableBandwidth(VideoCableClass? cableClass, VideoConnectorType connectorType)
+    private static double? GetCableBandwidthGbps(VideoCableClass? cableClass, VideoConnectorType connectorType)
     {
         if (!cableClass.HasValue)
             return null;
 
         return cableClass.Value switch
         {
-            VideoCableClass.HdmiStandard => 165.0,        // HDMI 1.4: 165 MHz TMDS (up to 4K30)
-            VideoCableClass.HdmiHighSpeed => 600.0,       // HDMI 2.0: 600 MHz TMDS (up to 4K60)
-            VideoCableClass.HdmiUltraHighSpeed => 1200.0, // HDMI 2.1: 48 Gbps FRL
-            VideoCableClass.DisplayPort14 => 810.0,       // DP 1.4 HBR3: 8.1 Gbps per lane × 4 = 32.4 Gbps
-            VideoCableClass.DisplayPort20 => 1000.0,      // DP 2.0 UHBR10: 10 Gbps per lane × 4 = 40 Gbps
-            VideoCableClass.DisplayPort20Uhbr135 => 1350.0, // DP 2.0 UHBR13.5: 54 Gbps
-            VideoCableClass.DisplayPort20Uhbr20 => 2000.0,  // DP 2.0 UHBR20: 80 Gbps
-            VideoCableClass.UsbC31Gen1 => 540.0,          // USB-C with DP Alt Mode HBR2: 5.4 Gbps per lane
-            VideoCableClass.UsbC31Gen2 => 810.0,          // USB-C with DP Alt Mode HBR3: 8.1 Gbps per lane
-            VideoCableClass.UsbC4Gen3 => 2000.0,          // USB4 with DP 2.0: up to 80 Gbps
+            VideoCableClass.HdmiStandard => 10.2,            // HDMI 1.4
+            VideoCableClass.HdmiHighSpeed => 18.0,           // HDMI 2.0
+            VideoCableClass.HdmiUltraHighSpeed => 48.0,      // HDMI 2.1 FRL
+            VideoCableClass.DisplayPort14 => 25.92,          // DP 1.4 HBR3 effective payload
+            VideoCableClass.DisplayPort20Uhbr10 => 38.79,    // DP 2.0 UHBR10 effective payload
+            VideoCableClass.DisplayPort20Uhbr135 => 52.36,   // DP 2.0 UHBR13.5 effective payload
+            VideoCableClass.DisplayPort20Uhbr20 => 77.58,    // DP 2.0 UHBR20 effective payload
+            VideoCableClass.UsbC31Gen1 => 17.28,             // USB-C DP Alt Mode HBR2 effective payload
+            VideoCableClass.UsbC31Gen2 => 25.92,             // USB-C DP Alt Mode HBR3 effective payload
+            VideoCableClass.UsbC4Gen3 => 77.58,              // USB4 DP 2.0 class effective payload
             _ => null
         };
     }
 
-    private static double? GetGpuBandwidth(GpuCapabilities? gpuCaps, VideoConnectorType connectorType)
+    private static double? GetGpuBandwidthGbps(GpuCapabilities? gpuCaps, VideoConnectorType connectorType)
     {
         if (gpuCaps == null)
             return null;
 
-        // Use max pixel clock if available
+        // Convert pixel clock (MHz) to approximate throughput in Gbps.
         if (gpuCaps.MaxPixelClockMhz.HasValue)
-            return gpuCaps.MaxPixelClockMhz.Value;
+            return (gpuCaps.MaxPixelClockMhz.Value * BitsPerPixelRgb8Bit) / 1000.0;
 
         // Otherwise estimate from HDMI/DP generation
         if (connectorType == VideoConnectorType.HDMI && !string.IsNullOrEmpty(gpuCaps.MaxHdmiGen))
         {
             return gpuCaps.MaxHdmiGen switch
             {
-                "1.4" => 165.0,
-                "2.0" => 600.0,
-                "2.1" => 1200.0,
+                "1.4" => 10.2,
+                "2.0" => 18.0,
+                "2.1" => 48.0,
                 _ => null
             };
         }
@@ -254,9 +254,9 @@ public static class VideoLinkDiagnostic
         {
             return gpuCaps.MaxDisplayPortGen switch
             {
-                "1.2" => 540.0,
-                "1.4" => 810.0,
-                "2.0" => 2000.0,
+                "1.2" => 17.28,
+                "1.4" => 25.92,
+                "2.0" => 77.58,
                 _ => null
             };
         }

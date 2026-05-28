@@ -42,7 +42,7 @@ public enum VideoCableClass
     HdmiHighSpeed,    // HDMI 2.0 (up to 4K60)
     HdmiUltraHighSpeed, // HDMI 2.1 (up to 8K60 or 4K120+)
     DisplayPort14,    // DP 1.4 (HBR3, up to 8.1 Gbps per lane)
-    DisplayPort20,    // DP 2.0 UHBR10 (10 Gbps per lane)
+    DisplayPort20Uhbr10, // DP 2.0 UHBR10 (10 Gbps per lane)
     DisplayPort20Uhbr135, // DP 2.0 UHBR13.5 (13.5 Gbps per lane)
     DisplayPort20Uhbr20,  // DP 2.0 UHBR20 (20 Gbps per lane)
     UsbC31Gen1,       // USB-C 3.1 Gen1 (DP Alt Mode up to HBR2)
