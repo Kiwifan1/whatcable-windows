@@ -13,6 +13,7 @@ internal static class ComGuids
 {
     public const string IClassFactory = "00000001-0000-0000-C000-000000000046";
     public const string IUnknown = "00000000-0000-0000-C000-000000000046";
+    public const string IInspectable = "AF86E2E0-B12D-4c6a-9C5A-D7AA65101E90";
 }
 
 [ComImport]
@@ -34,34 +35,55 @@ internal sealed class WidgetProviderFactory<T> : IClassFactory
     private const int CLASS_E_NOAGGREGATION = -2147221232;
     private const int E_NOINTERFACE = -2147467262;
 
+    // IIDs the host may request: IWidgetProvider, IInspectable (WinRT default), and IUnknown.
+    private static readonly Guid IWidgetProviderIid = typeof(IWidgetProvider).GUID;
+    private static readonly Guid IUnknownIid = Guid.Parse(ComGuids.IUnknown);
+    private static readonly Guid IInspectableIid = Guid.Parse(ComGuids.IInspectable);
+
+    private readonly Action _onServerIdle;
+
+    internal WidgetProviderFactory(Action onServerIdle) => _onServerIdle = onServerIdle;
+
     public int CreateInstance(IntPtr pUnkOuter, ref Guid riid, out IntPtr ppvObject)
     {
         ppvObject = IntPtr.Zero;
 
         if (pUnkOuter != IntPtr.Zero)
         {
-            Marshal.ThrowExceptionForHR(CLASS_E_NOAGGREGATION);
+            return CLASS_E_NOAGGREGATION;
         }
 
-        if (riid == typeof(T).GUID || riid == Guid.Parse(ComGuids.IUnknown))
+        if (riid == IWidgetProviderIid || riid == IUnknownIid || riid == IInspectableIid)
         {
             ppvObject = MarshalInspectable<IWidgetProvider>.FromManaged(new T());
         }
         else
         {
-            Marshal.ThrowExceptionForHR(E_NOINTERFACE);
+            return E_NOINTERFACE;
         }
 
         return 0;
     }
 
-    public int LockServer(bool fLock) => 0;
+    public int LockServer(bool fLock)
+    {
+        uint refs = fLock
+            ? NativeMethods.CoAddRefServerProcess()
+            : NativeMethods.CoReleaseServerProcess();
+
+        if (!fLock && refs == 0)
+        {
+            _onServerIdle();
+        }
+
+        return 0;
+    }
 }
 
 /// <summary>
 /// Registers the widget provider class object with COM for the lifetime of the process and revokes
-/// it on dispose. <see cref="GetDisposedEvent"/> lets a headless host block until the last widget is
-/// removed.
+/// it on dispose. <see cref="ExitWaitHandle"/> is signaled when the COM server's lock count drops to
+/// zero so the host can unblock and then dispose/revoke the class object.
 /// </summary>
 internal sealed class WidgetProviderRegistration<TWidgetProvider> : IDisposable
     where TWidgetProvider : IWidgetProvider, new()
@@ -70,14 +92,19 @@ internal sealed class WidgetProviderRegistration<TWidgetProvider> : IDisposable
     private const uint REGCLS_MULTIPLEUSE = 0x1;
 
     private readonly uint _cookie;
-    private readonly ManualResetEvent _disposedEvent = new(false);
+    private readonly ManualResetEvent _exitEvent;
     private bool _disposed;
 
-    private WidgetProviderRegistration(uint cookie) => _cookie = cookie;
+    private WidgetProviderRegistration(uint cookie, ManualResetEvent exitEvent)
+    {
+        _cookie = cookie;
+        _exitEvent = exitEvent;
+    }
 
     public static WidgetProviderRegistration<TWidgetProvider> Register()
     {
-        var factory = new WidgetProviderFactory<TWidgetProvider>();
+        var exitEvent = new ManualResetEvent(false);
+        var factory = new WidgetProviderFactory<TWidgetProvider>(() => exitEvent.Set());
         int hr = NativeMethods.CoRegisterClassObject(
             typeof(TWidgetProvider).GUID,
             factory,
@@ -87,13 +114,19 @@ internal sealed class WidgetProviderRegistration<TWidgetProvider> : IDisposable
 
         if (hr != 0)
         {
+            exitEvent.Dispose();
             Marshal.ThrowExceptionForHR(hr);
         }
 
-        return new WidgetProviderRegistration<TWidgetProvider>(cookie);
+        return new WidgetProviderRegistration<TWidgetProvider>(cookie, exitEvent);
     }
 
-    public ManualResetEvent GetDisposedEvent() => _disposedEvent;
+    /// <summary>
+    /// Signaled when <see cref="IClassFactory.LockServer"/> drops the COM server's reference count
+    /// to zero. The main loop should wait on this before exiting the <c>using</c> scope so that
+    /// <see cref="Dispose"/> can revoke the class object cleanly.
+    /// </summary>
+    public WaitHandle ExitWaitHandle => _exitEvent;
 
     public void Dispose()
     {
@@ -104,7 +137,7 @@ internal sealed class WidgetProviderRegistration<TWidgetProvider> : IDisposable
 
         NativeMethods.CoRevokeClassObject(_cookie);
         _disposed = true;
-        _disposedEvent.Set();
+        _exitEvent.Dispose();
     }
 }
 
@@ -121,4 +154,10 @@ internal static class NativeMethods
 
     [DllImport("ole32.dll")]
     internal static extern int CoRevokeClassObject(uint dwRegister);
+
+    [DllImport("ole32.dll")]
+    internal static extern uint CoAddRefServerProcess();
+
+    [DllImport("ole32.dll")]
+    internal static extern uint CoReleaseServerProcess();
 }

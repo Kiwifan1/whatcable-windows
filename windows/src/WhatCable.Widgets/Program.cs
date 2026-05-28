@@ -22,9 +22,8 @@ internal static class Program
 
         using var registration = WidgetProviderRegistration<WhatCableWidgetProvider>.Register();
 
-        // Wait until the host has disposed of the last widget provider before exiting.
-        using var disposedEvent = registration.GetDisposedEvent();
-        disposedEvent.WaitOne();
+        // Block until the host releases its last server lock (LockServer(false) drops count to 0).
+        registration.ExitWaitHandle.WaitOne();
 
         return 0;
     }
