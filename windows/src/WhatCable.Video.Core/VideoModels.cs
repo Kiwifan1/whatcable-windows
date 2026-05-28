@@ -77,6 +77,18 @@ public sealed record VideoPortSnapshot
 }
 
 /// <summary>
+/// A single display port paired with its link diagnostic, as emitted in the CLI
+/// <c>video</c> section. The snapshot is produced from <c>QueryDisplayConfig</c> +
+/// the EDID, and the diagnostic from <see cref="VideoLinkDiagnostic.Analyze"/>.
+/// </summary>
+public sealed record VideoPortReport
+{
+    [JsonPropertyName("displayName")] public string? DisplayName { get; init; }
+    [JsonPropertyName("port")] public VideoPortSnapshot Port { get; init; } = new();
+    [JsonPropertyName("diagnostic")] public VideoLinkDiagnosticResult Diagnostic { get; init; } = new();
+}
+
+/// <summary>
 /// Bottleneck classification for video link diagnostic.
 /// </summary>
 [JsonConverter(typeof(JsonStringEnumConverter))]
