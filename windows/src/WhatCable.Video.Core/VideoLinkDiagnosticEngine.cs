@@ -91,7 +91,10 @@ public static class VideoLinkDiagnostic
             AddVendorLinkDetails(details, vendorLink);
             if (haveMeasuredLink)
             {
-                cableBandwidthGbps = vendorLinkGbps;
+                // Take the higher of the advertised cable class and the measured link so that
+                // a transiently-renegotiated-down or conservatively-trained link never turns
+                // a correctly-"Sink" verdict into a spurious "Cable limited" verdict.
+                cableBandwidthGbps = Math.Max(cableBandwidthGbps ?? 0, vendorLinkGbps!.Value);
             }
         }
 
