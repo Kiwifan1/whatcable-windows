@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!--
+    WinUI 3 resource file. Keys mirror WhatCable.Windows.App.Core.Localization.StringKeys.
+    Strings ported from the macOS app (Sources/WhatCable/Resources/*.lproj/Localizable.strings);
+    Windows-only entries (vendor SDK toggle, Pro license, port summary) are new for this port.
+    Generated/maintained set — keep all five locales in key parity (see LocalizationParityTests).
+  -->
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Tray_Tooltip" xml:space="preserve">
+    <value>WhatCable</value>
+  </data>
+  <data name="Tray_Refresh" xml:space="preserve">
+    <value>刷新</value>
+  </data>
+  <data name="Tray_Settings" xml:space="preserve">
+    <value>设置…</value>
+  </data>
+  <data name="Tray_Quit" xml:space="preserve">
+    <value>退出</value>
+  </data>
+  <data name="Tray_NothingConnected" xml:space="preserve">
+    <value>未连接任何设备</value>
+  </data>
+  <data name="Tray_NoPortsDetected" xml:space="preserve">
+    <value>未检测到 USB-C 端口</value>
+  </data>
+  <data name="Tray_PortsSummary" xml:space="preserve">
+    <value>{1} 个端口中有 {0} 个活跃</value>
+  </data>
+  <data name="Port_Active" xml:space="preserve">
+    <value>活跃</value>
+  </data>
+  <data name="Port_Connection" xml:space="preserve">
+    <value>连接</value>
+  </data>
+  <data name="Port_ConnectedDevices" xml:space="preserve">
+    <value>已连接设备</value>
+  </data>
+  <data name="Port_Transports" xml:space="preserve">
+    <value>传输</value>
+  </data>
+  <data name="Port_PdSource" xml:space="preserve">
+    <value>PD 供电源</value>
+  </data>
+  <data name="Port_CableTrustSignals" xml:space="preserve">
+    <value>线缆可信度信号</value>
+  </data>
+  <data name="Port_Display" xml:space="preserve">
+    <value>显示</value>
+  </data>
+  <data name="Port_ThunderboltFabric" xml:space="preserve">
+    <value>Thunderbolt 拓扑</value>
+  </data>
+  <data name="Port_ShowTechnicalDetails" xml:space="preserve">
+    <value>显示技术详情</value>
+  </data>
+  <data name="Port_UsbDevice" xml:space="preserve">
+    <value>USB 设备</value>
+  </data>
+  <data name="Port_ActiveCableElectronics" xml:space="preserve">
+    <value>有源线缆电子组件</value>
+  </data>
+  <data name="Port_ReportThisCable" xml:space="preserve">
+    <value>报告这条线缆</value>
+  </data>
+  <data name="Port_VideoDiagnostic" xml:space="preserve">
+    <value>视频诊断</value>
+  </data>
+  <data name="Settings_Title" xml:space="preserve">
+    <value>设置</value>
+  </data>
+  <data name="Settings_Behavior" xml:space="preserve">
+    <value>行为</value>
+  </data>
+  <data name="Settings_LaunchAtLogin" xml:space="preserve">
+    <value>登录时启动</value>
+  </data>
+  <data name="Settings_Notifications" xml:space="preserve">
+    <value>通知</value>
+  </data>
+  <data name="Settings_NotifyOnCableChanges" xml:space="preserve">
+    <value>线缆变化时通知</value>
+  </data>
+  <data name="Settings_HideEmptyPorts" xml:space="preserve">
+    <value>隐藏空端口</value>
+  </data>
+  <data name="Settings_VendorSdk" xml:space="preserve">
+    <value>使用 GPU 厂商 SDK</value>
+  </data>
+  <data name="Settings_VendorSdkDetail" xml:space="preserve">
+    <value>启用可选的 NVIDIA、AMD 和 Intel SDK 以获得更丰富的视频诊断。</value>
+  </data>
+  <data name="Settings_Language" xml:space="preserve">
+    <value>语言</value>
+  </data>
+  <data name="Settings_SystemDefault" xml:space="preserve">
+    <value>系统默认</value>
+  </data>
+  <data name="Settings_Pro" xml:space="preserve">
+    <value>Pro</value>
+  </data>
+  <data name="Settings_ProLicenseKey" xml:space="preserve">
+    <value>Pro 许可证密钥</value>
+  </data>
+  <data name="Settings_ProLicenseValid" xml:space="preserve">
+    <value>许可证已激活</value>
+  </data>
+  <data name="Settings_ProLicenseInvalid" xml:space="preserve">
+    <value>请输入有效的许可证密钥</value>
+  </data>
+  <data name="Settings_Privacy" xml:space="preserve">
+    <value>隐私</value>
+  </data>
+  <data name="Settings_Done" xml:space="preserve">
+    <value>完成</value>
+  </data>
+  <data name="Notification_ChargerConnected" xml:space="preserve">
+    <value>充电器已连接</value>
+  </data>
+  <data name="Notification_ChargerDisconnected" xml:space="preserve">
+    <value>充电器已断开</value>
+  </data>
+  <data name="Notification_DeviceConnected" xml:space="preserve">
+    <value>设备已连接</value>
+  </data>
+  <data name="Notification_DeviceDisconnected" xml:space="preserve">
+    <value>USB 设备已断开</value>
+  </data>
+  <data name="Common_Yes" xml:space="preserve">
+    <value>是</value>
+  </data>
+  <data name="Common_No" xml:space="preserve">
+    <value>否</value>
+  </data>
+  <data name="Common_Unknown" xml:space="preserve">
+    <value>未知</value>
+  </data>
+  <data name="Common_Cancel" xml:space="preserve">
+    <value>取消</value>
+  </data>
+</root>

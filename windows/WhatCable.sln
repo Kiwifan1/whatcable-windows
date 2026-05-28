@@ -20,6 +20,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WhatCable.Video.Core.Tests"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WhatCable.Windows.Backend.Tests", "tests\WhatCable.Windows.Backend.Tests\WhatCable.Windows.Backend.Tests.csproj", "{A749D3CC-BB0C-4C16-9663-09E27234F33B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E321B2A3-1E18-4606-8B76-F69A2887BBB1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhatCable.Windows.App.Core", "src\WhatCable.Windows.App.Core\WhatCable.Windows.App.Core.csproj", "{9BEC4C47-9032-4B85-AAF7-7A34F4C4EA4B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{91859670-391F-4908-87F6-D6698BE48391}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhatCable.Windows.App.Core.Tests", "tests\WhatCable.Windows.App.Core.Tests\WhatCable.Windows.App.Core.Tests.csproj", "{64AB4DB3-294F-4F5E-9925-C430A2C9AC42}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -100,5 +108,25 @@ Global
 		{A749D3CC-BB0C-4C16-9663-09E27234F33B}.Release|x64.Build.0 = Release|Any CPU
 		{A749D3CC-BB0C-4C16-9663-09E27234F33B}.Release|ARM64.ActiveCfg = Release|Any CPU
 		{A749D3CC-BB0C-4C16-9663-09E27234F33B}.Release|ARM64.Build.0 = Release|Any CPU
+		{9BEC4C47-9032-4B85-AAF7-7A34F4C4EA4B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9BEC4C47-9032-4B85-AAF7-7A34F4C4EA4B}.Debug|x64.Build.0 = Debug|Any CPU
+		{9BEC4C47-9032-4B85-AAF7-7A34F4C4EA4B}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{9BEC4C47-9032-4B85-AAF7-7A34F4C4EA4B}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{9BEC4C47-9032-4B85-AAF7-7A34F4C4EA4B}.Release|x64.ActiveCfg = Release|Any CPU
+		{9BEC4C47-9032-4B85-AAF7-7A34F4C4EA4B}.Release|x64.Build.0 = Release|Any CPU
+		{9BEC4C47-9032-4B85-AAF7-7A34F4C4EA4B}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{9BEC4C47-9032-4B85-AAF7-7A34F4C4EA4B}.Release|ARM64.Build.0 = Release|Any CPU
+		{64AB4DB3-294F-4F5E-9925-C430A2C9AC42}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{64AB4DB3-294F-4F5E-9925-C430A2C9AC42}.Debug|x64.Build.0 = Debug|Any CPU
+		{64AB4DB3-294F-4F5E-9925-C430A2C9AC42}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{64AB4DB3-294F-4F5E-9925-C430A2C9AC42}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{64AB4DB3-294F-4F5E-9925-C430A2C9AC42}.Release|x64.ActiveCfg = Release|Any CPU
+		{64AB4DB3-294F-4F5E-9925-C430A2C9AC42}.Release|x64.Build.0 = Release|Any CPU
+		{64AB4DB3-294F-4F5E-9925-C430A2C9AC42}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{64AB4DB3-294F-4F5E-9925-C430A2C9AC42}.Release|ARM64.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9BEC4C47-9032-4B85-AAF7-7A34F4C4EA4B} = {E321B2A3-1E18-4606-8B76-F69A2887BBB1}
+		{64AB4DB3-294F-4F5E-9925-C430A2C9AC42} = {91859670-391F-4908-87F6-D6698BE48391}
 	EndGlobalSection
 EndGlobal
