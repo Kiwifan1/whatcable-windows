@@ -38,7 +38,7 @@ jobs:
         run: dotnet restore WhatCable.sln
 
       - name: Build (Release, x64)
-        run: dotnet build WhatCable.sln -c Release /p:Platform=x64 --no-restore
+        run: msbuild WhatCable.sln /p:Configuration=Release /p:Platform=x64
 
       - name: Test
         run: dotnet test WhatCable.sln -c Release --no-build --logger "trx;LogFileName=test-results.trx"
