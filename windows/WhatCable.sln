@@ -1,4 +1,4 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.0.0
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -17,6 +17,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WhatCable.Core.Tests", "tests\WhatCable.Core.Tests\WhatCable.Core.Tests.csproj", "{11111111-1111-1111-1111-111111111107}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WhatCable.Video.Core.Tests", "tests\WhatCable.Video.Core.Tests\WhatCable.Video.Core.Tests.csproj", "{11111111-1111-1111-1111-111111111108}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WhatCable.Windows.Backend.Tests", "tests\WhatCable.Windows.Backend.Tests\WhatCable.Windows.Backend.Tests.csproj", "{A749D3CC-BB0C-4C16-9663-09E27234F33B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -90,5 +92,13 @@ Global
 		{11111111-1111-1111-1111-111111111108}.Release|x64.Build.0 = Release|Any CPU
 		{11111111-1111-1111-1111-111111111108}.Release|ARM64.ActiveCfg = Release|Any CPU
 		{11111111-1111-1111-1111-111111111108}.Release|ARM64.Build.0 = Release|Any CPU
+		{A749D3CC-BB0C-4C16-9663-09E27234F33B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A749D3CC-BB0C-4C16-9663-09E27234F33B}.Debug|x64.Build.0 = Debug|Any CPU
+		{A749D3CC-BB0C-4C16-9663-09E27234F33B}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{A749D3CC-BB0C-4C16-9663-09E27234F33B}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{A749D3CC-BB0C-4C16-9663-09E27234F33B}.Release|x64.ActiveCfg = Release|Any CPU
+		{A749D3CC-BB0C-4C16-9663-09E27234F33B}.Release|x64.Build.0 = Release|Any CPU
+		{A749D3CC-BB0C-4C16-9663-09E27234F33B}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{A749D3CC-BB0C-4C16-9663-09E27234F33B}.Release|ARM64.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

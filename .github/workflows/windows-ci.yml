@@ -43,6 +43,14 @@ jobs:
       - name: Test
         run: dotnet test WhatCable.sln -c Release --no-build --logger "trx;LogFileName=test-results.trx"
 
+      - name: CLI smoke test (snapshot --json | jq)
+        shell: pwsh
+        run: |
+          $exe = Get-ChildItem -Recurse -Path src/WhatCable.Cli/bin -Filter whatcable-cli.exe | Select-Object -First 1
+          if (-not $exe) { throw "whatcable-cli.exe not found" }
+          & $exe.FullName snapshot --json | jq . | Out-Null
+          if ($LASTEXITCODE -ne 0) { throw "snapshot --json | jq exited with $LASTEXITCODE" }
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4

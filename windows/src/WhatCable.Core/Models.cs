@@ -25,6 +25,7 @@ public sealed record Port
     [JsonPropertyName("cio")] public JsonElement? Cio { get; init; }
     [JsonPropertyName("devices")] public JsonElement? Devices { get; init; }
     [JsonPropertyName("rawProperties")] public JsonElement? RawProperties { get; init; }
+    [JsonPropertyName("unavailable_reason")] public string? UnavailableReason { get; init; }
 }
 
 public sealed record Cable
