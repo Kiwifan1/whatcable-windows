@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!--
+      Plain net8.0 (no Windows App SDK) so the Adaptive Card rendering and the IPC
+      contract are unit-testable off the widget host and on non-Windows CI hosts.
+      The Windows-only COM server in WhatCable.Widgets references this library, and the
+      WinUI app uses it to publish snapshot updates over the named pipe.
+    -->
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>WhatCable.Widgets.Core</RootNamespace>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Description>Testable core for the WhatCable Windows 11 widget provider: Adaptive Card templates and the app↔provider snapshot IPC contract.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WhatCable.Core\WhatCable.Core.csproj" />
+  </ItemGroup>
+</Project>

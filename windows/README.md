@@ -20,6 +20,7 @@ windows/
 │   ├── WhatCable.Windows.Backend/   # P/Invoke adapters: UCSI, USB, power, TB chain, display, EDID, vendor GPU
 │   ├── WhatCable.Windows.App.Core/  # platform-neutral tray/settings ViewModels, settings store, localisation
 │   ├── WhatCable.Windows.App/       # WinUI 3 tray app + popover + Settings
+│   ├── WhatCable.Widgets.Core/      # testable widget core: Adaptive Card templates + app↔provider IPC
 │   ├── WhatCable.Widgets/           # Windows 11 Widget Provider COM server
 │   └── WhatCable.Cli/               # whatcable-cli.exe — JSON-compatible with the macOS CLI
 └── tests/
@@ -54,6 +55,22 @@ The WinUI 3 app and Widget Provider produce x64 / ARM64 binaries. The CLI and cl
 | `WhatCable.Widgets` | Windows 11 22H2 | x64, ARM64 |
 
 The widget provider is gated to Windows 11 because the Widgets Board / lock-screen widget host doesn't exist on Windows 10.
+
+## Widgets
+
+`WhatCable.Widgets` is an out-of-process **Widget Provider COM server** (`IWidgetProvider`) registered through the app's MSIX manifest (`Package.appxmanifest`: a `com:ExeServer` plus a `com.microsoft.windows.widgets` app extension). It renders three Adaptive Card sizes:
+
+| Size | Content |
+|---|---|
+| Small | Charging status + active port link speed |
+| Medium | Per-port summary table |
+| Large | Full snapshot incl. per-port detail and video diagnostic verdicts |
+
+All card rendering and the IPC contract live in the testable `WhatCable.Widgets.Core` library (plain `net8.0`, no Windows App SDK), so the templates are unit-tested off the widget host. The COM activation plumbing stays in the Windows-only `WhatCable.Widgets` executable.
+
+The tray app pushes live state to the provider over a named pipe (`WidgetSnapshotPipe`) on each backend poll, so a pinned widget refreshes within one poll interval (≤5s) of a USB-C or display event. On Windows 11 23H2+, the same size-aware widgets are eligible for the lock screen; users enable them via **Settings → Personalization → Lock screen**.
+
+Free-floating desktop widgets remain a macOS-only feature — Windows has no equivalent API.
 
 ## Capability vs. the macOS app
 

@@ -24,6 +24,7 @@ public partial class App : Application
     private readonly ISettingsStore _settingsStore = new JsonFileSettingsStore();
     private readonly ILocalizer _localizer = new ResourceLocalizer();
     private readonly IStartupTaskService _startupTask = new StartupTaskService();
+    private readonly WidgetPublisher _widgetPublisher = new();
 
     private TrayViewModel? _trayViewModel;
     private TaskbarIcon? _trayIcon;
@@ -125,9 +126,28 @@ public partial class App : Application
         var queue = DispatcherQueue.GetForCurrentThread();
         _pollTimer = queue.CreateTimer();
         _pollTimer.Interval = PollInterval;
-        _pollTimer.Tick += (_, _) => _trayViewModel!.Refresh();
+        _pollTimer.Tick += (_, _) => Poll();
         _pollTimer.Start();
+        Poll();
+    }
+
+    /// <summary>Refreshes the tray UI and pushes the latest snapshot to the widget provider.</summary>
+    private void Poll()
+    {
         _trayViewModel!.Refresh();
+        _ = PublishToWidgetsAsync();
+    }
+
+    private async Task PublishToWidgetsAsync()
+    {
+        try
+        {
+            await _widgetPublisher.PublishAsync();
+        }
+        catch
+        {
+            // Widget publishing is best-effort and must never disrupt the tray app.
+        }
     }
 
     private void ShowSettings()

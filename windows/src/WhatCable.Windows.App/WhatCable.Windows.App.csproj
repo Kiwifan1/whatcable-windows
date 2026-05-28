@@ -22,6 +22,7 @@
   <ItemGroup>
     <ProjectReference Include="..\WhatCable.Core\WhatCable.Core.csproj" />
     <ProjectReference Include="..\WhatCable.Video.Core\WhatCable.Video.Core.csproj" />
+    <ProjectReference Include="..\WhatCable.Widgets.Core\WhatCable.Widgets.Core.csproj" />
     <ProjectReference Include="..\WhatCable.Windows.App.Core\WhatCable.Windows.App.Core.csproj" />
     <ProjectReference Include="..\WhatCable.Windows.Backend\WhatCable.Windows.Backend.csproj" />
   </ItemGroup>

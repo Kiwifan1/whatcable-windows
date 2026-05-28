@@ -2,9 +2,11 @@
 <Package
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3"
   xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
+  xmlns:com="http://schemas.microsoft.com/appx/manifest/com/windows10"
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
-  IgnorableNamespaces="uap desktop rescap">
+  IgnorableNamespaces="uap uap3 desktop com rescap">
 
   <Identity Name="uk.whatcable.WhatCable"
             Publisher="CN=WhatCable"
@@ -36,11 +38,74 @@
         <desktop:Extension Category="windows.startupTask" Executable="WhatCable.exe" EntryPoint="Windows.FullTrustApplication">
           <desktop:StartupTask TaskId="WhatCableStartup" Enabled="false" DisplayName="WhatCable" />
         </desktop:Extension>
+
+        <!--
+          Widget Provider COM server (WhatCable.Widgets.exe). The Widgets Board host activates this
+          out-of-process COM class on demand; the CLSID is mirrored in WhatCable.Widgets.Core's
+          WidgetCatalog.ProviderClassId.
+        -->
+        <com:Extension Category="windows.comServer">
+          <com:ComServer>
+            <com:ExeServer Executable="WhatCable.Widgets.exe" Arguments="-RegisterProcessAsComServer" DisplayName="WhatCable Widget Provider">
+              <com:Class Id="739FA740-7E5C-48DD-9AFE-C78E4FBCC14E" DisplayName="WhatCable Widget Provider" />
+            </com:ExeServer>
+          </com:ComServer>
+        </com:Extension>
+
+        <!--
+          Widget definitions surfaced in the Windows 11 Widgets Board picker. On Windows 11 23H2+
+          these size-aware widgets are also eligible for the lock screen; the user enables them via
+          Settings > Personalization > Lock screen.
+        -->
+        <uap3:Extension Category="windows.appExtension">
+          <uap3:AppExtension Name="com.microsoft.windows.widgets" DisplayName="WhatCable" Id="uk.whatcable.widgets" PublicFolder="Public">
+            <uap3:Properties>
+              <WidgetProvider>
+                <ProviderIcons>
+                  <Icon Path="Assets\Square44x44Logo.png" />
+                </ProviderIcons>
+                <Activation>
+                  <CreateInstance ClassId="739FA740-7E5C-48DD-9AFE-C78E4FBCC14E" />
+                </Activation>
+                <Definitions>
+                  <Definition Id="WhatCable_Status_Widget"
+                              DisplayName="WhatCable"
+                              Description="Live USB-C charging, port and video cable status."
+                              AllowMultiple="false"
+                              IsCustomizable="false">
+                    <Capabilities>
+                      <Capability>
+                        <Size Name="small" />
+                      </Capability>
+                      <Capability>
+                        <Size Name="medium" />
+                      </Capability>
+                      <Capability>
+                        <Size Name="large" />
+                      </Capability>
+                    </Capabilities>
+                    <ThemeResources>
+                      <Icons>
+                        <Icon Path="Assets\Square44x44Logo.png" />
+                      </Icons>
+                      <Screenshots>
+                        <Screenshot Path="Assets\Square150x150Logo.png" DisplayAltText="WhatCable widget showing cable status" />
+                      </Screenshots>
+                      <DarkMode />
+                      <LightMode />
+                    </ThemeResources>
+                  </Definition>
+                </Definitions>
+              </WidgetProvider>
+            </uap3:Properties>
+          </uap3:AppExtension>
+        </uap3:Extension>
       </Extensions>
     </Application>
   </Applications>
 
   <Capabilities>
     <Capability Name="internetClient" />
+    <rescap:Capability Name="runFullTrust" />
   </Capabilities>
 </Package>
