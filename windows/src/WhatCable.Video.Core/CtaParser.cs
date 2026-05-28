@@ -188,7 +188,7 @@ public static class CtaParser
             }
             else if (formatCode >= 2 && formatCode <= 8)
             {
-                maxBitrate = b2 * 8; // in kbps
+                maxBitrate = b2 * 8; // CTA stores this field in 8 kbps units
             }
 
             descriptors.Add(new AudioDescriptor
