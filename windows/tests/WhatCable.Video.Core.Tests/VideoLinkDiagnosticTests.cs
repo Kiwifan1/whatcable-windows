@@ -197,4 +197,64 @@ public sealed class VideoLinkDiagnosticTests
         Assert.Equal(VideoBottleneck.Unknown, diagnostic.Bottleneck);
         Assert.Contains("Cable or source is limiting", diagnostic.Verdict);
     }
+
+    [Fact]
+    public void Analyze_VendorLinkCarriesSinkMax_UpgradesUnknownToSink()
+    {
+        // A vendor GPU SDK reports a fast measured link (UHBR20 ×4) that can carry the sink's
+        // maximum, so the lower active mode is an intentional selection rather than a cable or
+        // source limit -- the verdict upgrades from "cable or source limited" (Unknown) to Sink.
+        var snapshot = new VideoPortSnapshot
+        {
+            ConnectorType = VideoConnectorType.DisplayPort,
+            ActiveMode = new VideoMode { WidthPx = 3840, HeightPx = 2160, RefreshRateHz = 60 },
+            SinkMaxMode = new VideoMode { WidthPx = 3840, HeightPx = 2160, RefreshRateHz = 120 },
+            VendorGpuLink = new VendorGpuLinkInfo
+            {
+                Vendor = "NVIDIA",
+                DpLinkRateGbps = 20.0,
+                DpLaneCount = 4,
+            }
+        };
+
+        var diagnostic = VideoLinkDiagnostic.Analyze(snapshot);
+
+        Assert.Equal(VideoBottleneck.Sink, diagnostic.Bottleneck);
+        Assert.Contains(diagnostic.Details, d => d.Contains("can carry the display's maximum", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(diagnostic.Details, d => d.Contains("NVIDIA", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void Analyze_VendorLinkBelowSinkMax_UpgradesUnknownToCable()
+    {
+        // The measured link (HBR2 ×2) cannot carry the sink's maximum, so the diagnostic can
+        // confidently attribute the bottleneck to the cable/link rather than reporting Unknown.
+        var snapshot = new VideoPortSnapshot
+        {
+            ConnectorType = VideoConnectorType.DisplayPort,
+            ActiveMode = new VideoMode { WidthPx = 1920, HeightPx = 1080, RefreshRateHz = 60 },
+            SinkMaxMode = new VideoMode { WidthPx = 3840, HeightPx = 2160, RefreshRateHz = 120 },
+            VendorGpuLink = new VendorGpuLinkInfo
+            {
+                Vendor = "AMD",
+                DpLinkRateGbps = 5.4,
+                DpLaneCount = 2,
+            }
+        };
+
+        var diagnostic = VideoLinkDiagnostic.Analyze(snapshot);
+
+        Assert.Equal(VideoBottleneck.Cable, diagnostic.Bottleneck);
+        Assert.NotNull(diagnostic.RecommendedCableClass);
+        Assert.Contains(diagnostic.Details, d => d.Contains("AMD", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void TotalLinkBandwidthGbps_DerivesFromDpAndHdmiFields()
+    {
+        Assert.Equal(32.4, new VendorGpuLinkInfo { DpLinkRateGbps = 8.1, DpLaneCount = 4 }.TotalLinkBandwidthGbps);
+        Assert.Equal(48.0, new VendorGpuLinkInfo { HdmiFrlRateGbps = 12.0, HdmiFrlLaneCount = 4 }.TotalLinkBandwidthGbps);
+        Assert.Equal(40.0, new VendorGpuLinkInfo { NegotiatedLinkRateGbps = 40.0 }.TotalLinkBandwidthGbps);
+        Assert.Null(new VendorGpuLinkInfo { Vendor = "Intel" }.TotalLinkBandwidthGbps);
+    }
 }

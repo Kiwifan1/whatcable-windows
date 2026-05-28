@@ -12,6 +12,12 @@
     <Platforms>x64;ARM64</Platforms>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+  <!-- Installer builds pass /p:EnableVendorGpuAdapters=true to turn the optional vendor GPU
+       probes (NVAPI / AMD ADL / Intel IGCL) on by default; CI / redistributable builds leave
+       it unset so the default build carries no vendor-SDK behaviour. -->
+  <PropertyGroup Condition="'$(EnableVendorGpuAdapters)' == 'true'">
+    <DefineConstants>$(DefineConstants);ENABLE_VENDOR_GPU</DefineConstants>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\WhatCable.Core\WhatCable.Core.csproj" />
     <ProjectReference Include="..\WhatCable.Video.Core\WhatCable.Video.Core.csproj" />

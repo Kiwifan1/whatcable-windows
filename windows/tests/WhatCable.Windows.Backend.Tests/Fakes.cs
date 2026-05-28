@@ -45,3 +45,33 @@ internal sealed class FakeThunderboltEnumerator : IThunderboltEnumerator
 
     public IReadOnlyList<ThunderboltDeviceInfo> EnumerateChain() => _devices;
 }
+
+/// <summary>In-memory <see cref="IVendorGpuAdapter"/> returning recorded link info.</summary>
+internal sealed class FakeVendorGpuAdapter : IVendorGpuAdapter
+{
+    private readonly Func<DisplayInfo, WhatCable.Video.Core.VendorGpuLinkInfo?> _query;
+
+    public FakeVendorGpuAdapter(
+        WhatCable.Video.Core.VendorGpuLinkInfo? link,
+        bool isAvailable = true,
+        string name = "Fake")
+        : this(_ => link, isAvailable, name)
+    {
+    }
+
+    public FakeVendorGpuAdapter(
+        Func<DisplayInfo, WhatCable.Video.Core.VendorGpuLinkInfo?> query,
+        bool isAvailable = true,
+        string name = "Fake")
+    {
+        _query = query;
+        IsAvailable = isAvailable;
+        Name = name;
+    }
+
+    public string Name { get; }
+
+    public bool IsAvailable { get; }
+
+    public WhatCable.Video.Core.VendorGpuLinkInfo? QueryLink(DisplayInfo display) => _query(display);
+}

@@ -52,11 +52,22 @@ public sealed class SnapshotBuilder
         IUcsiTransport? ucsiTransport,
         IDisplayEnumerator? displayEnumerator,
         IThunderboltEnumerator? thunderboltEnumerator)
+        : this(usbEnumerator, powerSource, ucsiTransport, displayEnumerator, thunderboltEnumerator, vendorGpuAdapters: null)
+    {
+    }
+
+    public SnapshotBuilder(
+        IUsbEnumerator usbEnumerator,
+        ISystemPowerSource powerSource,
+        IUcsiTransport? ucsiTransport,
+        IDisplayEnumerator? displayEnumerator,
+        IThunderboltEnumerator? thunderboltEnumerator,
+        IReadOnlyList<IVendorGpuAdapter>? vendorGpuAdapters)
     {
         _usb = new UsbTopologyAdapter(usbEnumerator);
         _power = new PowerAdapter(powerSource);
         _ucsi = ucsiTransport is null ? null : new UcsiAdapter(ucsiTransport);
-        _video = displayEnumerator is null ? null : new VideoPortAdapter(displayEnumerator);
+        _video = displayEnumerator is null ? null : new VideoPortAdapter(displayEnumerator, vendorGpuAdapters);
         _thunderbolt = thunderboltEnumerator is null ? null : new ThunderboltChainAdapter(thunderboltEnumerator);
     }
 
@@ -99,13 +110,34 @@ public sealed class SnapshotBuilder
     };
 
 #if WINDOWS
+    /// <summary>
+    /// Default state of the optional vendor GPU adapters. Off in CI / redistributable builds;
+    /// installer builds define <c>ENABLE_VENDOR_GPU</c> (via the <c>EnableVendorGpuAdapters</c>
+    /// MSBuild property) so the richer NVAPI / ADL / IGCL probes are on by default there.
+    /// </summary>
+    public const bool VendorGpuAdaptersEnabledByDefault =
+#if ENABLE_VENDOR_GPU
+        true;
+#else
+        false;
+#endif
+
     /// <summary>Creates a builder backed by the live Windows enumerators.</summary>
     public static SnapshotBuilder CreateDefault()
+        => CreateDefault(VendorGpuAdaptersEnabledByDefault);
+
+    /// <summary>
+    /// Creates a builder backed by the live Windows enumerators, with the optional vendor GPU
+    /// adapters enabled per <paramref name="enableVendorGpuAdapters"/> (each adapter still only
+    /// activates when its native SDK actually loads).
+    /// </summary>
+    public static SnapshotBuilder CreateDefault(bool enableVendorGpuAdapters)
         => new(
             new SetupApiUsbEnumerator(),
             new WindowsSystemPowerSource(),
             new WindowsUcsiTransport(),
             new QueryDisplayConfigDisplayEnumerator(),
-            new SetupApiThunderboltEnumerator());
+            new SetupApiThunderboltEnumerator(),
+            VendorGpuAdapters.Discover(enableVendorGpuAdapters));
 #endif
 }
