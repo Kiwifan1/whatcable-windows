@@ -137,10 +137,26 @@ public static class VideoLinkDiagnostic
             }
             else
             {
-                // Display supports more but we don't know why it's not being used
-                bottleneck = VideoBottleneck.Sink;
-                details.Add($"Display reports {FormatMode(sinkMaxMode)} capability but not active.");
-                details.Add("This may be a user setting or OS limitation.");
+                // Display supports more than the active mode. If we have cable and/or GPU
+                // capability data showing headroom, the lower mode is a user/OS selection
+                // (the sink itself is not the limit). On a stock PC with no vendor SDK we
+                // usually have neither the cable e-marker nor GPU caps, so we cannot tell
+                // whether the cable or the source is the limit — report that explicitly.
+                bool haveComponentInfo = cableBandwidthGbps.HasValue || gpuBandwidthGbps.HasValue;
+                if (haveComponentInfo)
+                {
+                    bottleneck = VideoBottleneck.Sink;
+                    details.Add($"Display reports {FormatMode(sinkMaxMode)} capability but not active.");
+                    details.Add("This may be a user setting or OS limitation.");
+                }
+                else
+                {
+                    bottleneck = VideoBottleneck.Unknown;
+                    details.Add($"Sink advertises {FormatMode(sinkMaxMode)}; active mode is {FormatMode(activeMode)} — cable or source limited.");
+                    recommendedCableClass = RecommendCableForMode(sinkMaxMode, snapshot.ConnectorType);
+                    return BuildDiagnostic(bottleneck, details, recommendedCableClass,
+                        "⚠ Cable or source is limiting the video link. The display advertises a higher mode than is active.");
+                }
             }
         }
         else
@@ -153,9 +169,9 @@ public static class VideoLinkDiagnostic
         return BuildDiagnostic(bottleneck, details, recommendedCableClass);
     }
 
-    private static VideoLinkDiagnosticResult BuildDiagnostic(VideoBottleneck bottleneck, List<string> details, VideoCableClass? recommendedCableClass)
+    private static VideoLinkDiagnosticResult BuildDiagnostic(VideoBottleneck bottleneck, List<string> details, VideoCableClass? recommendedCableClass, string? verdictOverride = null)
     {
-        string verdict = bottleneck switch
+        string verdict = verdictOverride ?? bottleneck switch
         {
             VideoBottleneck.None => "✓ Optimal configuration - running at display's maximum capability.",
             VideoBottleneck.Cable => "⚠ Cable is limiting the video link. Consider upgrading the cable.",
