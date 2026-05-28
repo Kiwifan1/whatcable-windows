@@ -160,20 +160,6 @@ public sealed class UcsiAdapter
             return modes;
         }
 
-        uint? supported = null;
-        try
-        {
-            var rawSupported = _transport.GetCamSupported(index);
-            if (rawSupported is { Length: > 0 })
-            {
-                supported = UcsiDecoder.DecodeCamSupported(rawSupported);
-            }
-        }
-        catch
-        {
-            return modes;
-        }
-
         int currentCam;
         try
         {
@@ -191,11 +177,6 @@ public sealed class UcsiAdapter
         }
 
         var modeIndex = currentCam - 1;
-        if (supported is uint bitmap && modeIndex < 32 && ((bitmap >> modeIndex) & 1) == 0)
-        {
-            return modes;
-        }
-
         return modes
             .Select((mode, i) => i == modeIndex ? mode with { Active = true } : mode)
             .ToList();
