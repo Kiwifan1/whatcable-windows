@@ -292,7 +292,7 @@ public static class CtaParser
             byte pb5 = data[4];
             supportsAllm = (pb5 & 0x40) != 0;
             supportsQms = (pb5 & 0x02) != 0;
-            supportsQft = (pb5 & 0x09) != 0;
+            supportsQft = (pb5 & 0x08) != 0;
             supportsVrr = (pb5 & 0x10) != 0;
         }
 

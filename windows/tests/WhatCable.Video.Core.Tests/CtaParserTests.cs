@@ -68,7 +68,7 @@ public sealed class CtaParserTests
         SampleCtaBlock[offset++] = 0x78; // Max TMDS character rate: 600 MHz
         SampleCtaBlock[offset++] = 0x80; // SCDC present
         SampleCtaBlock[offset++] = 0xE4; // Max FRL rate = 4, plus 4:2:0 deep color flags
-        SampleCtaBlock[offset++] = 0x53; // QMS, QFT range, VRR, ALLM
+        SampleCtaBlock[offset++] = 0x5A; // QMS, QFT, VRR, ALLM
         SampleCtaBlock[offset++] = 0x30; // VRR min = 48
         SampleCtaBlock[offset++] = 0x78; // VRR max = 120
         SampleCtaBlock[offset++] = 0x01; // DSC 1.2 support

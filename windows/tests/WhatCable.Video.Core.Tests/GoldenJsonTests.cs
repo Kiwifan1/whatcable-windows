@@ -10,8 +10,8 @@ public sealed class GoldenJsonTests
     [InlineData("8k120-dp20-both-limiting.json")]
     public void Diagnostic_GoldenFixtures_Match(string fixtureName)
     {
-        var expected = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Fixtures", fixtureName));
-        var fixture = VideoJsonFormatter.Parse<GoldenDiagnosticFixture>(expected);
+        var fixtureContent = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Fixtures", fixtureName));
+        var fixture = VideoJsonFormatter.Parse<GoldenDiagnosticFixture>(fixtureContent);
 
         Assert.NotNull(fixture);
 
