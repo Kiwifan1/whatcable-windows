@@ -164,6 +164,6 @@
     <value>通过 WhatCable Pro 解锁</value>
   </data>
   <data name="Pro_LiquidDetectionBanner" xml:space="preserve">
-    <value>USB-C 端口检测到液体。请拔下线缆并晩干。</value>
+    <value>USB-C 端口检测到液体。请拔下线缆并晾干。</value>
   </data>
 </root>
