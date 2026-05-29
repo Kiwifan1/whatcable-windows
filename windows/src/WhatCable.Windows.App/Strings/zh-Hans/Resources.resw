@@ -166,4 +166,10 @@
   <data name="Pro_LiquidDetectionBanner" xml:space="preserve">
     <value>USB-C 端口检测到液体。请拔下线缆并晾干。</value>
   </data>
+  <data name="Port_Unavailable_ucsi_not_supported" xml:space="preserve">
+    <value>This PC does not expose USB-C connector details (UCSI not supported).</value>
+  </data>
+  <data name="Port_Unavailable_no_partner_connected" xml:space="preserve">
+    <value>No device connected.</value>
+  </data>
 </root>

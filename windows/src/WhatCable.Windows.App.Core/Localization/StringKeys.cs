@@ -65,6 +65,10 @@ public static class StringKeys
     public const string ProUpsell = "Pro_Upsell";
     public const string LiquidDetectionBanner = "Pro_LiquidDetectionBanner";
 
+    // Unavailable reasons (machine-readable keys from the backend, prefixed for resource lookup)
+    public const string PortUnavailableUcsiNotSupported = "Port_Unavailable_ucsi_not_supported";
+    public const string PortUnavailableNoPartnerConnected = "Port_Unavailable_no_partner_connected";
+
     // Common
     public const string CommonYes = "Common_Yes";
     public const string CommonNo = "Common_No";
@@ -89,6 +93,7 @@ public static class StringKeys
         NotificationLiquidDetectedTitle, NotificationLiquidDetectedBody,
         ProPinDiagram, ProLiquidDetection, ProPowerMonitor,
         ProPowerMonitorPerPortUnavailable, ProUpsell, LiquidDetectionBanner,
+        PortUnavailableUcsiNotSupported, PortUnavailableNoPartnerConnected,
         CommonYes, CommonNo, CommonUnknown, CommonCancel,
     };
 }

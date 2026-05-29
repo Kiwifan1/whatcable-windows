@@ -44,10 +44,10 @@
 
             <!-- Unavailable -->
             <InfoBar
+                x:Name="UnavailableBar"
                 Grid.Row="1"
                 IsClosable="False"
                 IsOpen="{Binding IsUnavailable}"
-                Message="{Binding UnavailableReason}"
                 Severity="Informational" />
 
             <!-- Connected devices -->

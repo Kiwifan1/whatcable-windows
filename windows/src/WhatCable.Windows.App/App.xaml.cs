@@ -209,7 +209,11 @@ public partial class App : Application
     {
         if (_settingsWindow is null)
         {
-            _settingsWindow = new SettingsWindow(new SettingsViewModel(_settingsStore, _startupTask), _localizer);
+            _settingsWindow = new SettingsWindow(new SettingsViewModel(_settingsStore, _startupTask), _localizer)
+            {
+                SystemBackdrop = new Microsoft.UI.Xaml.Media.MicaBackdrop(),
+            };
+            Helpers.PopupWindowHelper.ApplyCompactWindowStyle(_settingsWindow, width: 500, height: 650);
             _settingsWindow.Closed += (_, _) =>
             {
                 _settingsWindow = null;
@@ -225,7 +229,11 @@ public partial class App : Application
 
     private void ShowPortDetail(PortViewModel port)
     {
-        var window = new PortDetailWindow(port, _localizer);
+        var window = new PortDetailWindow(port, _localizer)
+        {
+            SystemBackdrop = new Microsoft.UI.Xaml.Media.MicaBackdrop(),
+        };
+        Helpers.PopupWindowHelper.ApplyCompactWindowStyle(window, width: 500, height: 600);
         window.Activate();
     }
 

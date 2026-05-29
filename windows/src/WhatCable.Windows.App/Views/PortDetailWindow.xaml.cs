@@ -40,6 +40,13 @@ public sealed partial class PortDetailWindow : Window
         CableHeader.Text = _localizer.Get(StringKeys.PortActiveCableElectronics);
         PinDiagramHeader.Text = _localizer.Get(StringKeys.ProPinDiagram);
         PinDiagramUpsellBar.Message = _localizer.Get(StringKeys.ProUpsell);
+
+        // Unavailable reason comes from the backend as a machine-readable key
+        // (e.g. "ucsi_not_supported"). Look up a human-readable translation.
+        if (_port.IsUnavailable && _port.UnavailableReason is not null)
+        {
+            UnavailableBar.Message = _localizer.Get($"Port_Unavailable_{_port.UnavailableReason}");
+        }
     }
 
     private async System.Threading.Tasks.Task RenderPinDiagramAsync()

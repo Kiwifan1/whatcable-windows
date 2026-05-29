@@ -7,8 +7,7 @@ using WinRT.Interop;
 namespace WhatCable.Windows.App.Helpers;
 
 /// <summary>
-/// Styles a WinUI 3 <see cref="Window"/> as a tray popup: no taskbar entry, no title bar,
-/// rounded corners, positioned above the system tray, and hidden on focus loss.
+/// Win32 interop helpers for styling WinUI 3 windows as tray popups or compact dialogs.
 /// </summary>
 internal static class PopupWindowHelper
 {
@@ -68,12 +67,13 @@ internal static class PopupWindowHelper
         // 4. Size the window.
         appWindow.Resize(new global::Windows.Graphics.SizeInt32(width, height));
 
-        // 5. Position at the bottom-right of the work area, just above the taskbar.
+        // 5. Position at the bottom-right of the work area, flush against the taskbar.
+        //    WorkArea already excludes the taskbar, so bottom of work area = top of taskbar.
         var area = DisplayArea.GetFromWindowId(windowId, DisplayAreaFallback.Primary);
         var workArea = area.WorkArea;
         appWindow.Move(new global::Windows.Graphics.PointInt32(
             workArea.X + workArea.Width - width - TrayMargin,
-            workArea.Y + workArea.Height - height - TrayMargin));
+            workArea.Y + workArea.Height - height));
 
         // 6. Auto-hide on focus loss (hide, not close — prevents WinUI app exit).
         var hasBeenActivated = false;
@@ -100,5 +100,25 @@ internal static class PopupWindowHelper
         ShowWindow(hwnd, SW_SHOWNOACTIVATE);
         SetForegroundWindow(hwnd);
         window.Activate();
+    }
+
+    /// <summary>
+    /// Sizes and centers a regular window (Settings, Port Detail) on the primary display.
+    /// Keeps the title bar and taskbar entry — this is for normal windows, not tray popups.
+    /// </summary>
+    public static void ApplyCompactWindowStyle(Window window, int width, int height)
+    {
+        var hwnd = WindowNative.GetWindowHandle(window);
+        var windowId = Win32Interop.GetWindowIdFromWindow(hwnd);
+        var appWindow = AppWindow.GetFromWindowId(windowId);
+
+        appWindow.Resize(new global::Windows.Graphics.SizeInt32(width, height));
+
+        // Center on the primary display work area.
+        var area = DisplayArea.GetFromWindowId(windowId, DisplayAreaFallback.Primary);
+        var workArea = area.WorkArea;
+        appWindow.Move(new global::Windows.Graphics.PointInt32(
+            workArea.X + (workArea.Width - width) / 2,
+            workArea.Y + (workArea.Height - height) / 2));
     }
 }
