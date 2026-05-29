@@ -8,10 +8,17 @@
     <AssemblyName>WhatCable</AssemblyName>
     <UseWinUI>true</UseWinUI>
     <EnableMsixTooling>true</EnableMsixTooling>
-    <WindowsPackageType>None</WindowsPackageType>
+    <!-- Default to unpackaged; MSIX publish profile sets WindowsPackageType=MSIX. -->
+    <WindowsPackageType Condition="'$(WindowsPackageType)' == ''">None</WindowsPackageType>
     <Platforms>x64;ARM64</Platforms>
     <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
     <Description>WhatCable for Windows — system tray app showing live USB-C and video cable diagnostics.</Description>
+    <!-- MSIX signing: uses self-signed dev cert at .\Signing\WhatCable_TemporaryKey.pfx. -->
+    <PackageCertificateKeyFile Condition="'$(PackageCertificateKeyFile)' == ''">Signing\WhatCable_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <AppxPackageSigningEnabled Condition="'$(AppxPackageSigningEnabled)' == '' and '$(WindowsPackageType)' == 'MSIX'">true</AppxPackageSigningEnabled>
+    <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
+    <GenerateAppInstallerFile Condition="'$(GenerateAppInstallerFile)' == ''">False</GenerateAppInstallerFile>
+    <AppxBundle Condition="'$(AppxBundle)' == ''">Never</AppxBundle>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.241114003" />
@@ -26,12 +33,89 @@
     <ProjectReference Include="..\WhatCable.Windows.App.Core\WhatCable.Windows.App.Core.csproj" />
     <ProjectReference Include="..\WhatCable.Windows.Backend\WhatCable.Windows.Backend.csproj" />
     <!--
-      Include WhatCable.Widgets.exe in the MSIX package alongside WhatCable.exe. The manifest
-      registers it as the out-of-process widget provider COM server; both must live at the app root.
+      WhatCable.Widgets is bundled (not referenced). It's published into an intermediate folder by
+      the PublishWidgetsProject target below and copied next to WhatCable.exe via the Content items.
+      The manifest registers WhatCable.Widgets.exe as the out-of-process widget provider COM server.
     -->
     <ProjectReference Include="..\WhatCable.Widgets\WhatCable.Widgets.csproj"
                       ReferenceOutputAssembly="false"
-                      OutputItemType="Content"
-                      CopyToOutputDirectory="PreserveNewest" />
+                      Private="false"
+                      SkipGetTargetFrameworkProperties="true" />
   </ItemGroup>
+
+  <!-- MSIX manifest only when packaging; tile assets always available. -->
+  <ItemGroup Condition="'$(WindowsPackageType)' == 'MSIX'">
+    <AppxManifest Include="Package.appxmanifest">
+      <SubType>Designer</SubType>
+    </AppxManifest>
+  </ItemGroup>
+  <ItemGroup Condition="'$(WindowsPackageType)' != 'MSIX'">
+    <None Include="Package.appxmanifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Assets\*.png" />
+    <Content Include="Assets\tray.ico" />
+  </ItemGroup>
+
+  <!--
+    Publish WhatCable.Widgets into an intermediate folder so apphost.exe and the RID-qualified
+    outputs exist. Plain Build only produces non-RID outputs, which is why the previous
+    ProjectReference + CopyToOutputDirectory approach reported missing files.
+  -->
+  <PropertyGroup>
+    <WidgetsPublishDir>$(MSBuildThisFileDirectory)obj\$(Platform)\$(Configuration)\$(TargetFramework)\$(RuntimeIdentifier)\WidgetsPublish\</WidgetsPublishDir>
+  </PropertyGroup>
+
+  <Target Name="PublishWidgetsProject"
+          BeforeTargets="AssignTargetPaths;ResolveProjectReferences;GetCopyToOutputDirectoryItems"
+          Condition="'$(RuntimeIdentifier)' != ''">
+    <MSBuild Projects="..\WhatCable.Widgets\WhatCable.Widgets.csproj"
+             Targets="Publish"
+             Properties="Configuration=$(Configuration);Platform=$(Platform);RuntimeIdentifier=$(RuntimeIdentifier);SelfContained=false;PublishDir=$(WidgetsPublishDir);AppxPackageSigningEnabled=false;GenerateAppxPackageOnBuild=false;WindowsPackageType=None" />
+  </Target>
+
+  <ItemGroup Condition="'$(RuntimeIdentifier)' != ''">
+    <Content Include="$(WidgetsPublishDir)WhatCable.Widgets.exe"
+             Link="WhatCable.Widgets.exe"
+             CopyToOutputDirectory="PreserveNewest"
+             Visible="false" />
+    <Content Include="$(WidgetsPublishDir)WhatCable.Widgets.dll"
+             Link="WhatCable.Widgets.dll"
+             CopyToOutputDirectory="PreserveNewest"
+             Visible="false" />
+    <Content Include="$(WidgetsPublishDir)WhatCable.Widgets.deps.json"
+             Link="WhatCable.Widgets.deps.json"
+             CopyToOutputDirectory="PreserveNewest"
+             Visible="false" />
+    <Content Include="$(WidgetsPublishDir)WhatCable.Widgets.runtimeconfig.json"
+             Link="WhatCable.Widgets.runtimeconfig.json"
+             CopyToOutputDirectory="PreserveNewest"
+             Visible="false" />
+  </ItemGroup>
+
+  <!--
+    After publishing, automatically run Inno Setup to produce WhatCable-Setup-<version>.exe.
+    Only runs for win-x64 (the only RID supported by installer\WhatCable.iss).
+    Opt-out with: dotnet publish ... -p:RunInnoSetup=false
+    Override compiler path with: -p:InnoSetupCompiler="C:\Path\To\ISCC.exe"
+  -->
+  <PropertyGroup>
+    <RunInnoSetup Condition="'$(RunInnoSetup)' == ''">true</RunInnoSetup>
+  </PropertyGroup>
+
+  <Target Name="RunInnoSetupAfterPublish"
+          AfterTargets="Publish"
+          Condition="'$(RunInnoSetup)' == 'true' and '$(RuntimeIdentifier)' == 'win-x64'">
+    <PropertyGroup>
+      <InnoSetupCompiler Condition="'$(InnoSetupCompiler)' == '' and Exists('$(ProgramFiles)\Inno Setup 6\ISCC.exe')">$(ProgramFiles)\Inno Setup 6\ISCC.exe</InnoSetupCompiler>
+      <InnoSetupCompiler Condition="'$(InnoSetupCompiler)' == '' and Exists('$(ProgramFiles(x86))\Inno Setup 6\ISCC.exe')">$(ProgramFiles(x86))\Inno Setup 6\ISCC.exe</InnoSetupCompiler>
+      <InnoSetupCompiler Condition="'$(InnoSetupCompiler)' == ''">ISCC.exe</InnoSetupCompiler>
+      <InnoSetupScript>$(MSBuildThisFileDirectory)..\..\installer\WhatCable.iss</InnoSetupScript>
+      <InnoSetupSourceDir>$([System.IO.Path]::GetFullPath('$(PublishDir)').TrimEnd('\'))</InnoSetupSourceDir>
+      <InnoSetupAppVersion Condition="'$(InnoSetupAppVersion)' == '' and '$(Version)' != ''">$(Version)</InnoSetupAppVersion>
+      <InnoSetupAppVersion Condition="'$(InnoSetupAppVersion)' == ''">0.0.1</InnoSetupAppVersion>
+    </PropertyGroup>
+    <Message Importance="high" Text="Running Inno Setup: &quot;$(InnoSetupCompiler)&quot; on &quot;$(InnoSetupScript)&quot; (SourceDir=$(InnoSetupSourceDir), AppVersion=$(InnoSetupAppVersion))" />
+    <Exec Command="&quot;$(InnoSetupCompiler)&quot; /DSourceDir=&quot;$(InnoSetupSourceDir)&quot; /DAppVersion=$(InnoSetupAppVersion) &quot;$(InnoSetupScript)&quot;" />
+  </Target>
 </Project>

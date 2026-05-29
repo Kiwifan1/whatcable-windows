@@ -1,5 +1,8 @@
+using CommunityToolkit.Mvvm.Input;
 using H.NotifyIcon;
+using Microsoft.UI;
 using Microsoft.UI.Dispatching;
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.Windows.AppNotifications;
@@ -10,6 +13,7 @@ using WhatCable.Windows.App.Core.ViewModels;
 using WhatCable.Windows.App.Services;
 using WhatCable.Windows.App.Views;
 using WhatCable.Windows.Backend;
+using WinRT.Interop;
 
 namespace WhatCable.Windows.App;
 
@@ -33,6 +37,7 @@ public partial class App : Application
     private TrayViewModel? _trayViewModel;
     private TaskbarIcon? _trayIcon;
     private TrayPopover? _popover;
+    private Window? _popoverWindow;
     private MenuFlyoutItem? _refreshMenuItem;
     private MenuFlyoutItem? _settingsMenuItem;
     private MenuFlyoutItem? _quitMenuItem;
@@ -46,22 +51,36 @@ public partial class App : Application
     public App()
     {
         InitializeComponent();
+
+        // Surface the actual exception so it's visible in the Debug Output window.
+        UnhandledException += (_, e) =>
+        {
+            System.Diagnostics.Debug.WriteLine($">>> UNHANDLED EXCEPTION: {e.Exception}");
+        };
     }
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
-        ApplyLanguageOverride(_settingsStore.Load());
-        AppNotificationManager.Default.Register();
+        try
+        {
+            ApplyLanguageOverride(_settingsStore.Load());
+            AppNotificationManager.Default.Register();
 
-        _trayViewModel = new TrayViewModel(
-            _snapshotProvider,
-            _settingsStore,
-            _localizer,
-            new ToastNotificationService(),
-            new PowerMonitorSource());
+            _trayViewModel = new TrayViewModel(
+                _snapshotProvider,
+                _settingsStore,
+                _localizer,
+                new ToastNotificationService(),
+                new PowerMonitorSource());
 
-        CreateTrayIcon();
-        StartPolling();
+            CreateTrayIcon();
+            StartPolling();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($">>> ONLAUNCHED EXCEPTION: {ex}");
+            throw;
+        }
     }
 
     private void CreateTrayIcon()
@@ -79,9 +98,59 @@ public partial class App : Application
             IconSource = TrayIconImage.Load(),
             NoLeftClickDelay = true,
             ContextFlyout = BuildContextMenu(),
-            TrayPopup = _popover,
+            MenuActivation = H.NotifyIcon.Core.PopupActivationMode.RightClick,
+            LeftClickCommand = new RelayCommand(ShowPopover),
         };
         _trayIcon.ForceCreate();
+    }
+
+    private void ShowPopover()
+    {
+        if (_popoverWindow is not null)
+        {
+            _popoverWindow.Activate();
+            return;
+        }
+
+        _popoverWindow = new Window { Content = _popover, SystemBackdrop = new Microsoft.UI.Xaml.Media.MicaBackdrop() };
+
+        // Get the AppWindow to customize chrome and sizing.
+        var hwnd = WindowNative.GetWindowHandle(_popoverWindow);
+        var windowId = Win32Interop.GetWindowIdFromWindow(hwnd);
+        var appWindow = AppWindow.GetFromWindowId(windowId);
+
+        // Compact popover: hide title bar, fixed size.
+        if (appWindow.Presenter is OverlappedPresenter presenter)
+        {
+            presenter.IsResizable = false;
+            presenter.IsMaximizable = false;
+            presenter.IsMinimizable = false;
+            presenter.SetBorderAndTitleBar(true, false);
+        }
+
+        const int width = 400;
+        const int height = 500;
+        appWindow.Resize(new global::Windows.Graphics.SizeInt32(width, height));
+
+        // Position near the system tray (bottom-right of primary display).
+        var area = DisplayArea.GetFromWindowId(windowId, DisplayAreaFallback.Primary);
+        var workArea = area.WorkArea;
+        appWindow.Move(new global::Windows.Graphics.PointInt32(
+            workArea.X + workArea.Width - width - 12,
+            workArea.Y + workArea.Height - height - 12));
+
+        _popoverWindow.Closed += (_, _) => _popoverWindow = null;
+        // Close the popover when it loses focus, like a real tray popup.
+        _popoverWindow.Activated += (sender, args) =>
+        {
+            if (args.WindowActivationState == WindowActivationState.Deactivated)
+            {
+                _popoverWindow?.Close();
+            }
+        };
+
+        _trayViewModel!.Refresh();
+        _popoverWindow.Activate();
     }
 
     private MenuFlyout BuildContextMenu()
@@ -214,7 +283,20 @@ public partial class App : Application
 
     private static void ApplyLanguageOverride(AppSettings settings)
     {
-        Microsoft.Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride =
-            settings.Locale ?? string.Empty;
+        // PrimaryLanguageOverride throws E_INVALIDARG for empty strings; only set when a real
+        // BCP-47 tag is configured. Null/empty means "follow the system language".
+        if (string.IsNullOrWhiteSpace(settings.Locale))
+        {
+            return;
+        }
+
+        try
+        {
+            Microsoft.Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = settings.Locale;
+        }
+        catch (System.Runtime.InteropServices.COMException)
+        {
+            // Invalid tag or unsupported context — fall back to system language.
+        }
     }
 }
