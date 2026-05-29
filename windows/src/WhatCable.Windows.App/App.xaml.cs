@@ -57,7 +57,8 @@ public partial class App : Application
             _snapshotProvider,
             _settingsStore,
             _localizer,
-            new ToastNotificationService());
+            new ToastNotificationService(),
+            new PowerMonitorSource());
 
         CreateTrayIcon();
         StartPolling();

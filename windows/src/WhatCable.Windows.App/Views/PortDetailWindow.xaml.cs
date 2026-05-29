@@ -1,4 +1,8 @@
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media.Imaging;
+using System;
+using System.Text;
+using Windows.Storage.Streams;
 using WhatCable.Windows.App.Core.Localization;
 using WhatCable.Windows.App.Core.ViewModels;
 
@@ -25,6 +29,7 @@ public sealed partial class PortDetailWindow : Window
         Title = _port.Name;
         Root.DataContext = _port;
         ApplyLocalization();
+        _ = RenderPinDiagramAsync();
     }
 
     private void ApplyLocalization()
@@ -33,5 +38,38 @@ public sealed partial class PortDetailWindow : Window
         PdHeader.Text = _localizer.Get(StringKeys.PortPdSource);
         TrustHeader.Text = _localizer.Get(StringKeys.PortCableTrustSignals);
         CableHeader.Text = _localizer.Get(StringKeys.PortActiveCableElectronics);
+        PinDiagramHeader.Text = _localizer.Get(StringKeys.ProPinDiagram);
+        PinDiagramUpsellBar.Message = _localizer.Get(StringKeys.ProUpsell);
+    }
+
+    private async System.Threading.Tasks.Task RenderPinDiagramAsync()
+    {
+        var svg = _port.PinDiagramSvg;
+        if (!_port.ShowPinDiagram || string.IsNullOrEmpty(svg))
+        {
+            return;
+        }
+
+        try
+        {
+            using var stream = new InMemoryRandomAccessStream();
+            using (var writer = new DataWriter(stream))
+            {
+                writer.WriteBytes(Encoding.UTF8.GetBytes(svg));
+                await writer.StoreAsync();
+                await writer.FlushAsync();
+                writer.DetachStream();
+            }
+
+            stream.Seek(0);
+            var source = new SvgImageSource();
+            await source.SetSourceAsync(stream);
+            PinDiagramImage.Source = source;
+        }
+        catch (Exception)
+        {
+            // Rendering the diagram is best-effort; the textual signal summary remains visible.
+            PinDiagramImage.Visibility = Visibility.Collapsed;
+        }
     }
 }

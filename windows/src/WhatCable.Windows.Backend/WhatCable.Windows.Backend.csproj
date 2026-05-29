@@ -26,10 +26,12 @@
   <ItemGroup Condition="$(TargetFramework.Contains('-windows'))">
     <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.106" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
+    <PackageReference Include="System.Management" Version="8.0.0" />
   </ItemGroup>
   <ItemGroup Condition="!$(TargetFramework.Contains('-windows'))">
     <Compile Remove="Usb\SetupApiUsbEnumerator.cs" />
     <Compile Remove="Power\WindowsSystemPowerSource.cs" />
+    <Compile Remove="Power\WmiBatteryWattageSource.cs" />
     <Compile Remove="Video\QueryDisplayConfigDisplayEnumerator.cs" />
     <Compile Remove="Thunderbolt\SetupApiThunderboltEnumerator.cs" />
     <None Include="NativeMethods.txt" />

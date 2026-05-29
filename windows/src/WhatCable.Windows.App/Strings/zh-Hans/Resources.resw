@@ -142,4 +142,28 @@
   <data name="Common_Cancel" xml:space="preserve">
     <value>取消</value>
   </data>
+  <data name="Notification_LiquidDetectedTitle" xml:space="preserve">
+    <value>检测到液体</value>
+  </data>
+  <data name="Notification_LiquidDetectedBody" xml:space="preserve">
+    <value>请拔下线缆并擦干 USB-C 端口。</value>
+  </data>
+  <data name="Pro_PinDiagram" xml:space="preserve">
+    <value>针脚图</value>
+  </data>
+  <data name="Pro_LiquidDetection" xml:space="preserve">
+    <value>液体检测</value>
+  </data>
+  <data name="Pro_PowerMonitor" xml:space="preserve">
+    <value>功率监视器</value>
+  </data>
+  <data name="Pro_PowerMonitorPerPortUnavailable" xml:space="preserve">
+    <value>Windows 不提供单端口功率；此数值为全系统功率。</value>
+  </data>
+  <data name="Pro_Upsell" xml:space="preserve">
+    <value>通过 WhatCable Pro 解锁</value>
+  </data>
+  <data name="Pro_LiquidDetectionBanner" xml:space="preserve">
+    <value>USB-C 端口检测到液体。请拔下线缆并晾干。</value>
+  </data>
 </root>

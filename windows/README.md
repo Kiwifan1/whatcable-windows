@@ -106,7 +106,7 @@ Free-floating desktop widgets remain a macOS-only feature — Windows has no equ
 | 7 | Optional NVAPI / AMD ADL / Intel IGCL adapters, feature-flagged. |
 | 8 | WinUI 3 tray app, Settings, MSIX manifest, Inno Setup installer, launch-at-login, notifications, localisation. |
 | 9 | Widget Provider COM server, Adaptive Card templates, Widgets Board + lock-screen registration. |
-| 10 | Pro tier: pin diagrams (UCSI), liquid-detection indicator, Power Monitor graph. |
+| 10 | Pro tier: pin diagrams (UCSI), liquid-detection indicator, Power Monitor graph. ✅ Delivered: offline-key license gate (`ProEntitlement`), UCSI-derived pin diagrams with per-cable-class SVG, UCSI 2.0 liquid banner + toast, system-wide WMI Power Monitor (per-port explicitly unavailable). Each feature reports `unavailable_reason` when hardware support is missing; non-Pro users get an upsell affordance. |
 | 11 | Docs + `whatcable.uk` Windows section + screenshots. |
 
 ## CLI compatibility

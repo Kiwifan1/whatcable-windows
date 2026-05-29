@@ -24,6 +24,10 @@ public sealed partial class TrayPopover : UserControl
         RefreshButton.Content = localizer.Get(StringKeys.TrayRefresh);
         SettingsButton.Content = localizer.Get(StringKeys.TraySettings);
         QuitButton.Content = localizer.Get(StringKeys.TrayQuit);
+        PowerMonitorLabel.Text = localizer.Get(StringKeys.ProPowerMonitor);
+        PowerMonitorUpsell.Text = localizer.Get(StringKeys.ProUpsell);
+        LiquidDetectionUpsell.Title = localizer.Get(StringKeys.ProLiquidDetection);
+        LiquidDetectionUpsell.Message = localizer.Get(StringKeys.ProUpsell);
     }
 
     /// <summary>The backing ViewModel. Set by <see cref="App"/> after construction.</summary>
