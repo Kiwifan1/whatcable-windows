@@ -59,14 +59,6 @@
                     ItemsSource="{Binding Locales}"
                     SelectedItem="{Binding SelectedLocale, Mode=TwoWay}" />
 
-                <!-- Pro -->
-                <TextBlock x:Name="ProHeader" Style="{ThemeResource BodyStrongTextBlockStyle}" />
-                <TextBox
-                    x:Name="LicenseBox"
-                    PlaceholderText="WCPRO-XXXXX-XXXXX-XXXXX"
-                    Text="{Binding LicenseKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    TextChanged="OnLicenseChanged" />
-                <TextBlock x:Name="LicenseStatus" Style="{ThemeResource CaptionTextBlockStyle}" />
             </StackPanel>
         </ScrollViewer>
 

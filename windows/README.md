@@ -65,7 +65,7 @@ Click the tray icon to open the popover. Each USB-C port is a row; click it to e
 - **Cable** — on UCSI PCs, the decoded e-marker (current rating, max voltage, speed class) and any trust signals.
 - **Video** — for display outputs, the connector, active mode, sink maximum, and the "what's limiting the link" verdict.
 
-**Settings** (gear icon) covers launch-at-login, connect/disconnect toast notifications, the polling interval, language, and Pro licence management.
+**Settings** (gear icon) covers launch-at-login, connect/disconnect toast notifications, the polling interval, and language.
 
 ### Pro
 

@@ -7,8 +7,8 @@ namespace WhatCable.Windows.App.Views;
 
 /// <summary>
 /// Settings window over <see cref="SettingsViewModel"/>: launch-at-login, notifications, port
-/// visibility, vendor-SDK probing, UI language, and Pro license entry. Labels are pulled from the
-/// localiser at construction; values round-trip through the ViewModel and are persisted on close.
+/// visibility, vendor-SDK probing, and UI language. Labels are pulled from the localiser at
+/// construction; values round-trip through the ViewModel and are persisted on close.
 /// </summary>
 public sealed partial class SettingsWindow : Window
 {
@@ -25,7 +25,6 @@ public sealed partial class SettingsWindow : Window
         Title = _localizer.Get(StringKeys.SettingsTitle);
         Root.DataContext = _viewModel;
         ApplyLocalization();
-        UpdateLicenseStatus();
 
         // Persist whatever the user changed when the window closes.
         Closed += (_, _) => _viewModel.Save();
@@ -44,8 +43,6 @@ public sealed partial class SettingsWindow : Window
         VendorSdkDetail.Text = _localizer.Get(StringKeys.SettingsVendorSdkDetail);
 
         LanguageHeader.Text = _localizer.Get(StringKeys.SettingsLanguage);
-        ProHeader.Text = _localizer.Get(StringKeys.SettingsPro);
-        LicenseBox.Header = _localizer.Get(StringKeys.SettingsProLicenseKey);
         DoneButton.Content = _localizer.Get(StringKeys.SettingsDone);
     }
 
@@ -63,21 +60,6 @@ public sealed partial class SettingsWindow : Window
         // state (which the OS may override) is reflected back into the switch.
         await _viewModel.ApplyLaunchAtLoginCommand.ExecuteAsync(LaunchAtLoginToggle.IsOn);
         LaunchAtLoginToggle.IsOn = _viewModel.LaunchAtLogin;
-    }
-
-    private void OnLicenseChanged(object sender, TextChangedEventArgs e) => UpdateLicenseStatus();
-
-    private void UpdateLicenseStatus()
-    {
-        if (string.IsNullOrWhiteSpace(_viewModel.LicenseKey))
-        {
-            LicenseStatus.Text = string.Empty;
-            return;
-        }
-
-        LicenseStatus.Text = _viewModel.IsProLicensed
-            ? _localizer.Get(StringKeys.SettingsProLicenseValid)
-            : _localizer.Get(StringKeys.SettingsProLicenseInvalid);
     }
 
     private void OnDoneClicked(object sender, RoutedEventArgs e)
