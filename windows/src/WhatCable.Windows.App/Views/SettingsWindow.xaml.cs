@@ -62,6 +62,8 @@ public sealed partial class SettingsWindow : Window
         LaunchAtLoginToggle.IsOn = _viewModel.LaunchAtLogin;
     }
 
+    private void OnCloseClicked(object sender, RoutedEventArgs e) => Close();
+
     private void OnDoneClicked(object sender, RoutedEventArgs e)
     {
         _viewModel.Save();

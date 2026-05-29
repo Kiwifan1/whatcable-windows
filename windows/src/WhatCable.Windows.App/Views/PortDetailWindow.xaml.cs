@@ -32,6 +32,8 @@ public sealed partial class PortDetailWindow : Window
         _ = RenderPinDiagramAsync();
     }
 
+    private void OnCloseClicked(object sender, RoutedEventArgs e) => Close();
+
     private void ApplyLocalization()
     {
         DevicesHeader.Text = _localizer.Get(StringKeys.PortConnectedDevices);

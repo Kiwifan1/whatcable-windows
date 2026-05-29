@@ -14,10 +14,29 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock
-            x:Name="TitleText"
-            Grid.Row="0"
-            Style="{ThemeResource TitleTextBlockStyle}" />
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock
+                x:Name="TitleText"
+                Grid.Column="0"
+                Style="{ThemeResource TitleTextBlockStyle}" />
+            <Button
+                Grid.Column="1"
+                VerticalAlignment="Top"
+                Click="OnCloseClicked"
+                Padding="8"
+                Background="Transparent"
+                BorderBrush="Transparent"
+                ToolTipService.ToolTip="Close">
+                <FontIcon
+                    FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                    Glyph="&#xE711;"
+                    FontSize="14" />
+            </Button>
+        </Grid>
 
         <ScrollViewer Grid.Row="1">
             <StackPanel Spacing="16">

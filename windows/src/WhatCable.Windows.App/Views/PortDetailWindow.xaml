@@ -24,6 +24,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <FontIcon
                     Grid.Column="0"
@@ -40,6 +41,19 @@
                         Style="{ThemeResource BodyTextBlockStyle}"
                         TextWrapping="Wrap" />
                 </StackPanel>
+                <Button
+                    Grid.Column="2"
+                    VerticalAlignment="Top"
+                    Click="OnCloseClicked"
+                    Padding="8"
+                    Background="Transparent"
+                    BorderBrush="Transparent"
+                    ToolTipService.ToolTip="Close">
+                    <FontIcon
+                        FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                        Glyph="&#xE711;"
+                        FontSize="14" />
+                </Button>
             </Grid>
 
             <!-- Unavailable -->

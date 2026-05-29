@@ -7,7 +7,7 @@ using WinRT.Interop;
 namespace WhatCable.Windows.App.Helpers;
 
 /// <summary>
-/// Win32 interop helpers for styling WinUI 3 windows as tray popups or compact dialogs.
+/// Win32 interop helpers for styling WinUI 3 windows as tray popups or connected panel views.
 /// </summary>
 internal static class PopupWindowHelper
 {
@@ -37,45 +37,14 @@ internal static class PopupWindowHelper
     private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attribute, ref int pvAttribute, int cbAttribute);
 
     /// <summary>
-    /// Applies tray-popup styling to <paramref name="window"/> and positions it above the tray.
-    /// On focus loss the window is hidden (not closed) so the tray app stays alive.
-    /// Call <see cref="ShowOrActivate"/> to bring a previously hidden popup back.
+    /// Applies tray-popup styling and auto-hides on focus loss.
+    /// Call <see cref="ShowOrActivate"/> to bring a hidden popup back.
     /// </summary>
     public static void ApplyTrayPopupStyle(Window window, int width, int height)
     {
-        var hwnd = WindowNative.GetWindowHandle(window);
-        var windowId = Win32Interop.GetWindowIdFromWindow(hwnd);
-        var appWindow = AppWindow.GetFromWindowId(windowId);
+        var hwnd = ApplyToolWindowChrome(window, width, height);
 
-        // 1. Remove title bar and border, disable resize/minimize/maximize.
-        if (appWindow.Presenter is OverlappedPresenter presenter)
-        {
-            presenter.IsResizable = false;
-            presenter.IsMaximizable = false;
-            presenter.IsMinimizable = false;
-            presenter.SetBorderAndTitleBar(false, false);
-        }
-
-        // 2. WS_EX_TOOLWINDOW: hide from taskbar and Alt+Tab.
-        var exStyle = (long)GetWindowLongPtr(hwnd, GWL_EXSTYLE);
-        SetWindowLongPtr(hwnd, GWL_EXSTYLE, (IntPtr)(exStyle | WS_EX_TOOLWINDOW));
-
-        // 3. Windows 11 rounded corners.
-        var preference = DWMWCP_ROUND;
-        DwmSetWindowAttribute(hwnd, DWMWA_WINDOW_CORNER_PREFERENCE, ref preference, sizeof(int));
-
-        // 4. Size the window.
-        appWindow.Resize(new global::Windows.Graphics.SizeInt32(width, height));
-
-        // 5. Position at the bottom-right of the work area, flush against the taskbar.
-        //    WorkArea already excludes the taskbar, so bottom of work area = top of taskbar.
-        var area = DisplayArea.GetFromWindowId(windowId, DisplayAreaFallback.Primary);
-        var workArea = area.WorkArea;
-        appWindow.Move(new global::Windows.Graphics.PointInt32(
-            workArea.X + workArea.Width - width - TrayMargin,
-            workArea.Y + workArea.Height - height));
-
-        // 6. Auto-hide on focus loss (hide, not close — prevents WinUI app exit).
+        // Auto-hide on focus loss (hide, not close — prevents WinUI app exit).
         var hasBeenActivated = false;
         window.Activated += (_, args) =>
         {
@@ -91,6 +60,16 @@ internal static class PopupWindowHelper
     }
 
     /// <summary>
+    /// Applies the same tray-panel chrome (borderless, toolwindow, rounded corners, positioned
+    /// bottom-right) but does NOT auto-hide on focus loss. The user closes these panels via an
+    /// explicit close button.
+    /// </summary>
+    public static void ApplyTrayPanelStyle(Window window, int width, int height)
+    {
+        ApplyToolWindowChrome(window, width, height);
+    }
+
+    /// <summary>
     /// Shows a popup window that was previously hidden by the auto-dismiss handler,
     /// or activates it if already visible.
     /// </summary>
@@ -103,22 +82,42 @@ internal static class PopupWindowHelper
     }
 
     /// <summary>
-    /// Sizes and centers a regular window (Settings, Port Detail) on the primary display.
-    /// Keeps the title bar and taskbar entry — this is for normal windows, not tray popups.
+    /// Shared chrome for all tray-associated windows: borderless, no taskbar entry,
+    /// DWM rounded corners, sized and positioned at the bottom-right of the work area.
     /// </summary>
-    public static void ApplyCompactWindowStyle(Window window, int width, int height)
+    private static IntPtr ApplyToolWindowChrome(Window window, int width, int height)
     {
         var hwnd = WindowNative.GetWindowHandle(window);
         var windowId = Win32Interop.GetWindowIdFromWindow(hwnd);
         var appWindow = AppWindow.GetFromWindowId(windowId);
 
+        // Remove title bar and border, disable resize/minimize/maximize.
+        if (appWindow.Presenter is OverlappedPresenter presenter)
+        {
+            presenter.IsResizable = false;
+            presenter.IsMaximizable = false;
+            presenter.IsMinimizable = false;
+            presenter.SetBorderAndTitleBar(false, false);
+        }
+
+        // WS_EX_TOOLWINDOW: hide from taskbar and Alt+Tab.
+        var exStyle = (long)GetWindowLongPtr(hwnd, GWL_EXSTYLE);
+        SetWindowLongPtr(hwnd, GWL_EXSTYLE, (IntPtr)(exStyle | WS_EX_TOOLWINDOW));
+
+        // Windows 11 rounded corners.
+        var preference = DWMWCP_ROUND;
+        DwmSetWindowAttribute(hwnd, DWMWA_WINDOW_CORNER_PREFERENCE, ref preference, sizeof(int));
+
+        // Size the window.
         appWindow.Resize(new global::Windows.Graphics.SizeInt32(width, height));
 
-        // Center on the primary display work area.
+        // Position at the bottom-right of the work area, flush against the taskbar.
         var area = DisplayArea.GetFromWindowId(windowId, DisplayAreaFallback.Primary);
         var workArea = area.WorkArea;
         appWindow.Move(new global::Windows.Graphics.PointInt32(
-            workArea.X + (workArea.Width - width) / 2,
-            workArea.Y + (workArea.Height - height) / 2));
+            workArea.X + workArea.Width - width - TrayMargin,
+            workArea.Y + workArea.Height - height));
+
+        return hwnd;
     }
 }

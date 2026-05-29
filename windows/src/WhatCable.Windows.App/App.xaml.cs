@@ -211,16 +211,16 @@ public partial class App : Application
         {
             _settingsWindow = new SettingsWindow(new SettingsViewModel(_settingsStore, _startupTask), _localizer)
             {
-                SystemBackdrop = new Microsoft.UI.Xaml.Media.MicaBackdrop(),
+                SystemBackdrop = new Microsoft.UI.Xaml.Media.DesktopAcrylicBackdrop(),
             };
-            Helpers.PopupWindowHelper.ApplyCompactWindowStyle(_settingsWindow, width: 500, height: 650);
+            Helpers.PopupWindowHelper.ApplyTrayPanelStyle(_settingsWindow, width: 500, height: 650);
             _settingsWindow.Closed += (_, _) =>
             {
                 _settingsWindow = null;
-                // Re-apply language and refresh so changes take effect immediately.
                 ApplyLanguageOverride(_settingsStore.Load());
                 ApplyTrayLocalization();
                 _trayViewModel!.Refresh();
+                ShowPopover();
             };
         }
 
@@ -231,9 +231,10 @@ public partial class App : Application
     {
         var window = new PortDetailWindow(port, _localizer)
         {
-            SystemBackdrop = new Microsoft.UI.Xaml.Media.MicaBackdrop(),
+            SystemBackdrop = new Microsoft.UI.Xaml.Media.DesktopAcrylicBackdrop(),
         };
-        Helpers.PopupWindowHelper.ApplyCompactWindowStyle(window, width: 500, height: 600);
+        Helpers.PopupWindowHelper.ApplyTrayPanelStyle(window, width: 500, height: 600);
+        window.Closed += (_, _) => ShowPopover();
         window.Activate();
     }
 
