@@ -72,7 +72,6 @@ public partial class App : Application
         _popover.ApplyLocalization(_localizer);
         _popover.PortInvoked += (_, port) => ShowPortDetail(port);
         _popover.SettingsRequested += (_, _) => ShowSettings();
-        _popover.RefreshRequested += (_, _) => _trayViewModel!.Refresh();
         _popover.QuitRequested += (_, _) => Quit();
 
         _trayIcon = new TaskbarIcon
@@ -89,23 +88,26 @@ public partial class App : Application
 
     private void ShowPopover()
     {
+        _trayViewModel!.Refresh();
+
         if (_popoverWindow is not null)
         {
-            _popoverWindow.Activate();
+            // Window already exists (hidden by auto-dismiss) — just bring it back.
+            Helpers.PopupWindowHelper.ShowOrActivate(_popoverWindow);
             return;
         }
 
         _popoverWindow = new Window
         {
             Content = _popover,
-            SystemBackdrop = new Microsoft.UI.Xaml.Media.MicaBackdrop(),
+            SystemBackdrop = new Microsoft.UI.Xaml.Media.DesktopAcrylicBackdrop(),
         };
         _popoverWindow.Closed += (_, _) => _popoverWindow = null;
 
-        Helpers.PopupWindowHelper.ApplyTrayPopupStyle(_popoverWindow, width: 400, height: 500);
-
-        _trayViewModel!.Refresh();
+        // Style as tray popup, then show via Activate + Win32 foreground.
+        Helpers.PopupWindowHelper.ApplyTrayPopupStyle(_popoverWindow, width: 400, height: 350);
         _popoverWindow.Activate();
+        Helpers.PopupWindowHelper.ShowOrActivate(_popoverWindow);
     }
 
     private MenuFlyout BuildContextMenu()

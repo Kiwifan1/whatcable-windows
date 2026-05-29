@@ -21,8 +21,7 @@ public sealed partial class TrayPopover : UserControl
     public void ApplyLocalization(ILocalizer localizer)
     {
         ArgumentNullException.ThrowIfNull(localizer);
-        RefreshButton.Content = localizer.Get(StringKeys.TrayRefresh);
-        SettingsButton.Content = localizer.Get(StringKeys.TraySettings);
+        ToolTipService.SetToolTip(SettingsButton, localizer.Get(StringKeys.TraySettings));
         QuitButton.Content = localizer.Get(StringKeys.TrayQuit);
         PowerMonitorLabel.Text = localizer.Get(StringKeys.ProPowerMonitor);
         PowerMonitorUpsell.Text = localizer.Get(StringKeys.ProUpsell);
@@ -49,9 +48,6 @@ public sealed partial class TrayPopover : UserControl
     /// <summary>Raised when the user asks to open the Settings window.</summary>
     public event EventHandler? SettingsRequested;
 
-    /// <summary>Raised when the user asks for an immediate refresh.</summary>
-    public event EventHandler? RefreshRequested;
-
     /// <summary>Raised when the user asks to quit the app.</summary>
     public event EventHandler? QuitRequested;
 
@@ -62,9 +58,6 @@ public sealed partial class TrayPopover : UserControl
             PortInvoked?.Invoke(this, port);
         }
     }
-
-    private void OnRefreshClicked(object sender, RoutedEventArgs e)
-        => RefreshRequested?.Invoke(this, EventArgs.Empty);
 
     private void OnSettingsClicked(object sender, RoutedEventArgs e)
         => SettingsRequested?.Invoke(this, EventArgs.Empty);

@@ -8,13 +8,19 @@ namespace WhatCable.Windows.App.Helpers;
 
 /// <summary>
 /// Styles a WinUI 3 <see cref="Window"/> as a tray popup: no taskbar entry, no title bar,
-/// positioned above the system tray, and auto-dismissed on focus loss.
+/// rounded corners, positioned above the system tray, and hidden on focus loss.
 /// </summary>
 internal static class PopupWindowHelper
 {
     private const int GWL_EXSTYLE = -20;
     private const uint WS_EX_TOOLWINDOW = 0x00000080;
-    private const int TrayMargin = 12;
+    private const int TrayMargin = 16;
+
+    private const int SW_HIDE = 0;
+    private const int SW_SHOWNOACTIVATE = 4;
+
+    private const int DWMWA_WINDOW_CORNER_PREFERENCE = 33;
+    private const int DWMWCP_ROUND = 2;
 
     [DllImport("user32.dll", EntryPoint = "GetWindowLongPtrW", SetLastError = true)]
     private static extern IntPtr GetWindowLongPtr(IntPtr hWnd, int nIndex);
@@ -23,39 +29,18 @@ internal static class PopupWindowHelper
     private static extern IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
 
     [DllImport("user32.dll")]
-    private static extern uint GetDpiForWindow(IntPtr hwnd);
+    private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
-    [DllImport("shell32.dll", SetLastError = true)]
-    private static extern int SHAppBarMessage(uint dwMessage, ref APPBARDATA pData);
+    [DllImport("user32.dll")]
+    private static extern bool SetForegroundWindow(IntPtr hWnd);
 
-    private const uint ABM_GETTASKBARPOS = 0x00000005;
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct APPBARDATA
-    {
-        public int cbSize;
-        public IntPtr hWnd;
-        public uint uCallbackMessage;
-        public uint uEdge;
-        public RECT rc;
-        public int lParam;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct RECT
-    {
-        public int Left, Top, Right, Bottom;
-    }
+    [DllImport("dwmapi.dll", PreserveSig = true)]
+    private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attribute, ref int pvAttribute, int cbAttribute);
 
     /// <summary>
-    /// Applies tray-popup styling to <paramref name="window"/>:
-    /// <list type="bullet">
-    ///   <item>Removes the title bar</item>
-    ///   <item>Hides from the taskbar and Alt+Tab via <c>WS_EX_TOOLWINDOW</c></item>
-    ///   <item>Sizes the window to <paramref name="width"/> x <paramref name="height"/> (logical pixels, DPI-scaled automatically)</item>
-    ///   <item>Positions the window directly above the system tray area</item>
-    ///   <item>Wires the <c>Activated</c> event to close on focus loss</item>
-    /// </list>
+    /// Applies tray-popup styling to <paramref name="window"/> and positions it above the tray.
+    /// On focus loss the window is hidden (not closed) so the tray app stays alive.
+    /// Call <see cref="ShowOrActivate"/> to bring a previously hidden popup back.
     /// </summary>
     public static void ApplyTrayPopupStyle(Window window, int width, int height)
     {
@@ -63,92 +48,57 @@ internal static class PopupWindowHelper
         var windowId = Win32Interop.GetWindowIdFromWindow(hwnd);
         var appWindow = AppWindow.GetFromWindowId(windowId);
 
-        // 1. Remove title bar, disable resize/minimize/maximize.
+        // 1. Remove title bar and border, disable resize/minimize/maximize.
         if (appWindow.Presenter is OverlappedPresenter presenter)
         {
             presenter.IsResizable = false;
             presenter.IsMaximizable = false;
             presenter.IsMinimizable = false;
-            presenter.SetBorderAndTitleBar(true, false);
+            presenter.SetBorderAndTitleBar(false, false);
         }
 
         // 2. WS_EX_TOOLWINDOW: hide from taskbar and Alt+Tab.
         var exStyle = (long)GetWindowLongPtr(hwnd, GWL_EXSTYLE);
         SetWindowLongPtr(hwnd, GWL_EXSTYLE, (IntPtr)(exStyle | WS_EX_TOOLWINDOW));
 
-        // 3. Scale logical pixels to device pixels for the target monitor's DPI.
-        var dpi = GetDpiForWindow(hwnd);
-        var scale = dpi > 0 ? dpi / 96.0 : 1.0;
-        var scaledWidth = (int)(width * scale);
-        var scaledHeight = (int)(height * scale);
-        var scaledMargin = (int)(TrayMargin * scale);
+        // 3. Windows 11 rounded corners.
+        var preference = DWMWCP_ROUND;
+        DwmSetWindowAttribute(hwnd, DWMWA_WINDOW_CORNER_PREFERENCE, ref preference, sizeof(int));
 
-        appWindow.Resize(new global::Windows.Graphics.SizeInt32(scaledWidth, scaledHeight));
+        // 4. Size the window.
+        appWindow.Resize(new global::Windows.Graphics.SizeInt32(width, height));
 
-        // 4. Position above the tray.
-        PositionAboveTray(appWindow, windowId, scaledWidth, scaledHeight, scaledMargin);
+        // 5. Position at the bottom-right of the work area, just above the taskbar.
+        var area = DisplayArea.GetFromWindowId(windowId, DisplayAreaFallback.Primary);
+        var workArea = area.WorkArea;
+        appWindow.Move(new global::Windows.Graphics.PointInt32(
+            workArea.X + workArea.Width - width - TrayMargin,
+            workArea.Y + workArea.Height - height - TrayMargin));
 
-        // 5. Auto-dismiss on focus loss.
+        // 6. Auto-hide on focus loss (hide, not close — prevents WinUI app exit).
+        var hasBeenActivated = false;
         window.Activated += (_, args) =>
         {
-            if (args.WindowActivationState == WindowActivationState.Deactivated)
+            if (args.WindowActivationState != WindowActivationState.Deactivated)
             {
-                window.Close();
+                hasBeenActivated = true;
+            }
+            else if (hasBeenActivated)
+            {
+                ShowWindow(hwnd, SW_HIDE);
             }
         };
     }
 
-    private static void PositionAboveTray(
-        AppWindow appWindow, WindowId windowId, int width, int height, int margin)
+    /// <summary>
+    /// Shows a popup window that was previously hidden by the auto-dismiss handler,
+    /// or activates it if already visible.
+    /// </summary>
+    public static void ShowOrActivate(Window window)
     {
-        if (TryGetTaskbarPosition(out var abd))
-        {
-            int x, y;
-            switch (abd.uEdge)
-            {
-                case 3: // ABE_BOTTOM
-                    x = abd.rc.Right - width - margin;
-                    y = abd.rc.Top - height - margin;
-                    break;
-                case 1: // ABE_TOP
-                    x = abd.rc.Right - width - margin;
-                    y = abd.rc.Bottom + margin;
-                    break;
-                case 0: // ABE_LEFT
-                    x = abd.rc.Right + margin;
-                    y = abd.rc.Bottom - height - margin;
-                    break;
-                case 2: // ABE_RIGHT
-                    x = abd.rc.Left - width - margin;
-                    y = abd.rc.Bottom - height - margin;
-                    break;
-                default:
-                    PositionAtWorkAreaCorner(appWindow, windowId, width, height, margin);
-                    return;
-            }
-
-            appWindow.Move(new global::Windows.Graphics.PointInt32(x, y));
-            return;
-        }
-
-        PositionAtWorkAreaCorner(appWindow, windowId, width, height, margin);
-    }
-
-    private static bool TryGetTaskbarPosition(out APPBARDATA abd)
-    {
-        abd = new APPBARDATA { cbSize = Marshal.SizeOf<APPBARDATA>() };
-        var result = SHAppBarMessage(ABM_GETTASKBARPOS, ref abd);
-        return result != 0
-            && (abd.rc.Right - abd.rc.Left > 0 || abd.rc.Bottom - abd.rc.Top > 0);
-    }
-
-    private static void PositionAtWorkAreaCorner(
-        AppWindow appWindow, WindowId windowId, int width, int height, int margin)
-    {
-        var area = DisplayArea.GetFromWindowId(windowId, DisplayAreaFallback.Primary);
-        var workArea = area.WorkArea;
-        appWindow.Move(new global::Windows.Graphics.PointInt32(
-            workArea.X + workArea.Width - width - margin,
-            workArea.Y + workArea.Height - height - margin));
+        var hwnd = WindowNative.GetWindowHandle(window);
+        ShowWindow(hwnd, SW_SHOWNOACTIVATE);
+        SetForegroundWindow(hwnd);
+        window.Activate();
     }
 }
