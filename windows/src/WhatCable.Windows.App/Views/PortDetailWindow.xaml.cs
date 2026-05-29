@@ -32,7 +32,16 @@ public sealed partial class PortDetailWindow : Window
         _ = RenderPinDiagramAsync();
     }
 
-    private void OnCloseClicked(object sender, RoutedEventArgs e) => Close();
+    /// <summary>When true, the popover re-opens after this window closes.</summary>
+    public bool ReturnToPopover { get; private set; } = true;
+
+    private void OnBackClicked(object sender, RoutedEventArgs e) => Close();
+
+    private void OnCloseAllClicked(object sender, RoutedEventArgs e)
+    {
+        ReturnToPopover = false;
+        Close();
+    }
 
     private void ApplyLocalization()
     {

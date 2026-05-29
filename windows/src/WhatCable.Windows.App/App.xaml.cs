@@ -216,11 +216,12 @@ public partial class App : Application
             Helpers.PopupWindowHelper.ApplyTrayPanelStyle(_settingsWindow, width: 500, height: 650);
             _settingsWindow.Closed += (_, _) =>
             {
+                var returnToPopover = _settingsWindow?.ReturnToPopover ?? true;
                 _settingsWindow = null;
                 ApplyLanguageOverride(_settingsStore.Load());
                 ApplyTrayLocalization();
                 _trayViewModel!.Refresh();
-                ShowPopover();
+                if (returnToPopover) ShowPopover();
             };
         }
 
@@ -234,7 +235,10 @@ public partial class App : Application
             SystemBackdrop = new Microsoft.UI.Xaml.Media.DesktopAcrylicBackdrop(),
         };
         Helpers.PopupWindowHelper.ApplyTrayPanelStyle(window, width: 500, height: 600);
-        window.Closed += (_, _) => ShowPopover();
+        window.Closed += (_, _) =>
+        {
+            if (window.ReturnToPopover) ShowPopover();
+        };
         window.Activate();
     }
 

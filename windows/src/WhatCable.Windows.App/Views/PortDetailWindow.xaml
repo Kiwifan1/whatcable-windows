@@ -17,34 +17,31 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <!-- Header -->
-            <Grid Grid.Row="0" ColumnSpacing="12">
+            <!-- Navigation bar -->
+            <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <FontIcon
+                <Button
                     Grid.Column="0"
-                    VerticalAlignment="Top"
-                    FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                    FontSize="28"
-                    Glyph="{Binding Glyph}" />
-                <StackPanel Grid.Column="1" Spacing="2">
-                    <TextBlock Text="{Binding Name}" Style="{ThemeResource TitleTextBlockStyle}" />
-                    <TextBlock Text="{Binding Headline}" Style="{ThemeResource BodyStrongTextBlockStyle}" />
-                    <TextBlock
-                        Text="{Binding Subtitle}"
-                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                        Style="{ThemeResource BodyTextBlockStyle}"
-                        TextWrapping="Wrap" />
-                </StackPanel>
+                    Click="OnBackClicked"
+                    Padding="8"
+                    Background="Transparent"
+                    BorderBrush="Transparent"
+                    ToolTipService.ToolTip="Back">
+                    <FontIcon
+                        FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                        Glyph="&#xE72B;"
+                        FontSize="14" />
+                </Button>
                 <Button
                     Grid.Column="2"
-                    VerticalAlignment="Top"
-                    Click="OnCloseClicked"
+                    Click="OnCloseAllClicked"
                     Padding="8"
                     Background="Transparent"
                     BorderBrush="Transparent"
@@ -56,17 +53,40 @@
                 </Button>
             </Grid>
 
+            <!-- Header -->
+            <Grid Grid.Row="1" ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <FontIcon
+                    Grid.Column="0"
+                    VerticalAlignment="Top"
+                    FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                    FontSize="24"
+                    Glyph="{Binding Glyph}" />
+                <StackPanel Grid.Column="1" Spacing="2">
+                    <TextBlock Text="{Binding Name}" Style="{ThemeResource TitleTextBlockStyle}" />
+                    <TextBlock Text="{Binding Headline}" Style="{ThemeResource BodyStrongTextBlockStyle}" />
+                    <TextBlock
+                        Text="{Binding Subtitle}"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        Style="{ThemeResource BodyTextBlockStyle}"
+                        TextWrapping="Wrap" />
+                </StackPanel>
+            </Grid>
+
             <!-- Unavailable -->
             <InfoBar
                 x:Name="UnavailableBar"
-                Grid.Row="1"
+                Grid.Row="2"
                 IsClosable="False"
                 IsOpen="{Binding IsUnavailable}"
                 Severity="Informational" />
 
             <!-- Connected devices -->
             <StackPanel
-                Grid.Row="2"
+                Grid.Row="3"
                 Spacing="6"
                 Visibility="{Binding HasDevices, Converter={StaticResource BoolToVisibility}}">
                 <TextBlock x:Name="DevicesHeader" Style="{ThemeResource BodyStrongTextBlockStyle}" />
@@ -87,7 +107,7 @@
 
             <!-- PD source -->
             <StackPanel
-                Grid.Row="3"
+                Grid.Row="4"
                 Spacing="6"
                 Visibility="{Binding HasPowerProfiles, Converter={StaticResource BoolToVisibility}}">
                 <TextBlock x:Name="PdHeader" Style="{ThemeResource BodyStrongTextBlockStyle}" />
@@ -109,7 +129,7 @@
 
             <!-- Cable trust signals -->
             <StackPanel
-                Grid.Row="4"
+                Grid.Row="5"
                 Spacing="6"
                 Visibility="{Binding HasTrustSignals, Converter={StaticResource BoolToVisibility}}">
                 <TextBlock x:Name="TrustHeader" Style="{ThemeResource BodyStrongTextBlockStyle}" />
@@ -131,7 +151,7 @@
 
             <!-- Cable summary -->
             <StackPanel
-                Grid.Row="5"
+                Grid.Row="6"
                 Spacing="4"
                 Visibility="{Binding HasCable, Converter={StaticResource BoolToVisibility}}">
                 <TextBlock x:Name="CableHeader" Style="{ThemeResource BodyStrongTextBlockStyle}" />
@@ -145,7 +165,7 @@
             </StackPanel>
 
             <!-- Pin diagram (Pro, UCSI) -->
-            <StackPanel Grid.Row="6" Spacing="6">
+            <StackPanel Grid.Row="7" Spacing="6">
                 <TextBlock
                     x:Name="PinDiagramHeader"
                     Style="{ThemeResource BodyStrongTextBlockStyle}"
