@@ -112,42 +112,14 @@ public partial class App : Application
             return;
         }
 
-        _popoverWindow = new Window { Content = _popover, SystemBackdrop = new Microsoft.UI.Xaml.Media.MicaBackdrop() };
-
-        // Get the AppWindow to customize chrome and sizing.
-        var hwnd = WindowNative.GetWindowHandle(_popoverWindow);
-        var windowId = Win32Interop.GetWindowIdFromWindow(hwnd);
-        var appWindow = AppWindow.GetFromWindowId(windowId);
-
-        // Compact popover: hide title bar, fixed size.
-        if (appWindow.Presenter is OverlappedPresenter presenter)
+        _popoverWindow = new Window
         {
-            presenter.IsResizable = false;
-            presenter.IsMaximizable = false;
-            presenter.IsMinimizable = false;
-            presenter.SetBorderAndTitleBar(true, false);
-        }
-
-        const int width = 400;
-        const int height = 500;
-        appWindow.Resize(new global::Windows.Graphics.SizeInt32(width, height));
-
-        // Position near the system tray (bottom-right of primary display).
-        var area = DisplayArea.GetFromWindowId(windowId, DisplayAreaFallback.Primary);
-        var workArea = area.WorkArea;
-        appWindow.Move(new global::Windows.Graphics.PointInt32(
-            workArea.X + workArea.Width - width - 12,
-            workArea.Y + workArea.Height - height - 12));
-
-        _popoverWindow.Closed += (_, _) => _popoverWindow = null;
-        // Close the popover when it loses focus, like a real tray popup.
-        _popoverWindow.Activated += (sender, args) =>
-        {
-            if (args.WindowActivationState == WindowActivationState.Deactivated)
-            {
-                _popoverWindow?.Close();
-            }
+            Content = _popover,
+            SystemBackdrop = new Microsoft.UI.Xaml.Media.MicaBackdrop(),
         };
+        _popoverWindow.Closed += (_, _) => _popoverWindow = null;
+
+        Helpers.PopupWindowHelper.ApplyTrayPopupStyle(_popoverWindow, width: 400, height: 500);
 
         _trayViewModel!.Refresh();
         _popoverWindow.Activate();
