@@ -36,13 +36,19 @@
                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                 Style="{ThemeResource CaptionTextBlockStyle}" />
 
-            <!-- Liquid detection banner (Pro, UCSI 2.0) -->
-            <InfoBar
-                Grid.Row="2"
-                IsClosable="False"
-                IsOpen="{Binding IsLiquidDetected}"
-                Message="{Binding LiquidDetectionBanner}"
-                Severity="Error" />
+            <!-- Liquid detection banner (Pro, UCSI 2.0) and upsell (non-Pro) -->
+            <StackPanel Grid.Row="2" Spacing="4">
+                <InfoBar
+                    IsClosable="False"
+                    IsOpen="{Binding IsLiquidDetected}"
+                    Message="{Binding LiquidDetectionBanner}"
+                    Severity="Error" />
+                <InfoBar
+                    x:Name="LiquidDetectionUpsell"
+                    IsClosable="False"
+                    IsOpen="{Binding ShowLiquidDetectionUpsell}"
+                    Severity="Informational" />
+            </StackPanel>
 
             <ListView
                 Grid.Row="3"

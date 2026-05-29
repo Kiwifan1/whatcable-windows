@@ -23,6 +23,7 @@ public sealed partial class PowerMonitorViewModel : ObservableObject
     private readonly IPowerMonitorSource? _source;
     private readonly bool _proUnlocked;
     private readonly int _capacity;
+    private bool? _lastReadSucceeded;
 
     public PowerMonitorViewModel(IPowerMonitorSource? source, bool proUnlocked, int capacity = DefaultCapacity)
     {
@@ -51,7 +52,7 @@ public sealed partial class PowerMonitorViewModel : ObservableObject
     public bool ShowUpsell => !_proUnlocked;
 
     /// <summary>True when Pro is unlocked but the hardware can't supply readings (e.g. no battery).</summary>
-    public bool IsUnavailable => _proUnlocked && (_source is null || !_source.IsAvailable) && Samples.Count == 0;
+    public bool IsUnavailable => _proUnlocked && (_source is null || _lastReadSucceeded == false) && Samples.Count == 0;
 
     /// <summary>Machine-readable reason readings are unavailable, when applicable.</summary>
     public string? UnavailableReason => IsUnavailable ? (_source?.UnavailableReason ?? "power_monitor_unavailable") : null;
@@ -83,6 +84,7 @@ public sealed partial class PowerMonitorViewModel : ObservableObject
         }
 
         var reading = _source.Read();
+        _lastReadSucceeded = reading is not null;
         if (reading is null)
         {
             NotifyDerived();

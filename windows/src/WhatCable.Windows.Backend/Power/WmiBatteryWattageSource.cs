@@ -17,8 +17,13 @@ public sealed class WmiBatteryWattageSource : IBatteryWattageSource
     public const string ReasonWmiUnavailable = "wmi_unavailable";
 
     private string? _unavailableReason;
+    private bool _isAvailable;
 
-    public bool IsAvailable => _unavailableReason is null && Read() is not null;
+    /// <summary>
+    /// True when a battery is present and WMI readings are available. Updated by each call to
+    /// <see cref="Read()"/>; accessing this property does not perform any I/O.
+    /// </summary>
+    public bool IsAvailable => _isAvailable;
 
     public string? UnavailableReason => _unavailableReason;
 
@@ -41,22 +46,26 @@ public sealed class WmiBatteryWattageSource : IBatteryWattageSource
                     var dischargeRate = ToInt(obj["DischargeRate"]);
 
                     _unavailableReason = null;
+                    _isAvailable = true;
                     return BatteryWattageCalculator.Compute(charging, discharging, chargeRate, dischargeRate);
                 }
             }
 
             // No BatteryStatus instances => no battery present.
             _unavailableReason = ReasonNoBattery;
+            _isAvailable = false;
             return null;
         }
         catch (ManagementException)
         {
             _unavailableReason = ReasonWmiUnavailable;
+            _isAvailable = false;
             return null;
         }
         catch (UnauthorizedAccessException)
         {
             _unavailableReason = ReasonWmiUnavailable;
+            _isAvailable = false;
             return null;
         }
     }
