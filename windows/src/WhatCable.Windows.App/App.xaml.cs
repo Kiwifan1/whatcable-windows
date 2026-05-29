@@ -51,36 +51,22 @@ public partial class App : Application
     public App()
     {
         InitializeComponent();
-
-        // Surface the actual exception so it's visible in the Debug Output window.
-        UnhandledException += (_, e) =>
-        {
-            System.Diagnostics.Debug.WriteLine($">>> UNHANDLED EXCEPTION: {e.Exception}");
-        };
     }
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
-        try
-        {
-            ApplyLanguageOverride(_settingsStore.Load());
-            AppNotificationManager.Default.Register();
+        ApplyLanguageOverride(_settingsStore.Load());
+        AppNotificationManager.Default.Register();
 
-            _trayViewModel = new TrayViewModel(
-                _snapshotProvider,
-                _settingsStore,
-                _localizer,
-                new ToastNotificationService(),
-                new PowerMonitorSource());
+        _trayViewModel = new TrayViewModel(
+            _snapshotProvider,
+            _settingsStore,
+            _localizer,
+            new ToastNotificationService(),
+            new PowerMonitorSource());
 
-            CreateTrayIcon();
-            StartPolling();
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($">>> ONLAUNCHED EXCEPTION: {ex}");
-            throw;
-        }
+        CreateTrayIcon();
+        StartPolling();
     }
 
     private void CreateTrayIcon()
