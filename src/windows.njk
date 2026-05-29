@@ -1,0 +1,297 @@
+---
+permalink: /windows.html
+layout: page.njk
+title: "WhatCable for Windows"
+subtitle: "USB-C, Thunderbolt, and video-cable diagnostics — now on Windows 10 & 11."
+documentTitle: "WhatCable for Windows: USB-C & Video Cable Diagnostics"
+description: "WhatCable for Windows shows USB-C cable speed, charging power, e-marker data, and a new HDMI/DisplayPort video-cable diagnostic in plain English. Free tray app and CLI for Windows 10 22H2 and Windows 11."
+extraHead: |
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "WhatCable for Windows",
+    "operatingSystem": "Windows 10 22H2, Windows 11",
+    "applicationCategory": "UtilitiesApplication",
+    "description": "USB-C cable, Thunderbolt, and HDMI/DisplayPort video-cable diagnostics for Windows. Tray app and CLI.",
+    "url": "https://www.whatcable.uk/windows",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "GBP" }
+  }
+  </script>
+  <style>
+    .win-page h2 { margin-top: 40px; }
+    .win-cta { display: flex; flex-wrap: wrap; gap: 12px; margin: 4px 0 8px; }
+    .win-cta .button {
+      display: inline-block;
+      padding: 11px 18px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      text-decoration: none;
+    }
+    .win-cta .button.accent { background: var(--accent); color: #fff; }
+    .win-cta .button.accent:hover { background: var(--accent-strong); }
+    .win-cta .button.secondary { background: #fff; color: var(--ink); border: 1px solid var(--line); }
+    .win-cta .button.secondary:hover { border-color: #c8d0db; }
+    .win-cta-note { font-size: 13px; color: var(--muted); margin: 0 0 24px; }
+    .win-page td .yes { color: #1c7c45; font-weight: 600; }
+    .win-page td .partial { color: #9a6700; font-weight: 600; }
+    .win-page td .no { color: #b42318; font-weight: 600; }
+    .win-page pre {
+      margin: 0 0 14px;
+      padding: 18px 20px;
+      border-radius: 10px;
+      background: #0c1219;
+      color: #d7e1ec;
+      font-size: 13px;
+      line-height: 1.6;
+      overflow-x: auto;
+      border: 1px solid #1c2632;
+    }
+    .win-page pre code { padding: 0; background: none; color: inherit; font-size: inherit; }
+    .win-page p code, .win-page li code {
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: #eef2f7;
+      font-size: 13.5px;
+    }
+    .win-page .prompt { color: #5fc7d1; }
+    .win-page .comment { color: #6b7785; }
+    .faq dt { font-weight: 700; margin: 18px 0 6px; color: var(--ink); }
+    .faq dd { margin: 0 0 14px; color: var(--ink-soft); }
+  </style>
+---
+<div class="win-page">
+
+<p>
+  <strong>WhatCable for Windows</strong> is a clean-sheet rewrite of the macOS app for
+  Windows 10 22H2 and Windows 11. It explains what each USB-C port is actually doing —
+  link speed, charging state, and (on supported PCs) the power contract and cable
+  e-marker — in plain English. It also adds a brand-new <strong>video-cable
+  diagnostic</strong> for HDMI, DisplayPort, and USB-C-as-DisplayPort outputs that has
+  no macOS equivalent.
+</p>
+
+<div class="win-cta">
+  <a class="button accent" href="https://github.com/darrylmorley/whatcable/releases/latest">Download installer</a>
+  <a class="button secondary" href="https://github.com/darrylmorley/whatcable/releases/latest">Get the MSIX package</a>
+  <a class="button secondary" href="/cli">CLI docs</a>
+</div>
+<p class="win-cta-note">Free. Windows 10 22H2 or Windows 11 (widgets need Windows 11 22H2+). x64 &amp; ARM64. No driver install.</p>
+
+<h2>What you get</h2>
+<ul>
+  <li><strong>Tray app.</strong> A system-tray popover that lists every USB-C port: what's plugged in, the negotiated link speed, the charging state, and — on UCSI-capable PCs — the power contract and decoded cable e-marker.</li>
+  <li><strong>Video-cable diagnostic (new).</strong> For every HDMI / DisplayPort / USB-C-DP output it shows the connector, the active mode, the display's maximum capability, and a "what's limiting the link" verdict derived from EDID / CTA-861 / DisplayID.</li>
+  <li><strong>Command-line tool.</strong> <code>whatcable-cli.exe</code> emits JSON that's schema-compatible with the macOS CLI, plus extra <code>video</code> and <code>thunderbolt</code> sections.</li>
+  <li><strong>Windows 11 widgets.</strong> Small / medium / large Adaptive Card widgets for the Widgets Board and the lock screen.</li>
+  <li><strong>Pro tier.</strong> Pin diagrams, a liquid-detection indicator, and a live system-wide Power Monitor graph, unlocked with an offline licence key.</li>
+</ul>
+
+<h2>Install</h2>
+<h3>Installer (recommended)</h3>
+<p>
+  Download <code>WhatCable-Setup-&lt;version&gt;.exe</code> from the
+  <a href="https://github.com/darrylmorley/whatcable/releases/latest">Releases page</a>
+  and run it. It installs the tray app and the CLI, and adds a Start-menu entry.
+  Launch-at-login is controlled inside the app under <strong>Settings → Launch at login</strong>.
+</p>
+<h3>MSIX package</h3>
+<p>
+  Prefer a packaged install? Download <code>WhatCable-&lt;version&gt;.msix</code>, double-click
+  it, and confirm in the App Installer dialog. The MSIX is required for the Windows 11
+  widgets, because they're registered through the package manifest. The package is
+  code-signed; on a machine that doesn't yet trust the certificate, install the bundled
+  <code>.cer</code> into <strong>Local Machine → Trusted People</strong> first.
+</p>
+
+<h2>What works on your hardware</h2>
+<p>
+  How much detail you see depends on your PC. A USB-C <strong>device list with negotiated
+  speeds</strong> and the <strong>video diagnostic</strong> work everywhere. Power-delivery,
+  e-marker, and pin-diagram detail need a <strong>UCSI-capable PC</strong> (most 2019-or-newer
+  laptops). The full breakdown:
+</p>
+
+<table>
+  <thead>
+    <tr><th>Feature</th><th>Windows support</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Per-port USB device list with negotiated speed</td><td><span class="yes">✅ Full</span> (SetupAPI)</td></tr>
+    <tr><td>Charger profiles / PDO list</td><td><span class="partial">⚠️ UCSI-capable PCs only</span></td></tr>
+    <tr><td>Cable e-marker decode + trust signals</td><td><span class="partial">⚠️ UCSI-capable PCs only</span></td></tr>
+    <tr><td>Charging diagnostic banner</td><td><span class="yes">✅ Battery-level</span>; <span class="partial">⚠️ full PD bottleneck on UCSI PCs</span></td></tr>
+    <tr><td>Data-link diagnostic (USB &amp; video)</td><td><span class="yes">✅ Full</span></td></tr>
+    <tr><td>Video diagnostic: connector, active mode, sink max, "what's limiting"</td><td><span class="yes">✅ Full</span> via <code>QueryDisplayConfig</code> + EDID/CTA-861/DisplayID</td></tr>
+    <tr><td>Thunderbolt fabric topology</td><td><span class="partial">⚠️ Device chain only, no per-lane speeds</span></td></tr>
+    <tr><td>Pin diagrams (Pro)</td><td><span class="partial">⚠️ UCSI PCs only</span></td></tr>
+    <tr><td>Liquid detection (Pro)</td><td><span class="partial">⚠️ UCSI 2.0 PCs only</span></td></tr>
+    <tr><td>Cable resistance estimation (Pro)</td><td><span class="no">❌ No Windows API</span></td></tr>
+    <tr><td>Power Monitor live graph (Pro)</td><td><span class="yes">✅ System-wide</span> (WMI); <span class="no">❌ per-port</span></td></tr>
+    <tr><td>Widgets (small / medium / large)</td><td><span class="partial">⚠️ Widgets Board + lock screen</span>; <span class="no">❌ free-floating desktop</span></td></tr>
+    <tr><td>Tray app · launch at login · connect/disconnect notifications</td><td><span class="yes">✅ Full</span></td></tr>
+    <tr><td>Localisation (en / hy / it / pl / zh-Hans)</td><td><span class="yes">✅ Full</span></td></tr>
+  </tbody>
+</table>
+
+<h2>From the command line</h2>
+<p>
+  <code>whatcable-cli.exe</code> prints a JSON snapshot of every USB-C port, the power
+  adapter, the Thunderbolt chain, and connected displays. The <code>video</code> and
+  <code>thunderbolt</code> sections are Windows-only additions; pass <code>--legacy</code>
+  to drop them for tools that still consume the macOS schema.
+</p>
+<pre><code><span class="prompt">&gt;</span> whatcable-cli snapshot
+<span class="comment"># macOS-compatible schema only:</span>
+<span class="prompt">&gt;</span> whatcable-cli snapshot --legacy
+<span class="comment"># pipe into jq:</span>
+<span class="prompt">&gt;</span> whatcable-cli snapshot | jq .ports[0].dataLink</code></pre>
+<p>
+  A representative <code>whatcable-cli snapshot</code> payload — a USB-C dock with an SSD
+  downstream, a 4K120 HDMI display, and a Thunderbolt 4 dock, on a non-UCSI PC:
+</p>
+<pre><code>{
+  "adapter": {
+    "description": "Battery 100% — fully charged (AC connected).",
+    "isWireless": false,
+    "source": "AC"
+  },
+  "isDesktopMac": false,
+  "ports": [
+    {
+      "bullets": [],
+      "className": "UsbHostController",
+      "connectionActive": true,
+      "device": {
+        "children": [
+          {
+            "children": [
+              {
+                "children": [],
+                "locationID": "1.1.1",
+                "name": "External SSD",
+                "productID": 0,
+                "speed": "USB 3.2 Gen 2 (10 Gbps)",
+                "vendorID": 0
+              }
+            ],
+            "locationID": "1.1",
+            "name": "USB4 Dock",
+            "productID": 0,
+            "speed": "USB 3.2 Gen 2 (10 Gbps)",
+            "vendorID": 0
+          }
+        ],
+        "locationID": "0x01000000",
+        "name": "USB Host Controller",
+        "productID": 0,
+        "speed": "",
+        "vendorID": 0
+      },
+      "headline": "USB host controller",
+      "name": "USB Host Controller",
+      "pdCapable": false,
+      "powerSources": [],
+      "status": "connected",
+      "subtitle": "2 devices",
+      "unavailable_reason": "ucsi_not_supported"
+    }
+  ],
+  "thunderbolt": [
+    {
+      "enumerationIndex": 0,
+      "instanceId": "PCI\\TB#0",
+      "name": "Thunderbolt 4 Dock",
+      "perLaneSpeedsAvailable": false,
+      "unavailable_reason": "per_lane_speeds_unavailable_on_windows"
+    }
+  ],
+  "thunderboltSwitches": [],
+  "version": "0.26.0",
+  "video": [
+    {
+      "diagnostic": {
+        "bottleneck": "Unknown",
+        "details": [
+          "Active mode: 3840×2160@120Hz",
+          "Insufficient information to determine bottleneck."
+        ],
+        "verdict": "? Unable to determine what's limiting the video link."
+      },
+      "displayName": "Acme 4K120",
+      "port": {
+        "activeMode": {
+          "heightPx": 2160,
+          "interlaced": false,
+          "refreshRateHz": 120,
+          "widthPx": 3840
+        },
+        "connectorType": "HDMI"
+      }
+    }
+  ]
+}</code></pre>
+<p>
+  On a UCSI PC the <code>powerSources</code>, cable e-marker, and <code>pdCapable</code>
+  fields are populated and <code>unavailable_reason</code> disappears. When a display's
+  EDID can be read, the <code>video[].port</code> object gains <code>edidParsed</code> and
+  <code>sinkMaxMode</code>, and <code>diagnostic.bottleneck</code> becomes a concrete
+  verdict instead of <code>Unknown</code>. See the <a href="/cli">CLI docs</a> for more.
+</p>
+
+<h2>FAQ</h2>
+<dl class="faq">
+  <dt>Why no per-lane Thunderbolt speeds?</dt>
+  <dd>
+    There is no public Windows API that reports per-lane Thunderbolt link speeds. We
+    enumerate the device chain via SetupAPI and label each entry honestly with
+    <code>unavailable_reason: per_lane_speeds_unavailable_on_windows</code> rather than
+    guessing. macOS exposes this through Apple-only IOKit services that Windows has no
+    equivalent for.
+  </dd>
+
+  <dt>Why does PD / charger / cable info require a UCSI PC?</dt>
+  <dd>
+    Power-delivery contracts, charger PDOs, and cable e-marker data come from
+    <strong>UCSI</strong> (USB Type-C Connector System Software Interface) — a firmware
+    interface the PC's USB-C controller must expose. Most laptops from 2019 onwards have
+    it; many desktops and older laptops don't. Without UCSI those rows show
+    <code>ucsi_not_supported</code>. The USB device list and the video diagnostic don't
+    rely on UCSI and work everywhere.
+  </dd>
+
+  <dt>The cable e-marker is blank even on a UCSI PC. Why?</dt>
+  <dd>
+    Windows only reads the e-marker after the controller negotiates above 3 A, so a
+    low-wattage charger may never trigger the read. Try a higher-wattage USB-C charger.
+  </dd>
+
+  <dt>Why does the video diagnostic say "unable to determine"?</dt>
+  <dd>
+    That means the display's EDID couldn't be read — some virtual displays, KVMs, and
+    capture devices don't expose one. The connector and active mode still show; the
+    bottleneck verdict needs EDID / CTA-861 / DisplayID data.
+  </dd>
+
+  <dt>Where are the widgets?</dt>
+  <dd>
+    Widgets require Windows 11 22H2+ and the <strong>MSIX</strong> install, which
+    registers the widget provider through the package manifest. The unpackaged installer
+    build ships the tray app and CLI but not the widgets.
+  </dd>
+
+  <dt>Is it the same app as macOS?</dt>
+  <dd>
+    No — it's a clean-sheet WinUI 3 / C# rewrite, because the macOS app depends on
+    Apple-only IOKit services with no Windows equivalent. It reuses the same data models,
+    decoders, and JSON shape, so downstream tooling keeps working across platforms.
+  </dd>
+</dl>
+
+<div class="note">
+  <strong>On a Mac?</strong> See the <a href="/instructions">macOS docs</a> and the
+  <a href="/cli">CLI docs</a>. WhatCable for macOS is a menu-bar app for Apple Silicon.
+</div>
+
+</div>

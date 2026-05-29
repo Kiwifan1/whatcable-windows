@@ -1,6 +1,7 @@
 {
   "primary": [
     { "label": "Docs", "href": "/instructions" },
+    { "label": "Windows", "href": "/windows" },
     { "label": "CLI", "href": "/cli" },
     { "label": "Cables", "href": "/cables" },
     { "label": "Blog", "href": "/blog" }
@@ -15,6 +16,7 @@
   ],
   "footer": [
     { "label": "Docs", "href": "/instructions" },
+    { "label": "Windows", "href": "/windows" },
     { "label": "CLI", "href": "/cli" },
     { "label": "Cables", "href": "/cables" },
     { "label": "Blog", "href": "/blog" },
