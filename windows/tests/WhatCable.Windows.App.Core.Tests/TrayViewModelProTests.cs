@@ -28,17 +28,19 @@ public sealed class TrayViewModelProTests
         });
 
     [Fact]
-    public void LiquidDetection_ProLocked_ShowsUpsellNotBanner()
+    public void LiquidDetection_NoLicenseKey_StillShowsBanner()
     {
         var snapshot = Snapshot(null,
             UcsiJson.Port("Port 1", true, UcsiJson.Build(liquidDetectionSupported: true, liquidDetected: true)));
-        var vm = new TrayViewModel(new FakeSnapshotProvider(snapshot), new InMemorySettingsStore(), Localizer());
+        var settings = new InMemorySettingsStore(new AppSettings { NotificationsEnabled = true });
+        var notifications = new RecordingNotificationService();
+        var vm = new TrayViewModel(new FakeSnapshotProvider(snapshot), settings, Localizer(), notifications);
 
         vm.Refresh();
 
-        Assert.True(vm.ShowLiquidDetectionUpsell);
-        Assert.False(vm.IsLiquidDetected);
-        Assert.Null(vm.LiquidDetectionBanner);
+        Assert.False(vm.ShowLiquidDetectionUpsell);
+        Assert.True(vm.IsLiquidDetected);
+        Assert.Equal("Liquid detected on a USB-C port", vm.LiquidDetectionBanner);
     }
 
     [Fact]
@@ -75,7 +77,7 @@ public sealed class TrayViewModelProTests
     }
 
     [Fact]
-    public void PowerMonitor_ProLocked_ShowsUpsell()
+    public void PowerMonitor_NoLicenseKey_StillSamples()
     {
         var snapshot = Snapshot(null, Port("Port 1", active: true));
         var source = new FakePowerMonitorSource(isAvailable: true, readings: new PowerReading?[] { new() { Watts = 10 } });
@@ -83,8 +85,9 @@ public sealed class TrayViewModelProTests
 
         vm.Refresh();
 
-        Assert.True(vm.PowerMonitor.ShowUpsell);
-        Assert.False(vm.PowerMonitor.HasData);
+        Assert.True(vm.PowerMonitor.IsProUnlocked);
+        Assert.False(vm.PowerMonitor.ShowUpsell);
+        Assert.True(vm.PowerMonitor.HasData);
     }
 
     [Fact]

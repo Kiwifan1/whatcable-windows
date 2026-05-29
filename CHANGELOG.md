@@ -46,11 +46,11 @@ equivalent.
   large Adaptive Card templates, registered for the Widgets Board and (on 23H2+) the
   lock screen. Card rendering and the app↔provider IPC live in the testable
   `WhatCable.Widgets.Core` library.
-- **Pro tier (PR 10).** An offline licence gate (`ProEntitlement`, key format
-  `WCPRO-XXXXX-XXXXX-XXXXX`), UCSI-derived pin diagrams with per-cable-class SVG,
+- **Pro tier (PR 10).** UCSI-derived pin diagrams with per-cable-class SVG,
   a UCSI 2.0 liquid-detection banner + toast, and a system-wide WMI Power Monitor
-  graph. Each Pro feature reports an `unavailable_reason` when the hardware can't
-  supply the data; non-Pro users get an upsell affordance.
+  graph. These Pro features are **always unlocked for everyone** — there is no
+  licence key to enter (`ProEntitlement.IsUnlocked` always returns `true`). Each
+  Pro feature reports an `unavailable_reason` when the hardware can't supply the data.
 - **Docs, website & release (PR 11).** Full user guide in `windows/README.md`
   (install, usage, troubleshooting, capability matrix), a Windows feature page on
   `whatcable.uk` (download links, capability matrix, FAQ, CLI JSON example), this

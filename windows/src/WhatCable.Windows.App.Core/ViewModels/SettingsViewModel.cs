@@ -9,8 +9,8 @@ namespace WhatCable.Windows.App.Core.ViewModels;
 public sealed record LocaleOption(string DisplayName, string? Tag);
 
 /// <summary>
-/// Backs the Settings window: launch-at-login, notifications, vendor SDK toggle, locale selection,
-/// and Pro license entry. No WinUI dependency, so the persistence and validation logic is unit-testable.
+/// Backs the Settings window: launch-at-login, notifications, vendor SDK toggle, and locale
+/// selection. No WinUI dependency, so the persistence logic is unit-testable.
 /// </summary>
 public sealed partial class SettingsViewModel : ObservableObject
 {
@@ -40,7 +40,6 @@ public sealed partial class SettingsViewModel : ObservableObject
         _hideEmptyPorts = settings.HideEmptyPorts;
         _vendorSdkEnabled = settings.VendorSdkEnabled;
         _selectedLocale = AvailableLocales.FirstOrDefault(l => l.Tag == settings.Locale) ?? AvailableLocales[0];
-        _licenseKey = settings.ProLicenseKey ?? string.Empty;
     }
 
     public IReadOnlyList<LocaleOption> Locales => AvailableLocales;
@@ -65,14 +64,6 @@ public sealed partial class SettingsViewModel : ObservableObject
 
     [ObservableProperty]
     private LocaleOption _selectedLocale;
-
-    [ObservableProperty]
-    private string _licenseKey;
-
-    /// <summary>Whether the currently entered license key validates as a Pro key.</summary>
-    public bool IsProLicensed => LicenseValidator.IsValid(LicenseKey);
-
-    partial void OnLicenseKeyChanged(string value) => OnPropertyChanged(nameof(IsProLicensed));
 
     /// <summary>Reflects the user's intent to the OS startup task, then mirrors the effective state.</summary>
     [RelayCommand]
@@ -99,9 +90,6 @@ public sealed partial class SettingsViewModel : ObservableObject
             HideEmptyPorts = HideEmptyPorts,
             VendorSdkEnabled = VendorSdkEnabled,
             Locale = SelectedLocale.Tag,
-            ProLicenseKey = string.IsNullOrWhiteSpace(LicenseKey)
-                ? null
-                : LicenseValidator.Normalize(LicenseKey),
         });
     }
 }

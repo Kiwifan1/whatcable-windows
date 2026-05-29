@@ -57,7 +57,6 @@ public sealed class SettingsViewModelTests
             HideEmptyPorts = true,
             VendorSdkEnabled = true,
             SelectedLocale = SettingsViewModel.AvailableLocales.First(l => l.Tag == "pl"),
-            LicenseKey = LicenseValidator.Create("ABCDE", "FGHJK", "MNPQ"),
         };
 
         vm.Save();
@@ -68,29 +67,20 @@ public sealed class SettingsViewModelTests
         Assert.True(saved.HideEmptyPorts);
         Assert.True(saved.VendorSdkEnabled);
         Assert.Equal("pl", saved.Locale);
-        Assert.NotNull(saved.ProLicenseKey);
-        Assert.True(LicenseValidator.IsValid(saved.ProLicenseKey));
     }
 
     [Fact]
-    public void Save_BlankLicenseKeyPersistsAsNull()
+    public void Save_ClearsLegacyProLicenseKey()
     {
-        var store = new InMemorySettingsStore();
-        var vm = new SettingsViewModel(store) { LicenseKey = "   " };
+        var store = new InMemorySettingsStore(new AppSettings
+        {
+            ProLicenseKey = LicenseValidator.Create("ABCDE", "FGHJK", "MNPQ"),
+        });
+        var vm = new SettingsViewModel(store);
 
         vm.Save();
 
         Assert.Null(store.Load().ProLicenseKey);
-    }
-
-    [Fact]
-    public void IsProLicensed_TracksLicenseKey()
-    {
-        var vm = new SettingsViewModel(new InMemorySettingsStore());
-        Assert.False(vm.IsProLicensed);
-
-        vm.LicenseKey = LicenseValidator.Create("ABCDE", "FGHJK", "MNPQ");
-        Assert.True(vm.IsProLicensed);
     }
 
     [Fact]
