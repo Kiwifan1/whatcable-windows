@@ -26,7 +26,7 @@ Windows port of [WhatCable](https://whatcable.uk), plus a new **video-cable diag
 - **Video-cable diagnostic** (new on Windows) — for each HDMI / DisplayPort / USB-C-DP output it shows the connector, the active mode, the sink's maximum capability, and a "what's limiting the link" verdict derived from EDID / CTA-861 / DisplayID.
 - **`whatcable-cli.exe`** — the same diagnostics from your terminal, emitting JSON that is schema-compatible with the macOS CLI (plus `video` and `thunderbolt` sections).
 - **Windows 11 widgets** — small / medium / large Adaptive Card widgets for the Widgets Board and the lock screen.
-- **Pro tier** — pin diagrams, a liquid-detection indicator, and a live Power Monitor graph, unlocked with an offline licence key. See [Pro](#pro).
+- **Pro tier** — pin diagrams, a liquid-detection indicator, and a live Power Monitor graph, always unlocked for everyone (no licence key required). See [Pro](#pro).
 
 How much of this lights up depends on your hardware. The short version: a USB-C **device list with negotiated speeds** and the **video diagnostic** work everywhere; **PD / e-marker / pin-diagram** detail needs a **UCSI-capable PC** (most 2019+ laptops). The full breakdown is in the [capability matrix](#capability-vs-the-macos-app).
 
@@ -69,7 +69,7 @@ Click the tray icon to open the popover. Each USB-C port is a row; click it to e
 
 ### Pro
 
-Pro adds pin diagrams (UCSI), a liquid-detection indicator (UCSI 2.0), and a system-wide live Power Monitor graph. Unlock it with an offline key in the format `WCPRO-XXXXX-XXXXX-XXXXX` under **Settings → Pro**.
+Pro adds pin diagrams (UCSI), a liquid-detection indicator (UCSI 2.0), and a system-wide live Power Monitor graph. These features are **always unlocked for everyone** — there is no licence key to enter and no activation step.
 
 Each Pro feature reports an `unavailable_reason` when the hardware can't supply the data, rather than failing silently.
 
@@ -303,7 +303,7 @@ Free-floating desktop widgets remain a macOS-only feature — Windows has no equ
 | 7 | Optional NVAPI / AMD ADL / Intel IGCL adapters, feature-flagged. |
 | 8 | WinUI 3 tray app, Settings, MSIX manifest, Inno Setup installer, launch-at-login, notifications, localisation. |
 | 9 | Widget Provider COM server, Adaptive Card templates, Widgets Board + lock-screen registration. |
-| 10 | Pro tier: pin diagrams (UCSI), liquid-detection indicator, Power Monitor graph. ✅ Delivered: offline-key license gate (`ProEntitlement`), UCSI-derived pin diagrams with per-cable-class SVG, UCSI 2.0 liquid banner + toast, system-wide WMI Power Monitor (per-port explicitly unavailable). Each feature reports `unavailable_reason` when hardware support is missing; non-Pro users get an upsell affordance. |
+| 10 | Pro tier: pin diagrams (UCSI), liquid-detection indicator, Power Monitor graph. ✅ Delivered: Pro features always unlocked for everyone (`ProEntitlement.IsUnlocked` returns `true`, no licence key required), UCSI-derived pin diagrams with per-cable-class SVG, UCSI 2.0 liquid banner + toast, system-wide WMI Power Monitor (per-port explicitly unavailable). Each feature reports `unavailable_reason` when hardware support is missing. |
 | 11 | **Docs + `whatcable.uk` Windows section + screenshots** (this PR). ✅ Delivered: full user guide in this README (install, usage, troubleshooting), a Windows feature page on `whatcable.uk` (download links, capability matrix, FAQ, CLI JSON example), `CHANGELOG.md` covering PRs 1–11, a `SECURITY.md` Windows section, and a tag-triggered release workflow that builds and code-signs the MSIX + Inno installer artefacts. |
 
 ## CLI compatibility

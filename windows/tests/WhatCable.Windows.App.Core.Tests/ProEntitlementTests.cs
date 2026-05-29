@@ -6,21 +6,21 @@ namespace WhatCable.Windows.App.Core.Tests;
 public sealed class ProEntitlementTests
 {
     [Fact]
-    public void IsUnlocked_NullSettings_ReturnsFalse()
+    public void IsUnlocked_NullSettings_ReturnsTrue()
     {
-        Assert.False(ProEntitlement.IsUnlocked(null));
+        Assert.True(ProEntitlement.IsUnlocked(null));
     }
 
     [Fact]
-    public void IsUnlocked_NoKey_ReturnsFalse()
+    public void IsUnlocked_NoKey_ReturnsTrue()
     {
-        Assert.False(ProEntitlement.IsUnlocked(new AppSettings()));
+        Assert.True(ProEntitlement.IsUnlocked(new AppSettings()));
     }
 
     [Fact]
-    public void IsUnlocked_MalformedKey_ReturnsFalse()
+    public void IsUnlocked_MalformedKey_ReturnsTrue()
     {
-        Assert.False(ProEntitlement.IsUnlocked(new AppSettings { ProLicenseKey = "not-a-key" }));
+        Assert.True(ProEntitlement.IsUnlocked(new AppSettings { ProLicenseKey = "not-a-key" }));
     }
 
     [Fact]
