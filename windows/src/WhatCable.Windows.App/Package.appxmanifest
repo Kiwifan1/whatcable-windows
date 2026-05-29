@@ -8,13 +8,13 @@
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
   IgnorableNamespaces="uap uap3 desktop com rescap">
 
-  <Identity Name="uk.whatcable.WhatCable"
-            Publisher="CN=WhatCable"
+  <Identity Name="Kiwifan1.WhatCable"
+            Publisher="CN=Kiwifan1 Testing"
             Version="0.0.1.0" />
 
   <Properties>
     <DisplayName>WhatCable</DisplayName>
-    <PublisherDisplayName>WhatCable</PublisherDisplayName>
+    <PublisherDisplayName>Kiwifan1 Testing</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 

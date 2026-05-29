@@ -10,6 +10,7 @@ dist-mas/
 # Windows port (windows/) — .NET / WinUI 3 build artefacts
 windows/**/bin/
 windows/**/obj/
+windows/**/installer
 windows/**/AppPackages/
 windows/**/BundleArtifacts/
 windows/**/GeneratedArtifacts/

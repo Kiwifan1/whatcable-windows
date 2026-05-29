@@ -1,0 +1,2 @@
+# Self-signed dev PFX — do not commit
+*.pfx
