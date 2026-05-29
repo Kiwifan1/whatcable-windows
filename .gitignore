@@ -21,6 +21,8 @@ windows/**/TestResults/
 windows/**/Generated Files/
 .env
 .claude/
+.vs/
+.vscode/
 
 # App Store provisioning profile and any other local-only signing material.
 secrets/
