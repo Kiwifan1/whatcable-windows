@@ -1,0 +1,205 @@
+name: windows-release
+
+# Builds the Windows port release artefacts — a code-signed MSIX package and a
+# code-signed Inno Setup installer — and attaches them to a GitHub Release on tag push.
+#
+# Tag convention: windows-v1.2.3 (kept separate from the macOS app's vX.Y.Z tags so
+# the two release pipelines don't collide).
+#
+# Code signing is applied only when the signing secrets are present, so forks and dry
+# runs still produce (unsigned) artefacts:
+#   WINDOWS_CERT_PFX_BASE64  base64-encoded code-signing certificate (.pfx)
+#   WINDOWS_CERT_PASSWORD    password for the .pfx
+
+on:
+  push:
+    tags:
+      - 'windows-v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version (e.g. 1.2.3) for manual builds'
+        required: false
+        default: '0.0.0'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build & sign Windows artefacts
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: windows
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve version
+        id: version
+        shell: pwsh
+        run: |
+          $ref = "${{ github.ref_name }}"
+          if ($ref -like 'windows-v*') {
+            $v = $ref -replace '^windows-v', ''
+          } else {
+            $v = "${{ github.event.inputs.version }}"
+          }
+          if ([string]::IsNullOrWhiteSpace($v)) { $v = '0.0.0' }
+          if ($v -notmatch '^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<patch>0|[1-9]\d*)$') {
+            throw "Unsupported version '$v'. Use a numeric major.minor.patch value such as 1.2.3."
+          }
+          $major = [long]$Matches.major
+          $minor = [long]$Matches.minor
+          $patch = [long]$Matches.patch
+          foreach ($component in @(
+            @{ Name = 'major'; Value = $major },
+            @{ Name = 'minor'; Value = $minor },
+            @{ Name = 'patch'; Value = $patch }
+          )) {
+            if ($component.Value -gt 65535) {
+              throw "Unsupported version '$v'. The $($component.Name) component must be between 0 and 65535 for MSIX packaging."
+            }
+          }
+          $normalizedVersion = "$major.$minor.$patch"
+          "version=$normalizedVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "msixVersion=$major.$minor.$patch.0" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          Write-Host "Building version $normalizedVersion"
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Restore
+        run: dotnet restore WhatCable.sln
+
+      - name: Publish app (self-contained, x64)
+        run: >
+          dotnet publish src/WhatCable.Windows.App/WhatCable.Windows.App.csproj
+          -c Release -r win-x64 --self-contained
+          -p:Platform=x64
+          -p:WindowsPackageType=None
+          -p:WindowsAppSDKSelfContained=true
+          -p:EnableVendorGpuAdapters=true
+          -o publish/win-x64
+
+      - name: Publish CLI (self-contained, x64)
+        run: >
+          dotnet publish src/WhatCable.Cli/WhatCable.Cli.csproj
+          -c Release -r win-x64 --self-contained
+          -p:Platform=x64
+          -o publish/win-x64
+
+      - name: Decode signing certificate
+        id: cert
+        shell: pwsh
+        env:
+          PFX_BASE64: ${{ secrets.WINDOWS_CERT_PFX_BASE64 }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:PFX_BASE64)) {
+            Write-Host "::warning::No signing certificate configured; artefacts will be unsigned."
+            "hasCert=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          } else {
+            $pfxPath = Join-Path $env:RUNNER_TEMP 'whatcable-codesign.pfx'
+            [IO.File]::WriteAllBytes($pfxPath, [Convert]::FromBase64String($env:PFX_BASE64))
+            "hasCert=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+            "pfxPath=$pfxPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          }
+
+      - name: Locate signtool & makeappx
+        id: sdk
+        shell: pwsh
+        run: |
+          $sdk = Get-ChildItem 'C:\Program Files (x86)\Windows Kits\10\bin' -Directory |
+            Where-Object { Test-Path (Join-Path $_.FullName 'x64\signtool.exe') } |
+            Sort-Object Name -Descending | Select-Object -First 1
+          if (-not $sdk) { throw "Could not locate the Windows SDK bin directory." }
+          "signtool=$($sdk.FullName)\x64\signtool.exe" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "makeappx=$($sdk.FullName)\x64\makeappx.exe" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - name: Sign published binaries
+        if: steps.cert.outputs.hasCert == 'true'
+        shell: pwsh
+        run: |
+          $bins = Get-ChildItem publish/win-x64 -Recurse -Include WhatCable.exe, whatcable-cli.exe
+          & "${{ steps.sdk.outputs.signtool }}" sign /fd SHA256 `
+            /f "${{ steps.cert.outputs.pfxPath }}" /p "${{ secrets.WINDOWS_CERT_PASSWORD }}" `
+            /tr https://timestamp.digicert.com /td SHA256 $bins.FullName
+
+      - name: Build MSIX package
+        id: msix
+        shell: pwsh
+        run: |
+          $stage = "publish/msix-x64"
+          New-Item -ItemType Directory -Path $stage -Force | Out-Null
+          Copy-Item "publish/win-x64/*" $stage -Recurse -Force
+          # makeappx expects the manifest at the package root as AppxManifest.xml.
+          $manifest = "$stage/AppxManifest.xml"
+          Copy-Item src/WhatCable.Windows.App/Package.appxmanifest $manifest -Force
+          (Get-Content $manifest) `
+            -replace 'Version="[0-9.]+"', 'Version="${{ steps.version.outputs.msixVersion }}"' |
+            Set-Content $manifest
+          $out = "publish/WhatCable-${{ steps.version.outputs.version }}.msix"
+          & "${{ steps.sdk.outputs.makeappx }}" pack /o /d $stage /p $out
+          if ($LASTEXITCODE -ne 0) { throw "makeappx pack failed ($LASTEXITCODE)" }
+          "path=$out" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - name: Sign MSIX package
+        if: steps.cert.outputs.hasCert == 'true'
+        shell: pwsh
+        run: |
+          & "${{ steps.sdk.outputs.signtool }}" sign /fd SHA256 `
+            /f "${{ steps.cert.outputs.pfxPath }}" /p "${{ secrets.WINDOWS_CERT_PASSWORD }}" `
+            /tr https://timestamp.digicert.com /td SHA256 "${{ steps.msix.outputs.path }}"
+
+      - name: Build Inno Setup installer
+        id: inno
+        shell: pwsh
+        run: |
+          choco install innosetup --no-progress -y
+          $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          & $iscc installer/WhatCable.iss `
+            /DSourceDir="publish/win-x64" `
+            /DAppVersion="${{ steps.version.outputs.version }}"
+          if ($LASTEXITCODE -ne 0) { throw "ISCC failed ($LASTEXITCODE)" }
+          $exe = Get-ChildItem . -Recurse -Filter "WhatCable-Setup-*.exe" | Select-Object -First 1
+          if (-not $exe) { throw "Installer exe not found" }
+          "path=$($exe.FullName)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - name: Sign installer
+        if: steps.cert.outputs.hasCert == 'true'
+        shell: pwsh
+        run: |
+          & "${{ steps.sdk.outputs.signtool }}" sign /fd SHA256 `
+            /f "${{ steps.cert.outputs.pfxPath }}" /p "${{ secrets.WINDOWS_CERT_PASSWORD }}" `
+            /tr https://timestamp.digicert.com /td SHA256 "${{ steps.inno.outputs.path }}"
+
+      - name: Upload build artefacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-release-${{ steps.version.outputs.version }}
+          path: |
+            windows/${{ steps.msix.outputs.path }}
+            windows/${{ steps.inno.outputs.path }}
+          if-no-files-found: error
+
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/windows-v')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: WhatCable for Windows ${{ steps.version.outputs.version }}
+          files: |
+            windows/${{ steps.msix.outputs.path }}
+            windows/${{ steps.inno.outputs.path }}
+          body: |
+            WhatCable for Windows ${{ steps.version.outputs.version }}.
+
+            - `WhatCable-${{ steps.version.outputs.version }}.msix` — packaged install (includes the Windows 11 widgets).
+            - `WhatCable-Setup-${{ steps.version.outputs.version }}.exe` — Inno Setup installer (tray app + CLI).
+
+            See the [changelog](https://github.com/darrylmorley/whatcable/blob/main/CHANGELOG.md) for what's in this release.
