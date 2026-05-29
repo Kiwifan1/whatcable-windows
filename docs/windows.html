@@ -473,8 +473,9 @@
   Prefer a packaged install? Download <code>WhatCable-&lt;version&gt;.msix</code>, double-click
   it, and confirm in the App Installer dialog. The MSIX is required for the Windows 11
   widgets, because they're registered through the package manifest. The package is
-  code-signed; on a machine that doesn't yet trust the certificate, install the bundled
-  <code>.cer</code> into <strong>Local Machine → Trusted People</strong> first.
+  code-signed; on a machine that doesn't yet trust the certificate, export the signing
+  certificate as a Base-64 X.509 <code>.cer</code> from the package's digital-signature
+  details and install it into <strong>Local Machine → Trusted People</strong> first.
 </p>
 
 <h2>What works on your hardware</h2>

@@ -42,13 +42,13 @@ To uninstall, use **Settings → Apps** (or **Add or remove programs**) and remo
 
 ### MSIX package
 
-Download `WhatCable-<version>.msix` if you prefer a packaged install (it carries the Windows 11 widget registration). Double-click it and confirm in the App Installer dialog. The MSIX is code-signed; on a machine that doesn't yet trust the signing certificate you may need to install the bundled `.cer` into **Local Machine → Trusted People** first.
+Download `WhatCable-<version>.msix` if you prefer a packaged install (it carries the Windows 11 widget registration). Double-click it and confirm in the App Installer dialog. The MSIX is code-signed; on a machine that doesn't yet trust the signing certificate, export the signing certificate as a Base-64 X.509 `.cer` from the package's digital-signature details and install it into **Local Machine → Trusted People** first.
 
 > Widgets are a Windows 11 22H2+ feature and are only registered by the MSIX install. The unpackaged installer build provides the tray app and CLI but not the widget provider.
 
 ### CLI only
 
-The CLI (`whatcable-cli.exe`) is bundled with both installs. After installing, it lives next to the app under `Program Files\WhatCable\` (installer) or in the package install folder (MSIX). Add that folder to your `PATH`, or copy `whatcable-cli.exe` somewhere already on your `PATH`, to call it from any terminal.
+The CLI (`whatcable-cli.exe`) is bundled with both installs. With the installer, it lives next to the app under `Program Files\WhatCable\`; add that folder to your `PATH` (or copy `whatcable-cli.exe` somewhere already on your `PATH`) to call it from any terminal. The MSIX package does not currently declare an App Execution Alias, so if you want to invoke the CLI directly from a terminal, use the installer build.
 
 ### Requirements
 
@@ -69,11 +69,7 @@ Click the tray icon to open the popover. Each USB-C port is a row; click it to e
 
 ### Pro
 
-Pro adds pin diagrams (UCSI), a liquid-detection indicator (UCSI 2.0), and a system-wide live Power Monitor graph. Unlock it with an offline key in the format `WCPRO-XXXXX-XXXXX-XXXXX` under **Settings → Pro**, or from the CLI:
-
-```powershell
-whatcable-cli --activate WCPRO-XXXXX-XXXXX-XXXXX
-```
+Pro adds pin diagrams (UCSI), a liquid-detection indicator (UCSI 2.0), and a system-wide live Power Monitor graph. Unlock it with an offline key in the format `WCPRO-XXXXX-XXXXX-XXXXX` under **Settings → Pro**.
 
 Each Pro feature reports an `unavailable_reason` when the hardware can't supply the data, rather than failing silently.
 

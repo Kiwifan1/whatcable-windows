@@ -47,9 +47,25 @@ jobs:
             $v = "${{ github.event.inputs.version }}"
           }
           if ([string]::IsNullOrWhiteSpace($v)) { $v = '0.0.0' }
-          "version=$v" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-          "msixVersion=$v.0" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-          Write-Host "Building version $v"
+          if ($v -notmatch '^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<patch>0|[1-9]\d*)$') {
+            throw "Unsupported version '$v'. Use a numeric major.minor.patch value such as 1.2.3."
+          }
+          $major = [long]$Matches.major
+          $minor = [long]$Matches.minor
+          $patch = [long]$Matches.patch
+          foreach ($component in @(
+            @{ Name = 'major'; Value = $major },
+            @{ Name = 'minor'; Value = $minor },
+            @{ Name = 'patch'; Value = $patch }
+          )) {
+            if ($component.Value -gt 65535) {
+              throw "Unsupported version '$v'. The $($component.Name) component must be between 0 and 65535 for MSIX packaging."
+            }
+          }
+          $normalizedVersion = "$major.$minor.$patch"
+          "version=$normalizedVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "msixVersion=$major.$minor.$patch.0" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          Write-Host "Building version $normalizedVersion"
 
       - name: Setup .NET 8
         uses: actions/setup-dotnet@v4
@@ -113,14 +129,15 @@ jobs:
           $bins = Get-ChildItem publish/win-x64 -Recurse -Include WhatCable.exe, whatcable-cli.exe
           & "${{ steps.sdk.outputs.signtool }}" sign /fd SHA256 `
             /f "${{ steps.cert.outputs.pfxPath }}" /p "${{ secrets.WINDOWS_CERT_PASSWORD }}" `
-            /tr http://timestamp.digicert.com /td SHA256 $bins.FullName
+            /tr https://timestamp.digicert.com /td SHA256 $bins.FullName
 
       - name: Build MSIX package
         id: msix
         shell: pwsh
         run: |
           $stage = "publish/msix-x64"
-          Copy-Item publish/win-x64 $stage -Recurse -Force
+          New-Item -ItemType Directory -Path $stage -Force | Out-Null
+          Copy-Item "publish/win-x64/*" $stage -Recurse -Force
           # makeappx expects the manifest at the package root as AppxManifest.xml.
           $manifest = "$stage/AppxManifest.xml"
           Copy-Item src/WhatCable.Windows.App/Package.appxmanifest $manifest -Force
@@ -138,7 +155,7 @@ jobs:
         run: |
           & "${{ steps.sdk.outputs.signtool }}" sign /fd SHA256 `
             /f "${{ steps.cert.outputs.pfxPath }}" /p "${{ secrets.WINDOWS_CERT_PASSWORD }}" `
-            /tr http://timestamp.digicert.com /td SHA256 "${{ steps.msix.outputs.path }}"
+            /tr https://timestamp.digicert.com /td SHA256 "${{ steps.msix.outputs.path }}"
 
       - name: Build Inno Setup installer
         id: inno
@@ -160,7 +177,7 @@ jobs:
         run: |
           & "${{ steps.sdk.outputs.signtool }}" sign /fd SHA256 `
             /f "${{ steps.cert.outputs.pfxPath }}" /p "${{ secrets.WINDOWS_CERT_PASSWORD }}" `
-            /tr http://timestamp.digicert.com /td SHA256 "${{ steps.inno.outputs.path }}"
+            /tr https://timestamp.digicert.com /td SHA256 "${{ steps.inno.outputs.path }}"
 
       - name: Upload build artefacts
         uses: actions/upload-artifact@v4
