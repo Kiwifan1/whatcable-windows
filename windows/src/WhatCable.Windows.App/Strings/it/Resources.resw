@@ -142,4 +142,28 @@
   <data name="Common_Cancel" xml:space="preserve">
     <value>Annulla</value>
   </data>
+  <data name="Notification_LiquidDetectedTitle" xml:space="preserve">
+    <value>Liquido rilevato</value>
+  </data>
+  <data name="Notification_LiquidDetectedBody" xml:space="preserve">
+    <value>Scollega il cavo e asciuga la porta USB-C.</value>
+  </data>
+  <data name="Pro_PinDiagram" xml:space="preserve">
+    <value>Diagramma dei pin</value>
+  </data>
+  <data name="Pro_LiquidDetection" xml:space="preserve">
+    <value>Rilevamento liquidi</value>
+  </data>
+  <data name="Pro_PowerMonitor" xml:space="preserve">
+    <value>Monitoraggio energia</value>
+  </data>
+  <data name="Pro_PowerMonitorPerPortUnavailable" xml:space="preserve">
+    <value>La potenza per singola porta non è disponibile su Windows; il valore è di sistema.</value>
+  </data>
+  <data name="Pro_Upsell" xml:space="preserve">
+    <value>Sblocca con WhatCable Pro</value>
+  </data>
+  <data name="Pro_LiquidDetectionBanner" xml:space="preserve">
+    <value>Liquido rilevato in una porta USB-C. Scollega il cavo e lascialo asciugare.</value>
+  </data>
 </root>

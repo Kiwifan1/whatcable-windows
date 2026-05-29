@@ -142,4 +142,28 @@
   <data name="Common_Cancel" xml:space="preserve">
     <value>Anuluj</value>
   </data>
+  <data name="Notification_LiquidDetectedTitle" xml:space="preserve">
+    <value>Wykryto ciecz</value>
+  </data>
+  <data name="Notification_LiquidDetectedBody" xml:space="preserve">
+    <value>Odłącz kabel i osusz port USB-C.</value>
+  </data>
+  <data name="Pro_PinDiagram" xml:space="preserve">
+    <value>Schemat pinów</value>
+  </data>
+  <data name="Pro_LiquidDetection" xml:space="preserve">
+    <value>Wykrywanie cieczy</value>
+  </data>
+  <data name="Pro_PowerMonitor" xml:space="preserve">
+    <value>Monitor mocy</value>
+  </data>
+  <data name="Pro_PowerMonitorPerPortUnavailable" xml:space="preserve">
+    <value>Moc dla pojedynczego portu jest niedostępna w systemie Windows; wartość dotyczy całego systemu.</value>
+  </data>
+  <data name="Pro_Upsell" xml:space="preserve">
+    <value>Odblokuj z WhatCable Pro</value>
+  </data>
+  <data name="Pro_LiquidDetectionBanner" xml:space="preserve">
+    <value>Wykryto ciecz w porcie USB-C. Odłącz kabel i pozostaw do wyschnięcia.</value>
+  </data>
 </root>

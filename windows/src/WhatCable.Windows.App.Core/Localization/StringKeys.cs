@@ -54,6 +54,16 @@ public static class StringKeys
     public const string NotificationChargerDisconnected = "Notification_ChargerDisconnected";
     public const string NotificationDeviceConnected = "Notification_DeviceConnected";
     public const string NotificationDeviceDisconnected = "Notification_DeviceDisconnected";
+    public const string NotificationLiquidDetectedTitle = "Notification_LiquidDetectedTitle";
+    public const string NotificationLiquidDetectedBody = "Notification_LiquidDetectedBody";
+
+    // Pro features
+    public const string ProPinDiagram = "Pro_PinDiagram";
+    public const string ProLiquidDetection = "Pro_LiquidDetection";
+    public const string ProPowerMonitor = "Pro_PowerMonitor";
+    public const string ProPowerMonitorPerPortUnavailable = "Pro_PowerMonitorPerPortUnavailable";
+    public const string ProUpsell = "Pro_Upsell";
+    public const string LiquidDetectionBanner = "Pro_LiquidDetectionBanner";
 
     // Common
     public const string CommonYes = "Common_Yes";
@@ -76,6 +86,9 @@ public static class StringKeys
         SettingsPrivacy, SettingsDone,
         NotificationChargerConnected, NotificationChargerDisconnected,
         NotificationDeviceConnected, NotificationDeviceDisconnected,
+        NotificationLiquidDetectedTitle, NotificationLiquidDetectedBody,
+        ProPinDiagram, ProLiquidDetection, ProPowerMonitor,
+        ProPowerMonitorPerPortUnavailable, ProUpsell, LiquidDetectionBanner,
         CommonYes, CommonNo, CommonUnknown, CommonCancel,
     };
 }

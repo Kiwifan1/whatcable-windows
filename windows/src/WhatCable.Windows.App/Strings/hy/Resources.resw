@@ -142,4 +142,28 @@
   <data name="Common_Cancel" xml:space="preserve">
     <value>Չեղարկել</value>
   </data>
+  <data name="Notification_LiquidDetectedTitle" xml:space="preserve">
+    <value>Հայտնաբերվել է հեղուկ</value>
+  </data>
+  <data name="Notification_LiquidDetectedBody" xml:space="preserve">
+    <value>Անջատեք մալուխը և չորացրեք USB-C միացքը։</value>
+  </data>
+  <data name="Pro_PinDiagram" xml:space="preserve">
+    <value>Կոնտակտների սխեմա</value>
+  </data>
+  <data name="Pro_LiquidDetection" xml:space="preserve">
+    <value>Հեղուկի հայտնաբերում</value>
+  </data>
+  <data name="Pro_PowerMonitor" xml:space="preserve">
+    <value>Հզորության մոնիտոր</value>
+  </data>
+  <data name="Pro_PowerMonitorPerPortUnavailable" xml:space="preserve">
+    <value>Առանձին միացքի հզորությունը հասանելի չէ Windows-ում. ցուցանիշը ամբողջ համակարգի համար է։</value>
+  </data>
+  <data name="Pro_Upsell" xml:space="preserve">
+    <value>Բացեք WhatCable Pro-ով</value>
+  </data>
+  <data name="Pro_LiquidDetectionBanner" xml:space="preserve">
+    <value>USB-C միացքում հայտնաբերվել է հեղուկ։ Անջատեք մալուխը և թողեք չորանա։</value>
+  </data>
 </root>

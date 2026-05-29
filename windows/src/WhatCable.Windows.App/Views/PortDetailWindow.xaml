@@ -16,6 +16,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <!-- Header -->
@@ -127,6 +128,31 @@
                     Text="{Binding Cable.Speed}"
                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                     Style="{ThemeResource CaptionTextBlockStyle}" />
+            </StackPanel>
+
+            <!-- Pin diagram (Pro, UCSI) -->
+            <StackPanel Grid.Row="6" Spacing="6">
+                <TextBlock
+                    x:Name="PinDiagramHeader"
+                    Style="{ThemeResource BodyStrongTextBlockStyle}"
+                    Visibility="{Binding SupportsPinDiagram, Converter={StaticResource BoolToVisibility}}" />
+                <Image
+                    x:Name="PinDiagramImage"
+                    MaxWidth="320"
+                    HorizontalAlignment="Left"
+                    Stretch="Uniform"
+                    Visibility="{Binding ShowPinDiagram, Converter={StaticResource BoolToVisibility}}" />
+                <TextBlock
+                    Text="{Binding PinDiagram.SignalSummary}"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    Style="{ThemeResource CaptionTextBlockStyle}"
+                    TextWrapping="Wrap"
+                    Visibility="{Binding ShowPinDiagram, Converter={StaticResource BoolToVisibility}}" />
+                <InfoBar
+                    x:Name="PinDiagramUpsellBar"
+                    IsClosable="False"
+                    IsOpen="{Binding ShowPinDiagramUpsell}"
+                    Severity="Informational" />
             </StackPanel>
         </Grid>
     </ScrollViewer>

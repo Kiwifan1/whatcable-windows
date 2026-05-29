@@ -19,7 +19,9 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
@@ -34,8 +36,16 @@
                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                 Style="{ThemeResource CaptionTextBlockStyle}" />
 
-            <ListView
+            <!-- Liquid detection banner (Pro, UCSI 2.0) -->
+            <InfoBar
                 Grid.Row="2"
+                IsClosable="False"
+                IsOpen="{Binding IsLiquidDetected}"
+                Message="{Binding LiquidDetectionBanner}"
+                Severity="Error" />
+
+            <ListView
+                Grid.Row="3"
                 MaxHeight="320"
                 IsItemClickEnabled="True"
                 ItemClick="OnPortClicked"
@@ -66,8 +76,33 @@
                 </ListView.ItemTemplate>
             </ListView>
 
+            <!-- Power Monitor (Pro): system-wide watts -->
+            <StackPanel Grid.Row="4" Spacing="2">
+                <Grid Visibility="{Binding PowerMonitor.HasData, Converter={StaticResource BoolToVisibility}}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        x:Name="PowerMonitorLabel"
+                        Grid.Column="0"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        Style="{ThemeResource CaptionTextBlockStyle}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Text="{Binding PowerMonitor.CurrentWattsText}"
+                        Style="{ThemeResource BodyStrongTextBlockStyle}" />
+                </Grid>
+                <TextBlock
+                    x:Name="PowerMonitorUpsell"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    Style="{ThemeResource CaptionTextBlockStyle}"
+                    TextWrapping="Wrap"
+                    Visibility="{Binding PowerMonitor.ShowUpsell, Converter={StaticResource BoolToVisibility}}" />
+            </StackPanel>
+
             <StackPanel
-                Grid.Row="3"
+                Grid.Row="5"
                 HorizontalAlignment="Right"
                 Orientation="Horizontal"
                 Spacing="8">

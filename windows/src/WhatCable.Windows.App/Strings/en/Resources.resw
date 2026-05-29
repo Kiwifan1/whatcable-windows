@@ -142,4 +142,28 @@
   <data name="Common_Cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
+  <data name="Notification_LiquidDetectedTitle" xml:space="preserve">
+    <value>Liquid detected</value>
+  </data>
+  <data name="Notification_LiquidDetectedBody" xml:space="preserve">
+    <value>Disconnect the cable and dry the USB-C port.</value>
+  </data>
+  <data name="Pro_PinDiagram" xml:space="preserve">
+    <value>Pin diagram</value>
+  </data>
+  <data name="Pro_LiquidDetection" xml:space="preserve">
+    <value>Liquid detection</value>
+  </data>
+  <data name="Pro_PowerMonitor" xml:space="preserve">
+    <value>Power Monitor</value>
+  </data>
+  <data name="Pro_PowerMonitorPerPortUnavailable" xml:space="preserve">
+    <value>Per-port power isn't available on Windows; the figure is system-wide.</value>
+  </data>
+  <data name="Pro_Upsell" xml:space="preserve">
+    <value>Unlock with WhatCable Pro</value>
+  </data>
+  <data name="Pro_LiquidDetectionBanner" xml:space="preserve">
+    <value>Liquid detected in a USB-C port. Disconnect the cable and let it dry.</value>
+  </data>
 </root>
