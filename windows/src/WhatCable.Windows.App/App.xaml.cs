@@ -1,8 +1,6 @@
 using CommunityToolkit.Mvvm.Input;
 using H.NotifyIcon;
-using Microsoft.UI;
 using Microsoft.UI.Dispatching;
-using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.Windows.AppNotifications;
@@ -13,7 +11,6 @@ using WhatCable.Windows.App.Core.ViewModels;
 using WhatCable.Windows.App.Services;
 using WhatCable.Windows.App.Views;
 using WhatCable.Windows.Backend;
-using WinRT.Interop;
 
 namespace WhatCable.Windows.App;
 
